@@ -1,0 +1,61 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.x
+*.exe
+*.out
+*.app
+
+# Data files
+*.dat
+*.txt
+*.csv
+*.npy
+
+
+# Misc. files
+*.pro
+*.pro.user
+*.swp
+
+# Folders
+old*
+__pycache__
+homework
+results
+data
+figures
+Litterature
+
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.tif
