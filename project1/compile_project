@@ -10,7 +10,7 @@ cd build
 cmake ../
 
 # Make the Makefile using two threads
-make -j2
+make -j
 
 # Move the executable to the top-directory
 mv vmc.x ..
