@@ -4,7 +4,13 @@
 
 
 int main() {
-    std::cout << "hello\n4*2 = " << hey(4) << endl;
+    std::cout << "helle\n4*2 = " << hey(4) << endl;
     return 0;
-    
+
+}
+
+
+
+double test_simen() {
+    return 9000;
 }
