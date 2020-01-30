@@ -35,6 +35,7 @@
 # Data files
 *.dat
 *.txt
+!CMakeLists.txt
 *.csv
 *.npy
 
