@@ -11,6 +11,6 @@ int main() {
 
 
 
-double test_simen() {
-    return 9000;
+void test_alex(){
+    a = 1 + 2
 }
