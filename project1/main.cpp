@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Hamiltonians/hamiltonian.h"
 
-
+using namespace std;
 
 int main() {
     std::cout << "helle\n4*2 = " << hey(4) << endl;
@@ -25,3 +25,6 @@ long brach_alex_test(){
 void branch_test_2(){
     return "Hello, master branch!"
 }
+
+
+cout << "hello from branch test3!"
