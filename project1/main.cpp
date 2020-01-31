@@ -20,3 +20,8 @@ void test_alex(){
 long brach_alex_test(){
     return 42
 }
+
+
+void branch_test_2(){
+    return "Hello, master branch!"
+}
