@@ -1,6 +1,6 @@
 #include "hamiltonian.h"
 
 
-int hey(int a) {
-    return a*2;
+int example_function(int a) {
+    return a;
 }
