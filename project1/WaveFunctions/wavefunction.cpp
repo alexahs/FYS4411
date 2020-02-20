@@ -1,4 +1,4 @@
-#include "WaveFunction.h"
+#include "wavefunction.h"
 
 
 
@@ -10,10 +10,10 @@
 
 double WaveFunction::evaluate(std::vector<class Particle*> particles)
 {
-    return 1.0
+    return 1.0;
 }
 
-double WaveFunction::computeDoubleDerivative(std:vector<class Particle*> particles)
+double WaveFunction::computeDoubleDerivative(std::vector<class Particle*> particles)
 {
-    return 1.0
+    return 1.0;
 }
