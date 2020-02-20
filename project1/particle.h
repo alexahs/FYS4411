@@ -10,13 +10,12 @@ public:
     void setPosition(const std::vector<double> &position);
     void adjustPosition(double change, int dimension);
     void setNumberOfDimensions(int m_numberOfDimensions);
-    std::vector<double> getPosition() {return m_position};
+    std::vector<double> getPosition() {return m_position;}
 
 private:
     int m_numberOfDimensions = 0;
-    std:vector<double> m_position = std::vector<double>();
-}
-
+    std::vector<double> m_position = std::vector<double>();
+};
 
 
 #endif //PARTICLE_H

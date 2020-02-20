@@ -1,7 +1,10 @@
-#include <iostream>
 #include "Hamiltonians/hamiltonian.h"
 #include "random.h"
 #include "simple_vmc/harmonic_osc_1d.h"
+#include "WaveFunctions/wavefunction.h"
+#include "particle.h"
+
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 
