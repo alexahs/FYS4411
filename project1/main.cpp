@@ -11,12 +11,6 @@ int main() {
 
 
 
-    int n_cycles = 100000;
-
-
-    run(n_cycles);
-
-
 
     return 0;
 }
