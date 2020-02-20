@@ -4,12 +4,14 @@ project(project_1_fys4411)
 include_directories(
     .
     Hamiltonians
+    simple_vmc
 )
 
 # Add sources from all directories
 file(
     GLOB SOURCES "*.cpp"
     GLOB SOURCES "Hamiltonians/*.cpp"
+    GLOB SOURCES "simple_vmc/*.cpp"
 )
 
 

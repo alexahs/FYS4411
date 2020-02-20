@@ -1,11 +1,42 @@
-#include "hamiltonian.h"
+// #include "hamiltonian.h"
 #include "random.h"
+#include "harmonic_osc_1d.h"
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
 using namespace std;
+
+
+void run(int n_cycles){
+        int n_alphas = 20;
+        // int n_cycles = 100000;
+        double *alphas = new double[n_alphas];
+        double *energies = new double[n_alphas];
+        double *variances = new double[n_alphas];
+
+        double alpha = 0.4;
+
+        for(int i = 0; i < n_alphas; i++){
+            alphas[i] = alpha;
+            alpha += 0.05;
+        }
+
+        monte_carlo_sampling(alphas, n_alphas, energies, variances, n_cycles);
+
+
+        cout << setw(15) << "alpha";
+        cout << setw(15) << "energy";
+        cout << setw(15) << "variance" << endl;
+
+        for(int i = 0; i < n_alphas; i++){
+            cout << setw(15) << setprecision(8) << alphas[i];
+            cout << setw(15) << setprecision(8) << energies[i];
+            cout << setw(15) << setprecision(8) << variances[i] << endl;
+        }
+
+}
 
 
 double wave_function(double r, double alpha){

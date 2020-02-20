@@ -1,7 +1,9 @@
-#ifndef BRUTE_FORCE_VMC_H
-#define BRUTE_FORCE_VMC_H
+#ifndef HARMONIC_OSC_1D_H
+#define HARMONIC_OSC_1D_H
 
 #include <cmath>
+
+void run(int n_cycles);
 
 double wave_function(double r, double alpha);
 
@@ -14,4 +16,4 @@ void monte_carlo_sampling(double *alphas,
                             int n_cycles);
 
 
-#endif //BRUTE_FORCE_VMC_H
+#endif //HARMONIC_OSC_1D_H
