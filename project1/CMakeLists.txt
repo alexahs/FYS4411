@@ -5,6 +5,7 @@ include_directories(
     .
     Hamiltonians
     simple_vmc
+    WaveFunctions
 )
 
 # Add sources from all directories
@@ -12,6 +13,7 @@ file(
     GLOB SOURCES "*.cpp"
     GLOB SOURCES "Hamiltonians/*.cpp"
     GLOB SOURCES "simple_vmc/*.cpp"
+    GLOB SOURCES "WaveFunctions/*.cpp"
 )
 
 
