@@ -1,6 +1,7 @@
 #include "hamiltonian.h"
 
 
-int example_function(int a) {
-    return a;
-}
+// Hamiltonian::Hamiltonian(System* system)
+// {
+//     m_system = system;
+// }

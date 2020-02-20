@@ -18,7 +18,6 @@ public:
     virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
 
 protected:
-    int m_numberOfParticles = 0;
     int m_numberOfParameters = 1;
     std::vector<double> m_parameters = std::vector<double>();
     // class System* m_system = nullptr;
