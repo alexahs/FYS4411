@@ -3,11 +3,12 @@
 
 #include <vector>
 #include "hamiltonian.h"
+// #include "../particle.h"
 
 class HarmonicOscillator : public Hamiltonian
 {
 public:
-    HarmonicOscillator(double omega);
+    HarmonicOscillator(System* system, double omega);
     double computeLocalEnergy(std::vector<Particle*> particles);
 
 private:
