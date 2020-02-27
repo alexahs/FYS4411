@@ -1,9 +1,6 @@
 #include "wavefunction.h"
 
 
-
-
-WaveFunction::WaveFunction(class System* system)
-{
+WaveFunction::WaveFunction(System* system) {
     m_system = system;
 }

@@ -60,3 +60,6 @@ build
 *.jpg
 *.jpeg
 *.tif
+
+# Our executable
+vmc

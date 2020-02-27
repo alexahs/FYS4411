@@ -1,10 +1,7 @@
-#ifndef SYSTEM_H
-#define SYSTEM_H
-
+#pragma once
 #include <vector>
 
-class System
-{
+class System {
 public:
     bool metropolisStep             ();
     void runMetropolisSteps         (int numberOfMetropolisSteps);
@@ -15,19 +12,14 @@ public:
     void setHamiltonian             (class Hamiltonian* hamiltonian);
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
-
-    class WaveFunction*
-        getWaveFunction()           {return m_waveFunction;}
-    class Hamiltonian*
-        getHamiltonian()            {return m_hamiltonian;}
-    class Sampler*
-        getSampler()                {return m_sampler;}
-    std::vector<class Particle*>
-        getParticles()              {return m_particles;}
-    int getNumberOfParticles()      {return m_numberOfParticles;}
-    int getNumberOfDimensions()     {return m_numberOfDimensions;}
-    int getNumberOfMetropolisSteps(){return m_numberOfMetropolisSteps;}
-    double getEquilibrationFraction(){return m_equilibrationFraction;}
+    class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
+    class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
+    class Sampler*                  getSampler()        { return m_sampler; }
+    std::vector<class Particle*>    getParticles()      { return m_particles; }
+    int getNumberOfParticles()          { return m_numberOfParticles; }
+    int getNumberOfDimensions()         { return m_numberOfDimensions; }
+    int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
+    double getEquilibrationFraction()   { return m_equilibrationFraction; }
 
 private:
     int                             m_numberOfParticles = 0;
@@ -41,6 +33,3 @@ private:
     class Sampler*                  m_sampler = nullptr;
     std::vector<class Particle*>    m_particles = std::vector<class Particle*>();
 };
-
-
-#endif // SYSTEM_H

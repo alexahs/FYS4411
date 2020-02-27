@@ -11,28 +11,31 @@ using std::cout;
 using std::endl;
 
 
-Sampler::Sampler(System* system)
-{
+Sampler::Sampler(System* system) {
     m_system = system;
     m_stepNumber = 0;
 }
 
-void Sampler::sample(bool acceptedStep)
-{
+void Sampler::setNumberOfMetropolisSteps(int steps) {
+    m_numberOfMetropolisSteps = steps;
+}
+
+void Sampler::sample(bool acceptedStep) {
     // Make sure the sampling variable(s) are initialized at the first step.
-    if (m_stepNumber == 0) {m_cumulativeEnergy = 0;}
+    if (m_stepNumber == 0) {
+        m_cumulativeEnergy = 0;
+    }
 
     /* Here you should sample all the interesting things you want to measure.
      * Note that there are (way) more than the single one here currently.
      */
-    double localEnergy = m_system->getHamiltonian()
-                         -> computeLocalEnergy(m_system->getParticles());
-    m_cumulativeEnergy += localEnergy;
+    double localEnergy = m_system->getHamiltonian()->
+                         computeLocalEnergy(m_system->getParticles());
+    m_cumulativeEnergy  += localEnergy;
     m_stepNumber++;
 }
 
-void Sampler::printOutputToTerminal()
-{
+void Sampler::printOutputToTerminal() {
     int     np = m_system->getNumberOfParticles();
     int     nd = m_system->getNumberOfDimensions();
     int     ms = m_system->getNumberOfMetropolisSteps();
@@ -58,8 +61,7 @@ void Sampler::printOutputToTerminal()
     cout << endl;
 }
 
-void Sampler::computeAverages()
-{
+void Sampler::computeAverages() {
     /* Compute the averages of the sampled quantities. You need to think
      * thoroughly through what is written here currently; is this correct?
      */

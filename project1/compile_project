@@ -13,4 +13,4 @@ cmake ../
 make -j
 
 # Move the executable to the top-directory
-mv vmc.x ..
+mv vmc ..

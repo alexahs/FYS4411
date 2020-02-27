@@ -1,12 +1,8 @@
-#ifndef HARMONICOSCILLATOR_H
-#define HARMONICOSCILLATOR_H
-
-#include <vector>
+#pragma once
 #include "hamiltonian.h"
-// #include "../particle.h"
+#include <vector>
 
-class HarmonicOscillator : public Hamiltonian
-{
+class HarmonicOscillator : public Hamiltonian {
 public:
     HarmonicOscillator(System* system, double omega);
     double computeLocalEnergy(std::vector<Particle*> particles);
@@ -14,7 +10,3 @@ public:
 private:
     double m_omega = 0;
 };
-
-
-
-#endif // HARMONICOSCILLATOR_H

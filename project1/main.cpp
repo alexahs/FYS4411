@@ -1,24 +1,21 @@
+#include <iostream>
+#include "system.h"
+#include "particle.h"
+#include "WaveFunctions/wavefunction.h"
+#include "WaveFunctions/simplegaussian.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "Hamiltonians/harmonicoscillator.h"
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
 #include "Math/random.h"
-// #include "simple_vmc/harmonic_osc_1d.h"
-#include "WaveFunctions/simplegaussian.h"
-#include "WaveFunctions/wavefunction.h"
-#include "particle.h"
-#include "system.h"
-#include "sampler.h"
-#include <iostream>
-#include <fstream>
-#include <iomanip>
 
 using namespace std;
+
 
 int main() {
     int numberOfDimensions  = 1;
     int numberOfParticles   = 1;
-    int numberOfSteps       = (int) 10;
+    int numberOfSteps       = (int) 1e6;
     double omega            = 1.0;          // Oscillator frequency.
     double alpha            = 0.5;          // Variational parameter.
     double stepLength       = 0.1;          // Metropolis step length.

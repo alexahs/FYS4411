@@ -1,15 +1,13 @@
-#ifndef SAMPLER_H
-#define SAMPLER_H
+#pragma once
 
-class Sampler
-{
+class Sampler {
 public:
     Sampler(class System* system);
     void setNumberOfMetropolisSteps(int steps);
     void sample(bool acceptedStep);
     void printOutputToTerminal();
     void computeAverages();
-    double getEnergy() {return m_energy;}
+    double getEnergy()          { return m_energy; }
 
 private:
     int     m_numberOfMetropolisSteps = 0;
@@ -18,6 +16,3 @@ private:
     double  m_cumulativeEnergy = 0;
     class System* m_system = nullptr;
 };
-
-
-#endif // SAMPLER_H

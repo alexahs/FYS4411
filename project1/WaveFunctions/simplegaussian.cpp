@@ -1,13 +1,15 @@
 #include "simplegaussian.h"
-#include "wavefunction.h"
-#include "../particle.h"
-#include "../system.h"
 #include <cmath>
 #include <cassert>
+<<<<<<< HEAD
+=======
+#include "wavefunction.h"
+#include "../system.h"
+#include "../particle.h"
+>>>>>>> 40c8220fb37c7d7c850a1babb27cf0438dbdc38f
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
-    WaveFunction(system)
-{
+        WaveFunction(system) {
     assert(alpha >= 0);
     m_numberOfParameters = 1;
     m_parameters.reserve(1);
