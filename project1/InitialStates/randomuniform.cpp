@@ -1,7 +1,7 @@
 #include "randomuniform.h"
 #include <iostream>
 #include <cassert>
-#include "random.h"
+#include "Math/random.h"
 #include "../particle.h"
 #include "../system.h"
 

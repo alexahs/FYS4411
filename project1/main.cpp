@@ -1,5 +1,5 @@
 #include "Hamiltonians/hamiltonian.h"
-#include "random.h"
+#include "Math/random.h"
 #include "simple_vmc/harmonic_osc_1d.h"
 #include "WaveFunctions/wavefunction.h"
 #include "particle.h"
@@ -15,7 +15,7 @@ using namespace std;
 
 int main() {
 
-
+    run(10);
 
 
     return 0;

@@ -1,5 +1,5 @@
 // #include "hamiltonian.h"
-#include "random.h"
+#include "../Math/random.h"
 #include "harmonic_osc_1d.h"
 #include <cmath>
 #include <iostream>
@@ -69,9 +69,8 @@ void monte_carlo_sampling(double *alphas,
         // alpha += alpha_step;
         double energy = 0;
         double energy2 = 0;
-
+        
         // cout << "alpha= " << alphas[a] << endl;
-
 
         position_old += step_size*(Random::nextDouble() - 0.5);
         double wf_old = wave_function(position_old, alphas[a]);
@@ -79,8 +78,6 @@ void monte_carlo_sampling(double *alphas,
 
         for(int cycle = 0; cycle < n_cycles; cycle++){
             position_new = position_old + step_size*(Random::nextDouble() - 0.5);
-
-            // cout << position_new << endl;
 
             double wf_new = wave_function(position_new, alphas[a]);
             if (Random::nextDouble() <= wf_new*wf_new / wf_old*wf_old){
