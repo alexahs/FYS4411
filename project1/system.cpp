@@ -1,12 +1,11 @@
 #include "system.h"
+#include <cassert>
+#include "sampler.h"
 #include "particle.h"
 #include "WaveFunctions/wavefunction.h"
 #include "Hamiltonians/hamiltonian.h"
-#include "Math/random.h"
 #include "InitialStates/initialstate.h"
-#include "sampler.h"
-#include <cassert>
-
+#include "Math/random.h"
 
 bool System::metropolisStep() {
     /* Perform the actual Metropolis step: Choose a particle at random and
@@ -18,28 +17,25 @@ bool System::metropolisStep() {
     return false;
 }
 
-void System::runMetropolisSteps(int numberOfMetropolisSteps)
-{   /*
+void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_particles                 = m_initialState->getParticles();
     m_sampler                   = new Sampler(this);
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
 
-    for (int i=0; i < numberOfMetropolisSteps; i++)
-    {
+    for (int i=0; i < numberOfMetropolisSteps; i++) {
         bool acceptedStep = metropolisStep();
 
-         // * Here you should sample the energy (and maybe other things using
-         // * the m_sampler instance of the Sampler class. Make sure, though,
-         // * to only begin sampling after you have let the system equilibrate
-         // * for a while. You may handle this using the fraction of steps which
-         // * are equilibration steps; m_equilibrationFraction.
-
+        /* Here you should sample the energy (and maybe other things using
+         * the m_sampler instance of the Sampler class. Make sure, though,
+         * to only begin sampling after you have let the system equilibrate
+         * for a while. You may handle this using the fraction of steps which
+         * are equilibration steps; m_equilibrationFraction.
+         */
         m_sampler->sample(acceptedStep);
     }
     m_sampler->computeAverages();
     m_sampler->printOutputToTerminal();
-    */
 }
 
 void System::setNumberOfParticles(int numberOfParticles) {
@@ -68,6 +64,8 @@ void System::setWaveFunction(WaveFunction* waveFunction) {
     m_waveFunction = waveFunction;
 }
 
-// void System::setInitialState(InitialState* initialState) {
-//     m_initialState = initialState;
-// }
+void System::setInitialState(InitialState* initialState) {
+    m_initialState = initialState;
+}
+
+

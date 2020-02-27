@@ -1,20 +1,20 @@
 #include "harmonicoscillator.h"
-#include "hamiltonian.h"
+#include <cassert>
+#include <iostream>
 #include "../system.h"
 #include "../particle.h"
 #include "../WaveFunctions/wavefunction.h"
-#include <cassert>
-#include <iostream>
+
+using std::cout;
+using std::endl;
 
 HarmonicOscillator::HarmonicOscillator(System* system, double omega) :
-    Hamiltonian(system)
-{
+        Hamiltonian(system) {
     assert(omega > 0);
-    m_omega = omega;
+    m_omega  = omega;
 }
 
-double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
-{
+double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) {
     /* Here, you need to compute the kinetic and potential energies. Note that
      * when using numerical differentiation, the computation of the kinetic
      * energy becomes the same for all Hamiltonians, and thus the code for
@@ -24,13 +24,9 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
      * getWaveFunction method in the m_system object in the super-class, i.e.
      * m_system->getWaveFunction()...
      */
-    // int Num = m_system.getNumberOfParticles();
-    // cout << Num << endl;
-    // for (int i=0; i<N; i++) {
-    // }
 
     double potentialEnergy = 0;
     double kineticEnergy   = 0;
     return kineticEnergy + potentialEnergy;
-
 }
+

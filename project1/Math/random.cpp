@@ -4,8 +4,8 @@
 long     Random::iy = 0;
 long     Random::iv[NTAB];
 long     Random::seed = -1;
-void     Random::setSeed(long seed) {
-         Random::seed = seed;
+void Random::setSeed(long seed) {
+    Random::seed = seed;
 }
 
 double Random::nextGaussian(double mean, double standardDeviation) {
@@ -42,3 +42,4 @@ double Random::nextDouble()
     if((temp=AM*iy) > RNMX) return RNMX;
     else return temp;
 }
+
