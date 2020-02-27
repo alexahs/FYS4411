@@ -67,8 +67,3 @@ void System::setWaveFunction(WaveFunction* waveFunction) {
 void System::setInitialState(InitialState* initialState) {
     m_initialState = initialState;
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 40c8220fb37c7d7c850a1babb27cf0438dbdc38f

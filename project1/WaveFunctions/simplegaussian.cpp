@@ -1,12 +1,6 @@
 #include "simplegaussian.h"
 #include <cmath>
 #include <cassert>
-<<<<<<< HEAD
-=======
-#include "wavefunction.h"
-#include "../system.h"
-#include "../particle.h"
->>>>>>> 40c8220fb37c7d7c850a1babb27cf0438dbdc38f
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
         WaveFunction(system) {
@@ -30,8 +24,8 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
 
     for (auto particle : particles) {
         double r2 = 0;
-        for (auto x : particle->getPosition()) {
-            r2 += x*x;
+        for (auto xi : particle->getPosition()) {
+            r2 += xi*xi;
         }
         waveFunc *= exp(- alpha*r2);
     }
