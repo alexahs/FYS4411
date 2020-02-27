@@ -1,6 +1,7 @@
 #include <iostream>
 #include "system.h"
 #include "particle.h"
+#include "sampler.h"
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "Hamiltonians/hamiltonian.h"
