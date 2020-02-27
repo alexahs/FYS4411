@@ -3,10 +3,9 @@
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
 #include "Math/random.h"
-#include "simple_vmc/harmonic_osc_1d.h"
+// #include "simple_vmc/harmonic_osc_1d.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "WaveFunctions/wavefunction.h"
-#include "WaveFunctions/simplegaussian.h"
 #include "particle.h"
 #include "system.h"
 #include "sampler.h"
@@ -27,11 +26,11 @@ int main() {
     // for equilibration.
 
     System* system = new System();
-    system->setHamiltonian                 (new HarmonicOscillator(system, omega));
-    system->setWaveFunction                (new SimpleGaussian(system, alpha));
-    // system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-    // system->setEquilibrationFraction    (equilibration);
-    // system->setStepLength               (stepLength);
-    // system->runMetropolisSteps          (numberOfSteps);
+    system->setHamiltonian              (new HarmonicOscillator(system, omega));
+    system->setWaveFunction             (new SimpleGaussian(system, alpha));
+    system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+    system->setEquilibrationFraction    (equilibration);
+    system->setStepLength               (stepLength);
+    system->runMetropolisSteps          (numberOfSteps);
     return 0;
 }

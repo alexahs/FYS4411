@@ -21,6 +21,7 @@ RandomUniform::RandomUniform(System*    system,
      * particles and the number of dimensions used. To make sure everything
      * works as intended, this information is passed to the system here.
      */
+     
     m_system->setNumberOfDimensions(numberOfDimensions);
     m_system->setNumberOfParticles(numberOfParticles);
     setupInitialState();

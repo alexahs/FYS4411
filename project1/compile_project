@@ -9,7 +9,7 @@ cd build
 # Run CMake to create a Makefile
 cmake ../
 
-# Make the Makefile using two threads
+# Make the Makefile using all threads
 make -j
 
 # Move the executable to the top-directory

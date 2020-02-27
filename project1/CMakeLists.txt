@@ -7,6 +7,7 @@ include_directories(
     simple_vmc
     Math
     WaveFunctions
+    InitialStates
 )
 
 # Add sources from all directories
@@ -16,6 +17,7 @@ file(
     GLOB SOURCES "simple_vmc/*.cpp"
     GLOB SOURCES "WaveFunctions/*.cpp"
     GLOB SOURCES "Math/*.cpp"
+    GLOB SOURCES "InitialStates/*.cpp"
 )
 
 

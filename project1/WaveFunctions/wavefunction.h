@@ -19,4 +19,4 @@ protected:
 };
 
 
-#endif //WAVEFUNCTION_H
+#endif // WAVEFUNCTION_H

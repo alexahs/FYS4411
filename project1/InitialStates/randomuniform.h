@@ -10,4 +10,4 @@ public:
     void setupInitialState();
 };
 
-#endif //RANDUMUNIFORM_H
+#endif // RANDUMUNIFORM_H

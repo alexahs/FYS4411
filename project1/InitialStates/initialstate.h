@@ -19,4 +19,4 @@ protected:
 
 
 
-#endif //INITIALSTATE_H
+#endif // INITIALSTATE_H

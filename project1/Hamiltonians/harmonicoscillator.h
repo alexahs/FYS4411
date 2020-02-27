@@ -17,4 +17,4 @@ private:
 
 
 
-#endif //HARMONICOSCILLATOR_H
+#endif // HARMONICOSCILLATOR_H

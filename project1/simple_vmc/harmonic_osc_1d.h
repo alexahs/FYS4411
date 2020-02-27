@@ -16,4 +16,4 @@ void monte_carlo_sampling(double *alphas,
                             int n_cycles);
 
 
-#endif //HARMONIC_OSC_1D_H
+#endif // HARMONIC_OSC_1D_H

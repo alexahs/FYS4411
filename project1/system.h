@@ -43,4 +43,4 @@ private:
 };
 
 
-#endif //SYSTEM_H
+#endif // SYSTEM_H

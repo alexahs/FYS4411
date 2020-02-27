@@ -20,4 +20,4 @@ private:
 };
 
 
-#endif //SAMPLER_H
+#endif // SAMPLER_H

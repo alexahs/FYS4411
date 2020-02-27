@@ -5,7 +5,6 @@
 #include <cmath>
 #include <cassert>
 
-
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
     WaveFunction(system)
 {
@@ -13,7 +12,7 @@ SimpleGaussian::SimpleGaussian(System* system, double alpha) :
     m_numberOfParameters = 1;
     m_parameters.reserve(1);
     m_parameters.push_back(alpha);
-};
+}
 
 double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
 {
@@ -21,23 +20,22 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
      * the particles are accessible through the particle[i].getPosition()
      * function.
      *
-     * For the actual expression, use exp(-alpha * r^2), with alpha being the
+     * For the actual expression, use exp(- alpha * r^2), with alpha being the
      * (only) variational parameter.
      */
-     double wf = 1;
-     double alpha = m_parameters.at(1);
+    double wf = 1;
+    double alpha = m_parameters.at(0);
 
-     for(auto particle : particles){
-          double r2 = 0;
-         for(auto x : particle->getPosition()){
-             r2 += x*x;
-         };
-         wf *= exp(-alpha*r2);
-     };
-
+    for (auto particle : particles) {
+        double r2 = 0;
+        for (auto x : particle->getPosition()) {
+            r2 += x*x;
+        }
+        wf *= exp(- alpha*r2);
+    }
 
     return wf;
-};
+}
 
 double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> particles)
 {
@@ -49,5 +47,14 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
      * This quantity is needed to compute the (local) energy (consider the
      * Schrödinger equation to see how the two are related).
      */
-    return 0;
-};
+    int d = 3;
+    double alpha = m_parameters.at(0);
+    double r2 = 0;
+    for (auto particle : particles) {
+        for (auto x : particle->getPosition()) {
+            r2 += x*x;
+        }
+    }
+
+    return -2*alpha*(d - 2*alpha*r2);
+}
