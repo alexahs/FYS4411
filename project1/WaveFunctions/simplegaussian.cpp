@@ -24,16 +24,19 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
      * For the actual expression, use exp(-alpha * r^2), with alpha being the
      * (only) variational parameter.
      */
+     double wf = 1;
+     double alpha = m_parameters.at(1);
+
+     for(auto particle : particles){
+          double r2 = 0;
+         for(auto x : particle->getPosition()){
+             r2 += x*x;
+         };
+         wf *= exp(-alpha*r2);
+     };
 
 
-     double wf = 0;
-
-     int N = m_system
-
-     for(int i = 0; i < )
-
-
-    return 0;
+    return wf;
 };
 
 double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> particles)
