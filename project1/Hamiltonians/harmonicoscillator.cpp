@@ -24,6 +24,10 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
      * getWaveFunction method in the m_system object in the super-class, i.e.
      * m_system->getWaveFunction()...
      */
+    // int Num = m_system.getNumberOfParticles();
+    // cout << Num << endl;
+    // for (int i=0; i<N; i++) {
+    // }
 
     double potentialEnergy = 0;
     double kineticEnergy   = 0;
