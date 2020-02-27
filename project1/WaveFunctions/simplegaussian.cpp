@@ -24,6 +24,15 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
      * For the actual expression, use exp(-alpha * r^2), with alpha being the
      * (only) variational parameter.
      */
+
+
+     double wf = 0;
+
+     int N = m_system
+
+     for(int i = 0; i < )
+
+
     return 0;
 };
 
