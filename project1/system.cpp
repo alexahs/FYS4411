@@ -14,7 +14,31 @@ bool System::metropolisStep() {
      * at this new position with the one at the old position).
      */
 
-    return false;
+
+    int rnd_idx = Random::nextInt(m_numberOfParticles);
+    Particle* random_particle = m_particles.at(rnd_idx);
+
+    double wf_old = m_waveFunction->evaluate(m_particles);
+
+    std::vector<double> proposed_steps = std::vector<double>();
+
+    for(int dim = 0; dim < m_numberOfDimensions; dim++){
+        proposed_steps.push_back(m_stepLength*(Random::nextDouble() - 0.5));
+        random_particle->adjustPosition(proposed_steps.at(dim), dim);
+    }
+
+    double wf_new = m_waveFunction->evaluate(m_particles);
+
+    if (Random::nextDouble() <= wf_new*wf_new / wf_old*wf_old){
+        return true;
+    }
+    else{
+        for(int dim = 0; dim < m_numberOfDimensions; dim++){
+            random_particle->adjustPosition((-1)*proposed_steps.at(dim), dim);
+        }
+        return false;
+    }
+
 }
 
 void System::runMetropolisSteps(int numberOfMetropolisSteps) {
