@@ -25,7 +25,10 @@ void Sampler::sample(bool acceptedStep) {
     // Make sure the sampling variable(s) are initialized at the first step.
     if (m_stepNumber == 0) {
         m_cumulativeEnergy = 0;
+        m_cumulativeEnergy2 = 0;
     }
+
+    if (acceptedStep) {m_acceptedSteps++;}
 
     /* Here you should sample all the interesting things you want to measure.
      * Note that there are (way) more than the single one here currently.
@@ -35,6 +38,7 @@ void Sampler::sample(bool acceptedStep) {
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_stepNumber++;
+
 }
 
 void Sampler::printOutputToTerminal() {
@@ -51,6 +55,7 @@ void Sampler::printOutputToTerminal() {
     cout << " Number of dimensions : " << nd << endl;
     cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
     cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
+    cout << " Ratio of accepted steps        : " << m_acceptRatio << endl;
     cout << endl;
     cout << "  -- Wave function parameters -- " << endl;
     cout << " Number of parameters : " << p << endl;
@@ -71,7 +76,11 @@ void Sampler::computeAverages() {
     /* Compute the averages of the sampled quantities. You need to think
      * thoroughly through what is written here currently; is this correct?
      */
-    m_energy = m_cumulativeEnergy / m_system->getNumberOfMetropolisSteps();
-    m_energy2 = m_cumulativeEnergy2 / m_system->getNumberOfMetropolisSteps();
+
+    int nMetropolisSteps = m_system->getNumberOfMetropolisSteps();
+
+    m_energy = m_cumulativeEnergy / nMetropolisSteps;
+    m_energy2 = m_cumulativeEnergy2 / nMetropolisSteps;
     m_variance = m_energy2 - m_energy*m_energy;
+    m_acceptRatio = double (m_acceptedSteps) / double (nMetropolisSteps);
 }

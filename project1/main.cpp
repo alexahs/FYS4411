@@ -20,9 +20,9 @@ TODO:
     - Add functionality for writing to file (within sampler?)
     - Add importance sampling. Idea: make each sampling rule as a method
       of system, and declare which is to be used when initializing.
-    - Add functionality within system for equilibriating the system (complete)
-      before sampling begins.
-    - Add counting of accepted steps.
+    - Add functionality within system for equilibriating the system
+      before sampling begins. (completed)
+    - Add counting of accepted steps. (completed)
 
 */
 
@@ -61,7 +61,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step){
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->runMetropolisSteps          (numberOfSteps);
-
+        // cout << system
 
         Sampler* system_sampler = system->getSampler();
         double energy = system_sampler->getEnergy();

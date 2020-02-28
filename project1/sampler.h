@@ -14,6 +14,8 @@ public:
 private:
     int     m_numberOfMetropolisSteps = 0;
     int     m_stepNumber = 0;
+    int     m_acceptedSteps = 0;
+    double  m_acceptRatio = 0;
     double  m_energy = 0;
     double  m_energy2 = 0;
     double  m_variance = 0;
