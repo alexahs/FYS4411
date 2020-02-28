@@ -10,11 +10,13 @@ using std::endl;
 
 RandomUniform::RandomUniform(System*    system,
                              int        numberOfDimensions,
-                             int        numberOfParticles)  :
+                             int        numberOfParticles,
+                             double     characteristicLength)  :
         InitialState(system) {
     assert(numberOfDimensions > 0 && numberOfParticles > 0);
     m_numberOfDimensions = numberOfDimensions;
     m_numberOfParticles  = numberOfParticles;
+    m_characteristicLength = characteristicLength;
 
     /* The Initial State class is in charge of everything to do with the
      * initialization of the system; this includes determining the number of
