@@ -21,7 +21,8 @@ RandomUniform::RandomUniform(System*    system,
      * particles and the number of dimensions used. To make sure everything
      * works as intended, this information is passed to the system here.
      */
-     
+
+
     m_system->setNumberOfDimensions(numberOfDimensions);
     m_system->setNumberOfParticles(numberOfParticles);
     setupInitialState();
@@ -43,7 +44,10 @@ void RandomUniform::setupInitialState() {
              * according to their index in the particles list (this is
              * obviously NOT a good idea).
              */
-            position.push_back(i);
+
+            position.push_back((Random::nextDouble() - 0.5)*m_characteristicLength);
+
+            // position.push_back(i);
         }
         m_particles.push_back(new Particle());
         m_particles.at(i)->setNumberOfDimensions(m_numberOfDimensions);

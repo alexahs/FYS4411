@@ -15,7 +15,7 @@ using namespace std;
 /*
 TODO:
     - Fix randomuniform.cpp such that it initializes particle positions randomly
-      within the bounds of the external potential.
+      within the bounds of the external potential. (completed)
     - Add more generalized wavefunction and hamiltonian classes
     - Add functionality for writing to file (within sampler?)
     - Add importance sampling. Idea: make each sampling rule as a method
@@ -45,10 +45,10 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step){
 
     int numberOfDimensions  = 1;
-    int numberOfParticles   = 1;
+    int numberOfParticles   = 50;
     int numberOfSteps       = (int) 1e5;
     double omega            = 1.0;          // Oscillator frequency.
-    double stepLength       = 0.1;          // Metropolis step length.
+    double stepLength       = 1.0;          // Metropolis step length.
     double equilibration    = 0.1;          // Amount of the total steps used for equilibration.
 
     double alpha = alpha_min;
@@ -65,6 +65,8 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step){
 
         Sampler* system_sampler = system->getSampler();
         double energy = system_sampler->getEnergy();
+
+
 
 
         alpha += alpha_step;
