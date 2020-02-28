@@ -12,3 +12,15 @@ Correlated::Correlated(System* system, double alpha, double beta) :
     m_parameters.push_back(alpha);
     m_parameters.push_back(beta);
 }
+
+double Correlated::evaluate(std::vector<class Particle*> particles){
+
+    return 1.0
+}
+
+
+double Correlated::computeDoubleDerivative(std::vector<class Particle*> particles){
+
+
+    return 1.0
+}
