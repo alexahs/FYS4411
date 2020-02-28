@@ -45,10 +45,10 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step){
 
     int numberOfDimensions      = 1;
-    int numberOfParticles       = 50;
+    int numberOfParticles       = 10;
     int numberOfSteps           = (int) 1e5;
     double omega                = 1.0;          // Oscillator frequency.
-    double stepLength           = 1.0;          // Metropolis step length.
+    double stepLength           = 0.1;          // Metropolis step length.
     double equilibration        = 0.1;          // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
 
