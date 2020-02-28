@@ -41,6 +41,8 @@ bool System::metropolisStep() {
 
 }
 
+
+
 void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_particles                 = m_initialState->getParticles();
     m_sampler                   = new Sampler(this);

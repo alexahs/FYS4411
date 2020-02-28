@@ -32,6 +32,7 @@ void Sampler::sample(bool acceptedStep) {
     double localEnergy = m_system->getHamiltonian()->
                          computeLocalEnergy(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
+    m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_stepNumber++;
 }
 
@@ -58,6 +59,8 @@ void Sampler::printOutputToTerminal() {
     cout << endl;
     cout << "  -- Reults -- " << endl;
     cout << " Energy : " << m_energy << endl;
+    cout << " Energy^2 : " << m_energy2 << endl;
+    cout << " Variance : " << m_variance << endl;
     cout << endl;
 }
 
@@ -66,4 +69,6 @@ void Sampler::computeAverages() {
      * thoroughly through what is written here currently; is this correct?
      */
     m_energy = m_cumulativeEnergy / m_system->getNumberOfMetropolisSteps();
+    m_energy2 = m_cumulativeEnergy2 / m_system->getNumberOfMetropolisSteps();
+    m_variance = m_energy2 - m_energy*m_energy;
 }
