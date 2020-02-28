@@ -7,6 +7,8 @@
 #include "InitialStates/initialstate.h"
 #include "Math/random.h"
 
+
+
 bool System::metropolisStep() {
     /* Perform the actual Metropolis step: Choose a particle at random and
      * change it's position by a random amount, and check if the step is
@@ -48,6 +50,12 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_sampler                   = new Sampler(this);
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
+
+    //equilibriation
+    for (int i = 0; i < int (numberOfMetropolisSteps*m_equilibrationFraction); i++){
+        bool acceptedEquilibriateStep = metropolisStep();
+    }
+
 
     for (int i=0; i < numberOfMetropolisSteps; i++) {
         bool acceptedStep = metropolisStep();

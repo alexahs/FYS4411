@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <fstream>
 #include "sampler.h"
 #include "system.h"
 #include "particle.h"
@@ -63,6 +64,8 @@ void Sampler::printOutputToTerminal() {
     cout << " Variance : " << m_variance << endl;
     cout << endl;
 }
+
+
 
 void Sampler::computeAverages() {
     /* Compute the averages of the sampled quantities. You need to think
