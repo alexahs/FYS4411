@@ -8,6 +8,7 @@ include_directories(
     Math
     WaveFunctions
     InitialStates
+    Misc
 )
 
 # Add sources from all directories
@@ -17,6 +18,7 @@ file(
     GLOB SOURCES "InitialStates/*.cpp"
     GLOB SOURCES "Math/*.cpp"
     GLOB SOURCES "WaveFunctions/*.cpp"
+    GLOB SOURCES "Misc/*.cpp"
 )
 
 

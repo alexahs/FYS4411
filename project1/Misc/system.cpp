@@ -35,19 +35,15 @@ bool System::metropolisStep() {
 
     double wf_new = m_waveFunction->evaluate(m_particles);
 
-    if (Random::nextDouble() <= wf_new*wf_new / wf_old*wf_old){
+    if (Random::nextDouble() <= wf_new*wf_new / (wf_old*wf_old) ){
         return true;
-    }
-    else{
+    } else {
         for(int dim = 0; dim < m_numberOfDimensions; dim++){
             random_particle->adjustPosition((-1)*proposed_steps.at(dim), dim);
         }
         return false;
     }
-
 }
-
-
 
 void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_particles                 = m_initialState->getParticles();
@@ -56,7 +52,7 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
 
     //equilibriation
-    for (int i = 0; i < int (numberOfMetropolisSteps*m_equilibrationFraction); i++){
+    for (int i=0; i<numberOfMetropolisSteps*m_equilibrationFraction; i++) {
         bool acceptedEquilibriateStep = metropolisStep();
     }
 

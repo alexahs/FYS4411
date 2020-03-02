@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Create build-directory
-mkdir build
+mkdir Build
 
 # Move into the build-directory
-cd build
+cd Build
 
 # Run CMake to create a Makefile
 cmake ../

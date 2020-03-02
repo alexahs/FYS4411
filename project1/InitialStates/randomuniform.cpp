@@ -2,8 +2,8 @@
 #include <iostream>
 #include <cassert>
 #include "Math/random.h"
-#include "../particle.h"
-#include "../system.h"
+#include "Misc/particle.h"
+#include "Misc/system.h"
 
 using std::cout;
 using std::endl;

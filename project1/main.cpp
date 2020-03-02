@@ -1,7 +1,4 @@
 #include <iostream>
-#include "system.h"
-#include "particle.h"
-#include "sampler.h"
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "Hamiltonians/hamiltonian.h"
@@ -9,6 +6,9 @@
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
 #include "Math/random.h"
+#include "Misc/system.h"
+#include "Misc/particle.h"
+#include "Misc/sampler.h"
 
 using namespace std;
 
@@ -23,7 +23,6 @@ TODO:
     - Add functionality within system for equilibriating the system
       before sampling begins. (completed)
     - Add counting of accepted steps. (completed)
-
 */
 
 
@@ -42,7 +41,7 @@ int main() {
 }
 
 
-void run_vmc(double alpha_min, double alpha_max, double alpha_step){
+void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 1;
     int numberOfParticles       = 10;
@@ -65,15 +64,9 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step){
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->runMetropolisSteps          (numberOfSteps);
-        // cout << system
 
         Sampler* system_sampler = system->getSampler();
         double energy = system_sampler->getEnergy();
-
-
-
-
         alpha += alpha_step;
     }
-
 }

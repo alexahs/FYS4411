@@ -1,10 +1,10 @@
-#include "wavefunction.h"
+#include "correlated.h"
 #include <cmath>
 #include <cassert>
 
 
 Correlated::Correlated(System* system, double alpha, double beta) :
-    WaveFunction(system) {
+      WaveFunction(system) {
     assert(alpha >= 0);
     assert(beta >= 0);
     m_numberOfParameters = 2;
@@ -13,14 +13,14 @@ Correlated::Correlated(System* system, double alpha, double beta) :
     m_parameters.push_back(beta);
 }
 
-double Correlated::evaluate(std::vector<class Particle*> particles){
+double Correlated::evaluate(std::vector<class Particle*> particles) {
 
-    return 1.0
+    return 1.0;
 }
 
 
-double Correlated::computeDoubleDerivative(std::vector<class Particle*> particles){
+double Correlated::computeDoubleDerivative(std::vector<class Particle*> particles) {
 
 
-    return 1.0
+    return 1.0;
 }
