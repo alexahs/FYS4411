@@ -46,10 +46,11 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     double term = 0;
     double r2 = 0;
     int dim = particles.at(0)->getPosition().size();
+    int N = particles.size();
     for (auto particle : particles) { // loop over particles
         for (auto xi : particle->getPosition()) { // loop over dimensions
             r2 += xi*xi;
         }
     }
-    return -twoAlpha*(dim - twoAlpha*r2);
+    return -twoAlpha*(dim*N - twoAlpha*r2);
 }
