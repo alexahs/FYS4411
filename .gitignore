@@ -31,6 +31,7 @@
 *.exe
 *.out
 *.app
+vmc
 
 # Data files
 *.dat
@@ -53,7 +54,7 @@ results
 data
 figures
 Litterature
-build
+Build
 
 # Images
 *.png
