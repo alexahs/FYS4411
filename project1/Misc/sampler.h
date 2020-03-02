@@ -10,6 +10,7 @@ public:
     double getEnergy()          { return m_energy; }
     double getEnergy2()         { return m_energy2; }
     double getVariance()        { return m_variance; }
+    double getAcceptRatio()     { return m_acceptRatio; }
 
 private:
     int     m_numberOfMetropolisSteps = 0;

@@ -29,7 +29,6 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
         }
         waveFunc *= exp(- alpha*r2);
     }
-
     return waveFunc;
 }
 
@@ -45,13 +44,12 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
      */
     double twoAlpha = 2 * m_parameters.at(0);
     double term = 0;
+    double r2 = 0;
+    int dim = particles.at(0)->getPosition().size();
     for (auto particle : particles) { // loop over particles
-        double r2 = 0;
         for (auto xi : particle->getPosition()) { // loop over dimensions
             r2 += xi*xi;
         }
-        term += 1 - twoAlpha*r2;
     }
-
-    return -twoAlpha*term;
+    return -twoAlpha*(dim - twoAlpha*r2);
 }

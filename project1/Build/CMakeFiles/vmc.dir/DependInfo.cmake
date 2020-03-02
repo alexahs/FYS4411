@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/simen/FYS4411/project1/Misc/particle.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/Misc/particle.o"
   "/home/simen/FYS4411/project1/Misc/sampler.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/Misc/sampler.o"
   "/home/simen/FYS4411/project1/Misc/system.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/Misc/system.o"
+  "/home/simen/FYS4411/project1/Misc/writefile.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/Misc/writefile.o"
   "/home/simen/FYS4411/project1/WaveFunctions/correlated.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/WaveFunctions/correlated.o"
   "/home/simen/FYS4411/project1/WaveFunctions/simplegaussian.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o"
   "/home/simen/FYS4411/project1/WaveFunctions/wavefunction.cpp" "/home/simen/FYS4411/project1/Build/CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o"

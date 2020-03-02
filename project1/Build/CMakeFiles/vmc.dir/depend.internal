@@ -46,6 +46,9 @@ CMakeFiles/vmc.dir/Misc/system.o
  /home/simen/FYS4411/project1/Misc/sampler.h
  /home/simen/FYS4411/project1/Misc/system.cpp
  /home/simen/FYS4411/project1/Misc/system.h
+CMakeFiles/vmc.dir/Misc/writefile.o
+ /home/simen/FYS4411/project1/Misc/writefile.cpp
+ /home/simen/FYS4411/project1/Misc/writefile.h
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o
  ../Misc/particle.h
  /home/simen/FYS4411/project1/WaveFunctions/correlated.cpp
@@ -69,6 +72,7 @@ CMakeFiles/vmc.dir/main.o
  /home/simen/FYS4411/project1/Misc/particle.h
  /home/simen/FYS4411/project1/Misc/sampler.h
  /home/simen/FYS4411/project1/Misc/system.h
+ /home/simen/FYS4411/project1/Misc/writefile.h
  /home/simen/FYS4411/project1/WaveFunctions/simplegaussian.h
  /home/simen/FYS4411/project1/WaveFunctions/wavefunction.h
  /home/simen/FYS4411/project1/main.cpp

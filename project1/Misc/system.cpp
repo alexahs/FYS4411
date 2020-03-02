@@ -35,7 +35,7 @@ bool System::metropolisStep() {
 
     double wf_new = m_waveFunction->evaluate(m_particles);
 
-    if (Random::nextDouble() <= wf_new*wf_new / (wf_old*wf_old) ){
+    if (Random::nextDouble() <= wf_new*wf_new / (wf_old*wf_old)) {
         return true;
     } else {
         for(int dim = 0; dim < m_numberOfDimensions; dim++){

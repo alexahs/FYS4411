@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "Hamiltonians/hamiltonian.h"
@@ -9,6 +11,7 @@
 #include "Misc/system.h"
 #include "Misc/particle.h"
 #include "Misc/sampler.h"
+#include "Misc/writefile.h"
 
 using namespace std;
 
@@ -43,8 +46,8 @@ int main() {
 
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
-    int numberOfDimensions      = 1;
-    int numberOfParticles       = 10;
+    int numberOfDimensions      = 3;
+    int numberOfParticles       = 14;
     int numberOfSteps           = (int) 1e5;
     double omega                = 1.0;          // Oscillator frequency.
     double stepLength           = 0.1;          // Metropolis step length.
@@ -52,8 +55,15 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double characteristicLength = 1.0;
 
     double alpha = alpha_min;
+    int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
+    vector<double> alphaVec;
+    vector<double> energyVec;
+    vector<double> energy2Vec;
+    vector<double> varianceVec;
+    vector<double> acceptRatioVec;
 
-    while (alpha <= alpha_max) {
+
+    for (int i=0; i<numAlphas; i++) {
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
@@ -61,12 +71,21 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
                                                     numberOfDimensions,
                                                     numberOfParticles,
                                                     characteristicLength));
+
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->runMetropolisSteps          (numberOfSteps);
 
         Sampler* system_sampler = system->getSampler();
-        double energy = system_sampler->getEnergy();
+
+        alphaVec.push_back(alpha);
+        energyVec.push_back(system_sampler->getEnergy());
+        energy2Vec.push_back(system_sampler->getEnergy2());
+        varianceVec.push_back(system_sampler->getVariance());
+        acceptRatioVec.push_back(system_sampler->getAcceptRatio());
         alpha += alpha_step;
     }
+    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
+      int (equilibration*numberOfSteps), alphaVec, energyVec, energy2Vec,
+      varianceVec, acceptRatioVec);
 }

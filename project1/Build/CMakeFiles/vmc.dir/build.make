@@ -161,9 +161,22 @@ CMakeFiles/vmc.dir/Misc/system.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/vmc.dir/Misc/system.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/simen/FYS4411/project1/Misc/system.cpp -o CMakeFiles/vmc.dir/Misc/system.s
 
+CMakeFiles/vmc.dir/Misc/writefile.o: CMakeFiles/vmc.dir/flags.make
+CMakeFiles/vmc.dir/Misc/writefile.o: ../Misc/writefile.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/vmc.dir/Misc/writefile.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/vmc.dir/Misc/writefile.o -c /home/simen/FYS4411/project1/Misc/writefile.cpp
+
+CMakeFiles/vmc.dir/Misc/writefile.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/vmc.dir/Misc/writefile.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/simen/FYS4411/project1/Misc/writefile.cpp > CMakeFiles/vmc.dir/Misc/writefile.i
+
+CMakeFiles/vmc.dir/Misc/writefile.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/vmc.dir/Misc/writefile.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/simen/FYS4411/project1/Misc/writefile.cpp -o CMakeFiles/vmc.dir/Misc/writefile.s
+
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o: CMakeFiles/vmc.dir/flags.make
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o: ../WaveFunctions/correlated.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/correlated.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/correlated.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/vmc.dir/WaveFunctions/correlated.o -c /home/simen/FYS4411/project1/WaveFunctions/correlated.cpp
 
 CMakeFiles/vmc.dir/WaveFunctions/correlated.i: cmake_force
@@ -176,7 +189,7 @@ CMakeFiles/vmc.dir/WaveFunctions/correlated.s: cmake_force
 
 CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o: CMakeFiles/vmc.dir/flags.make
 CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o: ../WaveFunctions/simplegaussian.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o -c /home/simen/FYS4411/project1/WaveFunctions/simplegaussian.cpp
 
 CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.i: cmake_force
@@ -189,7 +202,7 @@ CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.s: cmake_force
 
 CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o: CMakeFiles/vmc.dir/flags.make
 CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o: ../WaveFunctions/wavefunction.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o -c /home/simen/FYS4411/project1/WaveFunctions/wavefunction.cpp
 
 CMakeFiles/vmc.dir/WaveFunctions/wavefunction.i: cmake_force
@@ -202,7 +215,7 @@ CMakeFiles/vmc.dir/WaveFunctions/wavefunction.s: cmake_force
 
 CMakeFiles/vmc.dir/main.o: CMakeFiles/vmc.dir/flags.make
 CMakeFiles/vmc.dir/main.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/vmc.dir/main.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/vmc.dir/main.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/vmc.dir/main.o -c /home/simen/FYS4411/project1/main.cpp
 
 CMakeFiles/vmc.dir/main.i: cmake_force
@@ -223,6 +236,7 @@ vmc_OBJECTS = \
 "CMakeFiles/vmc.dir/Misc/particle.o" \
 "CMakeFiles/vmc.dir/Misc/sampler.o" \
 "CMakeFiles/vmc.dir/Misc/system.o" \
+"CMakeFiles/vmc.dir/Misc/writefile.o" \
 "CMakeFiles/vmc.dir/WaveFunctions/correlated.o" \
 "CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o" \
 "CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o" \
@@ -239,13 +253,14 @@ vmc: CMakeFiles/vmc.dir/Math/random.o
 vmc: CMakeFiles/vmc.dir/Misc/particle.o
 vmc: CMakeFiles/vmc.dir/Misc/sampler.o
 vmc: CMakeFiles/vmc.dir/Misc/system.o
+vmc: CMakeFiles/vmc.dir/Misc/writefile.o
 vmc: CMakeFiles/vmc.dir/WaveFunctions/correlated.o
 vmc: CMakeFiles/vmc.dir/WaveFunctions/simplegaussian.o
 vmc: CMakeFiles/vmc.dir/WaveFunctions/wavefunction.o
 vmc: CMakeFiles/vmc.dir/main.o
 vmc: CMakeFiles/vmc.dir/build.make
 vmc: CMakeFiles/vmc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable vmc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/simen/FYS4411/project1/Build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable vmc"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/vmc.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

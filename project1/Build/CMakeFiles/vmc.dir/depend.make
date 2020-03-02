@@ -46,6 +46,9 @@ CMakeFiles/vmc.dir/Misc/system.o: ../Misc/sampler.h
 CMakeFiles/vmc.dir/Misc/system.o: ../Misc/system.cpp
 CMakeFiles/vmc.dir/Misc/system.o: ../Misc/system.h
 
+CMakeFiles/vmc.dir/Misc/writefile.o: ../Misc/writefile.cpp
+CMakeFiles/vmc.dir/Misc/writefile.o: ../Misc/writefile.h
+
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o: ../Misc/particle.h
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o: ../WaveFunctions/correlated.cpp
 CMakeFiles/vmc.dir/WaveFunctions/correlated.o: ../WaveFunctions/correlated.h
@@ -68,6 +71,7 @@ CMakeFiles/vmc.dir/main.o: ../Math/random.h
 CMakeFiles/vmc.dir/main.o: ../Misc/particle.h
 CMakeFiles/vmc.dir/main.o: ../Misc/sampler.h
 CMakeFiles/vmc.dir/main.o: ../Misc/system.h
+CMakeFiles/vmc.dir/main.o: ../Misc/writefile.h
 CMakeFiles/vmc.dir/main.o: ../WaveFunctions/simplegaussian.h
 CMakeFiles/vmc.dir/main.o: ../WaveFunctions/wavefunction.h
 CMakeFiles/vmc.dir/main.o: ../main.cpp

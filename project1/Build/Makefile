@@ -244,6 +244,21 @@ Misc/system.s:
 .PHONY : Misc/system.s
 
 # target to build an object file
+Misc/writefile.o:
+	$(MAKE) -f CMakeFiles/vmc.dir/build.make CMakeFiles/vmc.dir/Misc/writefile.o
+.PHONY : Misc/writefile.o
+
+# target to preprocess a source file
+Misc/writefile.i:
+	$(MAKE) -f CMakeFiles/vmc.dir/build.make CMakeFiles/vmc.dir/Misc/writefile.i
+.PHONY : Misc/writefile.i
+
+# target to generate assembly for a file
+Misc/writefile.s:
+	$(MAKE) -f CMakeFiles/vmc.dir/build.make CMakeFiles/vmc.dir/Misc/writefile.s
+.PHONY : Misc/writefile.s
+
+# target to build an object file
 WaveFunctions/correlated.o:
 	$(MAKE) -f CMakeFiles/vmc.dir/build.make CMakeFiles/vmc.dir/WaveFunctions/correlated.o
 .PHONY : WaveFunctions/correlated.o
@@ -336,6 +351,9 @@ help:
 	@echo "... Misc/system.o"
 	@echo "... Misc/system.i"
 	@echo "... Misc/system.s"
+	@echo "... Misc/writefile.o"
+	@echo "... Misc/writefile.i"
+	@echo "... Misc/writefile.s"
 	@echo "... WaveFunctions/correlated.o"
 	@echo "... WaveFunctions/correlated.i"
 	@echo "... WaveFunctions/correlated.s"
