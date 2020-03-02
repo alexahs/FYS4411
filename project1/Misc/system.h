@@ -20,6 +20,7 @@ public:
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
+    double getSumRiSquared          ();
 
 private:
     int                             m_numberOfParticles = 0;

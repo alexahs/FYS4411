@@ -20,26 +20,18 @@ TODO:
     - Fix randomuniform.cpp such that it initializes particle positions randomly
       within the bounds of the external potential. (completed)
     - Add more generalized wavefunction and hamiltonian classes
-    - Add functionality for writing to file (within sampler?)
+    - Add functionality for writing to file (complete for 1 variational parameter)
     - Add importance sampling. Idea: make each sampling rule as a method
       of system, and declare which is to be used when initializing.
     - Add functionality within system for equilibriating the system
       before sampling begins. (completed)
     - Add counting of accepted steps. (completed)
 */
-
-
-
+// Run VMC for spherical HO trap
 void run_vmc(double alpha_min, double alpha_max, double alpha_step);
 
 int main() {
-
-    double alpha_min = 0.1;
-    double alpha_max = 1.0;
-    double alpha_step = 0.1;
-
-    run_vmc(alpha_min, alpha_max, alpha_step);
-
+    run_vmc(0.1, 1.0, 0.05);
     return 0;
 }
 
@@ -47,10 +39,10 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
-    int numberOfParticles       = 14;
-    int numberOfSteps           = (int) 1e5;
+    int numberOfParticles       = 1;
+    int numberOfSteps           = (int) 1e6;
     double omega                = 1.0;          // Oscillator frequency.
-    double stepLength           = 0.1;          // Metropolis step length.
+    double stepLength           = 0.05;          // Metropolis step length.
     double equilibration        = 0.1;          // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
 
@@ -61,6 +53,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     vector<double> energy2Vec;
     vector<double> varianceVec;
     vector<double> acceptRatioVec;
+    vector<double> sumRiSquaredVec;
 
 
     for (int i=0; i<numAlphas; i++) {
@@ -75,17 +68,16 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->runMetropolisSteps          (numberOfSteps);
-
         Sampler* system_sampler = system->getSampler();
-
         alphaVec.push_back(alpha);
         energyVec.push_back(system_sampler->getEnergy());
         energy2Vec.push_back(system_sampler->getEnergy2());
         varianceVec.push_back(system_sampler->getVariance());
         acceptRatioVec.push_back(system_sampler->getAcceptRatio());
+        sumRiSquaredVec.push_back(system->getSumRiSquared());
         alpha += alpha_step;
     }
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), alphaVec, energyVec, energy2Vec,
-      varianceVec, acceptRatioVec);
+      varianceVec, acceptRatioVec, sumRiSquaredVec);
 }

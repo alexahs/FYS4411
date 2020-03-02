@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Misc/particle.h"
+#include "Misc/system.h"
 
 class WaveFunction {
 public:
@@ -13,5 +14,5 @@ public:
 protected:
     int     m_numberOfParameters = 0;
     std::vector<double> m_parameters = std::vector<double>();
-    class System* m_system = nullptr;
+    System* m_system = nullptr;
 };

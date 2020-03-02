@@ -19,16 +19,8 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
      * For the actual expression, use exp(- alpha * r^2), with alpha being the
      * (only) variational parameter.
      */
-    double waveFunc = 1;
     double alpha = m_parameters.at(0);
-
-    for (auto particle : particles) {
-        double r2 = 0;
-        for (auto xi : particle->getPosition()) {
-            r2 += xi*xi;
-        }
-        waveFunc *= exp(- alpha*r2);
-    }
+    double waveFunc = exp(- alpha*m_system->getSumRiSquared());
     return waveFunc;
 }
 
@@ -44,13 +36,8 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
      */
     double twoAlpha = 2 * m_parameters.at(0);
     double term = 0;
-    double r2 = 0;
     int dim = particles.at(0)->getPosition().size();
     int N = particles.size();
-    for (auto particle : particles) { // loop over particles
-        for (auto xi : particle->getPosition()) { // loop over dimensions
-            r2 += xi*xi;
-        }
-    }
+    double r2 = m_system->getSumRiSquared();
     return -twoAlpha*(dim*N - twoAlpha*r2);
 }
