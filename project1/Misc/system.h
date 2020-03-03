@@ -43,7 +43,7 @@ private:
     class Sampler*                  m_sampler = nullptr;
     std::vector<class Particle*>    m_particles = std::vector<class Particle*>();
 
-    //temporary wavefunction in metropolis steps
+    //temporary storage of the wavefunction in metropolis steps
     double                          wfOld = 0;
 
 };

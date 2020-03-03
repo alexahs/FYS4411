@@ -18,6 +18,8 @@ bool System::metropolisStep() {
      * accepted by the Metropolis test (compare the wave function evaluated
      * at this new position with the one at the old position).
      */
+
+
     int rndIdx = Random::nextInt(m_numberOfParticles);
     Particle* randomParticle = m_particles.at(rndIdx);
     std::vector<double> proposedSteps = std::vector<double>();
@@ -32,7 +34,10 @@ bool System::metropolisStep() {
     double probabilityRatio = wfNew*wfNew/(wfOld*wfOld);
     // cout << probabilityRatio << endl;
 
-    if (Random::nextDouble() <= probabilityRatio) { return true; }
+    if (Random::nextDouble() <= probabilityRatio) {
+        wfOld = wfNew;
+        return true;
+    }
     else {
         // If move is rejected, then revert to the old position
         for (int dim=0; dim<m_numberOfDimensions; dim++) {
@@ -82,10 +87,6 @@ bool System::importanceStep(){
     //perform test
     if (Random::nextDouble() <= probabilityRatio) {
         wfOld = wfNew;
-        for(int dim = 0; dim < m_numberOfDimensions; dim++){
-            posOld.at(dim) = posNew.at(dim);
-            qForceOld.at(dim) = qForceNew.at(dim);
-        }
         return true;
     }
     else {
