@@ -21,8 +21,7 @@ TODO:
       within the bounds of the external potential. (completed)
     - Add more generalized wavefunction and hamiltonian classes
     - Add functionality for writing to file (complete for 1 variational parameter)
-    - Add importance sampling. Idea: make each sampling rule as a method
-      of system, and declare which is to be used when initializing.
+    - Add importance sampling. (in progress)
     - Add functionality within system for equilibriating the system
       before sampling begins. (completed)
     - Add counting of accepted steps. (completed)
