@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 
 DATA_DIR = "./Data/"
 
@@ -16,6 +17,8 @@ def sphericalVMC():
     energy_ana = particles*dim*alpha - 2*alpha**2*ri_2 + 0.5*omega**2*ri_2
     plt.errorbar(alpha, energy_num, np.sqrt(df["Variance"]), 0, label="numerical", fmt="bo")
     plt.plot(alpha, energy_ana, "y--", label="analytic")
+    plt.xlabel(r"$\alpha$")
+    plt.ylabel(r"$<E>$")
     plt.legend()
     plt.show()
 
