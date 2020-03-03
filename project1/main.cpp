@@ -17,14 +17,15 @@ using namespace std;
 
 /*
 TODO:
-    - Fix randomuniform.cpp such that it initializes particle positions randomly
-      within the bounds of the external potential. (completed)
     - Add more generalized wavefunction and hamiltonian classes
     - Add functionality for writing to file (complete for 1 variational parameter)
     - Add importance sampling. (in progress)
-    - Add functionality within system for equilibriating the system
-      before sampling begins. (completed)
-    - Add counting of accepted steps. (completed)
+    - Implement gradient descent
+    - Implement functionality for resampling
+        - bootstrap
+        - blocking
+        - (this involves appending cumulative energy to an array for each MC step)
+
 */
 
 
