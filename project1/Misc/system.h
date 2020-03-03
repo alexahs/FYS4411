@@ -12,15 +12,18 @@ public:
     void setHamiltonian             (class Hamiltonian* hamiltonian);
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
+    void setMetropolisTest          (class MetropolisTest* test);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }
+    class MetropolisTest*           getMetropolisTest() { return m_test; }
     std::vector<class Particle*>    getParticles()      { return m_particles; }
     int getNumberOfParticles()          { return m_numberOfParticles; }
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
     double getSumRiSquared          ();
+
 
 private:
     int                             m_numberOfParticles = 0;
@@ -32,5 +35,6 @@ private:
     class Hamiltonian*              m_hamiltonian = nullptr;
     class InitialState*             m_initialState = nullptr;
     class Sampler*                  m_sampler = nullptr;
+    class MetropolisTest*           m_test = nullptr;
     std::vector<class Particle*>    m_particles = std::vector<class Particle*>();
 };

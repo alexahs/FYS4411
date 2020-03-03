@@ -95,6 +95,10 @@ void System::setInitialState(InitialState* initialState) {
     m_initialState = initialState;
 }
 
+void System::setMetropolisTest(MetropolisTest* test) {
+    m_test = test;
+}
+
 double System::getSumRiSquared() {
     double r2 = 0;
     for (auto particle : m_particles) { // loop over particles

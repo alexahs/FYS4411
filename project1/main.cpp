@@ -12,6 +12,8 @@
 #include "Misc/particle.h"
 #include "Misc/sampler.h"
 #include "Misc/writefile.h"
+#include "Misc/metropolistest.h"
+#include "Misc/standardmetropolistest.h"
 
 using namespace std;
 
@@ -45,6 +47,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double stepLength           = 0.05;          // Metropolis step length.
     double equilibration        = 0.1;          // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
+    int importanceSampling      = false;
 
     double alpha = alpha_min;
     int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
@@ -58,6 +61,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     for (int i=0; i<numAlphas; i++) {
         System* system = new System();
+        system->setMetropolisTest           (new StandardMetropolisTest(system));
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
         system->setInitialState             (new RandomUniform(system,
