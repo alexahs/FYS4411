@@ -26,6 +26,8 @@ void Sampler::sample(bool acceptedStep) {
     if (m_stepNumber == 0) {
         m_cumulativeEnergy = 0;
         m_cumulativeEnergy2 = 0;
+        m_acceptedSteps = 0;
+        m_acceptRatio = 0;
     }
 
     if (acceptedStep) {m_acceptedSteps++;}

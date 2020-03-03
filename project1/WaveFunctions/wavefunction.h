@@ -10,6 +10,7 @@ public:
     std::vector<double> getParameters() { return m_parameters; }
     virtual double evaluate(std::vector<class Particle*> particles) = 0;
     virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
+    virtual std::vector<double> computeQuantumForce(class Particle* particle) = 0;
 
 protected:
     int     m_numberOfParameters = 0;

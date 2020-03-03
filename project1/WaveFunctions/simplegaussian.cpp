@@ -1,6 +1,8 @@
 #include "simplegaussian.h"
 #include <cmath>
 #include <cassert>
+#include <iostream>
+
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
         WaveFunction(system) {
@@ -40,4 +42,18 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     int N = particles.size();
     double r2 = m_system->getSumRiSquared();
     return -twoAlpha*(dim*N - twoAlpha*r2);
+}
+
+std::vector<double> SimpleGaussian::computeQuantumForce(Particle* particle)
+{
+    int dims = m_system->getNumberOfDimensions();
+    double fourAlpha = 4.0*m_parameters.at(0);
+    std::vector<double> qForce =  std::vector<double>();
+    std::vector<double> pos = particle->getPosition();
+    for (int dim = 0; dim < dims; dim++){
+        qForce.push_back(-fourAlpha*pos.at(dim));
+        // std::cout << qForce.at(dim) << std::endl;
+    }
+
+    return qForce;
 }

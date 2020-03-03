@@ -39,12 +39,13 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
-    int numberOfParticles       = 1;
+    int numberOfParticles       = 10;
     int numberOfSteps           = (int) 1e6;
     double omega                = 1.0;          // Oscillator frequency.
-    double stepLength           = 0.05;          // Metropolis step length.
-    double equilibration        = 0.1;          // Amount of the total steps used for equilibration.
+    double stepLength           = 0.1;         // Metropolis step length.
+    double equilibration        = 0.05;          // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
+    bool importanceSampling     = true;
 
     double alpha = alpha_min;
     int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
@@ -67,6 +68,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
+        system->setImportanceSampling       (importanceSampling);
         system->runMetropolisSteps          (numberOfSteps);
         Sampler* system_sampler = system->getSampler();
         alphaVec.push_back(alpha);
