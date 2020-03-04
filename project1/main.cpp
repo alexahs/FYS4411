@@ -33,7 +33,7 @@ TODO:
 void run_vmc(double alpha_min, double alpha_max, double alpha_step);
 
 int main() {
-    run_vmc(0.1, 1.0, 0.05);
+    run_vmc(0.1, 0.9, 0.05);
     return 0;
 }
 
@@ -41,7 +41,7 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
-    int numberOfParticles       = 10;
+    int numberOfParticles       = 500;
     int numberOfSteps           = (int) 1e6;
     double omega                = 1.0;     // Oscillator frequency.
     double stepLength           = 0.1;     // Metropolis: step length
@@ -50,7 +50,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double equilibration        = 0.1;     // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
     bool importanceSampling     = false;
-    bool numericalDoubleDerviative = false;
+    bool numericalDoubleDerviative = true;
     vector<double> alphaVec;
     for(double alpha = alpha_min; alpha <= alpha_max; alpha += alpha_step){
         alphaVec.push_back(alpha);
