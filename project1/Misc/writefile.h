@@ -4,6 +4,5 @@
 
 using namespace std;
 
-void writeFileOneVariational(int, int, int, int, bool,
-    vector<double>, vector<double>, vector<double>, vector<double>,
-    vector<double>, vector<double>);
+void writeFileOneVariational(int, int, int, int, bool, vector<double>,
+     vector<double>, vector<double>, vector<double>, vector<double>);

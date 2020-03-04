@@ -28,8 +28,6 @@ public:
     double getStepLength()              { return m_h; }
     double getSumRiSquared          ();
 
-
-
 private:
     bool                            m_importanceSampling = false;
     bool                            m_numericalDoubleDerivative = false;
