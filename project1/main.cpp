@@ -46,7 +46,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double omega                = 1.0;    // Oscillator frequency.
     double stepLength           = 0.1;   // Metropolis: step length
     double timeStep             = 0.01;   // Metropolis-Hastings: time step
-    double h                    = 0.01;   // Double derivative step length
+    double h                    = 0.001;   // Double derivative step length
     double equilibration        = 0.05;   // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
     bool importanceSampling     = false;

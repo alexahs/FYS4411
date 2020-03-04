@@ -44,7 +44,8 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
         double minusalpha = - m_parameters.at(0);
         double dim = particles[0]->getPosition().size();
         // center piece of numerical double derivation
-        double doubleDerivative = -2*dim*this->evaluate(particles);
+        double waveFunc = this->evaluate(particles);
+        double doubleDerivative = -2*dim*waveFunc;
         // NOTE: we will divide by h^2 in the end to reduce # of FLOPS
         double r2 = m_system->getSumRiSquared();
         // The idea is to have the full Sum((r_i)^2), and calculate
@@ -73,7 +74,7 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
         }
         // Divide by step length squared
         doubleDerivative /= h2;
-        return doubleDerivative;
+        return doubleDerivative / waveFunc;
     } else {
         // Use the analytic expression for the double derivative
         double twoAlpha = 2 * m_parameters.at(0);
