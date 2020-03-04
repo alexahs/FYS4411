@@ -29,12 +29,11 @@ TODO:
 
 */
 
-
 // Run VMC for spherical HO trap
 void run_vmc(double alpha_min, double alpha_max, double alpha_step);
 
 int main() {
-    run_vmc(0.1, 1.0, 0.05);
+    run_vmc(0.1, 2.0, 0.1);
     return 0;
 }
 
@@ -42,8 +41,8 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
-    int numberOfParticles       = 1;
-    int numberOfSteps           = (int) 1e6;
+    int numberOfParticles       = 10;
+    int numberOfSteps           = (int) 1e5;
     double omega                = 1.0;    // Oscillator frequency.
     double stepLength           = 0.1;   // Metropolis: step length
     double timeStep             = 0.01;   // Metropolis-Hastings: time step
@@ -51,7 +50,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double equilibration        = 0.05;   // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
     bool importanceSampling     = false;
-    bool numericalDoubleDerviative = false;
+    bool numericalDoubleDerviative = true;
     double alpha = alpha_min;
     int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
     vector<double> alphaVec;
