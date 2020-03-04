@@ -33,7 +33,7 @@ TODO:
 void run_vmc(double alpha_min, double alpha_max, double alpha_step);
 
 int main() {
-    run_vmc(0.1, 2.0, 0.1);
+    run_vmc(0.1, 1.0, 0.05);
     return 0;
 }
 
@@ -42,7 +42,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
     int numberOfParticles       = 10;
-    int numberOfSteps           = (int) 1e5;
+    int numberOfSteps           = (int) 1e6;
     double omega                = 1.0;    // Oscillator frequency.
     double stepLength           = 0.1;   // Metropolis: step length
     double timeStep             = 0.01;   // Metropolis-Hastings: time step
@@ -51,46 +51,50 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double characteristicLength = 1.0;
     bool importanceSampling     = false;
     bool numericalDoubleDerviative = true;
-    double alpha = alpha_min;
-    int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
+    // int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
     vector<double> alphaVec;
     vector<double> energyVec;
     vector<double> energy2Vec;
     vector<double> varianceVec;
     vector<double> acceptRatioVec;
-    vector<double> sumRiSquaredVec;
     // auto start = high_resolution_clock::now();
-
-    for (int i=0; i<numAlphas; i++) {
-        System* system = new System();
-        system->setHamiltonian              (new HarmonicOscillator(system, omega));
-        system->setWaveFunction             (new SimpleGaussian(system, alpha));
-        system->setInitialState             (new RandomUniform(system,
-                                                    numberOfDimensions,
-                                                    numberOfParticles,
-                                                    characteristicLength));
-
-        system->setEquilibrationFraction     (equilibration);
-        system->setStepLength                (stepLength);
-        system->setStepLength                (stepLength);
-        system->setStepLength                (stepLength);
-        system->setImportanceSampling        (importanceSampling, timeStep);
-        system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
-        system->runMetropolisSteps           (numberOfSteps);
-        Sampler* system_sampler = system->getSampler();
+    for(double alpha = alpha_min; alpha <= alpha_max; alpha += alpha_step){
         alphaVec.push_back(alpha);
-        energyVec.push_back(system_sampler->getEnergy());
-        energy2Vec.push_back(system_sampler->getEnergy2());
-        varianceVec.push_back(system_sampler->getVariance());
-        acceptRatioVec.push_back(system_sampler->getAcceptRatio());
-        sumRiSquaredVec.push_back(system->getSumRiSquared());
-        alpha += alpha_step;
     }
+
+    // #pragma omp parallel
+    #pragma omp parallel for schedule(dynamic)
+        for(int i = 0; i < alphaVec.size(); i++){
+        // for(auto alpha : alphaVec){
+            System* system = new System();
+            system->setHamiltonian              (new HarmonicOscillator(system, omega));
+            system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
+            system->setInitialState             (new RandomUniform(system,
+                                                        numberOfDimensions,
+                                                        numberOfParticles,
+                                                        characteristicLength));
+
+            system->setEquilibrationFraction     (equilibration);
+            system->setStepLength                (stepLength);
+            system->setStepLength                (stepLength);
+            system->setStepLength                (stepLength);
+            system->setImportanceSampling        (importanceSampling, timeStep);
+            system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
+            system->runMetropolisSteps           (numberOfSteps);
+            Sampler* system_sampler = system->getSampler();
+            // alphaVec.push_back(alpha);
+            energyVec.push_back(system_sampler->getEnergy());
+            energy2Vec.push_back(system_sampler->getEnergy2());
+            varianceVec.push_back(system_sampler->getVariance());
+            acceptRatioVec.push_back(system_sampler->getAcceptRatio());
+            // alpha += alpha_step;
+        }
+        //end omp
 
     // auto stop = high_resolution_clock::now()
 
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
-      varianceVec, acceptRatioVec, sumRiSquaredVec);
+      varianceVec, acceptRatioVec);
 }
