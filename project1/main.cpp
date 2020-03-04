@@ -47,22 +47,28 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double stepLength           = 0.1;   // Metropolis: step length
     double timeStep             = 0.01;   // Metropolis-Hastings: time step
     double h                    = 0.001;   // Double derivative step length
-    double equilibration        = 0.05;   // Amount of the total steps used for equilibration.
+    double equilibration        = 0.1;   // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
     bool importanceSampling     = false;
-    bool numericalDoubleDerviative = true;
+    bool numericalDoubleDerviative = false;
     // int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
     vector<double> alphaVec;
-    vector<double> energyVec;
-    vector<double> energy2Vec;
-    vector<double> varianceVec;
-    vector<double> acceptRatioVec;
+    // vector<double> energyVec;
+    // vector<double> energy2Vec;
+    // vector<double> varianceVec;
+    // vector<double> acceptRatioVec;
     // auto start = high_resolution_clock::now();
+
+
     for(double alpha = alpha_min; alpha <= alpha_max; alpha += alpha_step){
         alphaVec.push_back(alpha);
     }
+    vector<double> energyVec(alphaVec.size(), 0);
+    vector<double> energy2Vec(alphaVec.size(), 0);
+    vector<double> varianceVec(alphaVec.size(), 0);
+    vector<double> acceptRatioVec(alphaVec.size(), 0);
 
-    // #pragma omp parallel
+    //
     #pragma omp parallel for schedule(dynamic)
         for(int i = 0; i < alphaVec.size(); i++){
         // for(auto alpha : alphaVec){
@@ -83,16 +89,15 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
             system->runMetropolisSteps           (numberOfSteps);
             Sampler* system_sampler = system->getSampler();
             // alphaVec.push_back(alpha);
-            energyVec.push_back(system_sampler->getEnergy());
-            energy2Vec.push_back(system_sampler->getEnergy2());
-            varianceVec.push_back(system_sampler->getVariance());
-            acceptRatioVec.push_back(system_sampler->getAcceptRatio());
+            energyVec.at(i) = (system_sampler->getEnergy());
+            energy2Vec.at(i) = (system_sampler->getEnergy2());
+            varianceVec.at(i) = (system_sampler->getVariance());
+            acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
             // alpha += alpha_step;
         }
-        //end omp
+        //end parallel region
 
     // auto stop = high_resolution_clock::now()
-
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
