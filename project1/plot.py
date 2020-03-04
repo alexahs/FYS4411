@@ -7,16 +7,10 @@ DATA_DIR = "./Data/"
 
 
 def sphericalVMC():
-    df = pd.read_csv(DATA_DIR + "vmc_3d_1p.csv")
-    alpha = df["Alpha"]
-    energy_num = df["Energy"]
-    ri_2 = df["SumRiSquared"]
-    dim = 3
-    particles = 1
-    omega = 1
-    energy_ana = particles*dim*alpha - 2*alpha**2*ri_2 + 0.5*omega**2*ri_2
-    plt.errorbar(alpha, energy_num, np.sqrt(df["Variance"]), 0, label="numerical", fmt="bo")
-    plt.plot(alpha, energy_ana, "y--", label="analytic")
+    df_ana = pd.read_csv(DATA_DIR + "vmc_3d_1p_ana.csv")
+    df_num = pd.read_csv(DATA_DIR + "vmc_3d_1p_num.csv")
+    plt.errorbar(df_num["Alpha"], df_num["Energy"], np.sqrt(df_num["Variance"]), 0, label="numerical", fmt="bo")
+    plt.errorbar(df_ana["Alpha"], df_ana["Energy"], np.sqrt(df_ana["Variance"]), 0, label="analytic", fmt="yo")
     plt.xlabel(r"$\alpha$")
     plt.ylabel(r"$<E>$")
     plt.legend()

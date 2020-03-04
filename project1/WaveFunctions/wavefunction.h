@@ -6,8 +6,8 @@
 class WaveFunction {
 public:
     WaveFunction(class System* system);
-    int     getNumberOfParameters() { return m_numberOfParameters; }
-    std::vector<double> getParameters() { return m_parameters; }
+    int getNumberOfParameters()                 { return m_numberOfParameters; }
+    std::vector<double> getParameters()         { return m_parameters; }
     virtual double evaluate(std::vector<class Particle*> particles) = 0;
     virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
     virtual std::vector<double> computeQuantumForce(class Particle* particle) = 0;

@@ -60,8 +60,8 @@ bool System::importanceStep(){
 
     for (int dim=0; dim<m_numberOfDimensions; dim++){
         //calculate new position based on the langevin equation
-        double step = qForceOld.at(dim)*m_stepLengthDiffusion
-                      + Random::nextGaussian(0, 1.0)*m_sqrtStepLength;
+        double step = qForceOld.at(dim)*m_timeStepDiffusion
+                      + Random::nextGaussian(0, 1.0)*m_sqrtTimeStep;
         proposedSteps.push_back(step);
         randomParticle->adjustPosition(proposedSteps.at(dim), dim);
     }
@@ -71,14 +71,18 @@ bool System::importanceStep(){
     std::vector<double> posNew = randomParticle->getPosition();
     std::vector<double> qForceNew = m_waveFunction->computeQuantumForce(randomParticle);
 
+
+
+
+
     //compute greens function
     double greensFunctionRatio = 0;
     for (int dim=0; dim<m_numberOfDimensions; dim++){
-        double term1 = posOld.at(dim) - posNew.at(dim) - m_stepLengthDiffusion*qForceOld.at(dim);
-        double term2 = posNew.at(dim) - posOld.at(dim) - m_stepLengthDiffusion*qForceNew.at(dim);
-        greensFunctionRatio += term1*term1 + term2*term2;
+        double term1 = posOld.at(dim) - posNew.at(dim) - m_timeStepDiffusion*qForceNew.at(dim);
+        double term2 = posNew.at(dim) - posOld.at(dim) - m_timeStepDiffusion*qForceOld.at(dim);
+        greensFunctionRatio += (term2*term2) - (term1*term1);
     }
-    greensFunctionRatio *= m_invFourStepLengthDiffusion;
+    greensFunctionRatio *= m_invFourTimeStepDiffusion;
     greensFunctionRatio = exp(greensFunctionRatio);
 
     double probabilityRatio = greensFunctionRatio*wfNew*wfNew/(wfOld*wfOld);
@@ -153,9 +157,7 @@ void System::setNumberOfDimensions(int numberOfDimensions) {
 void System::setStepLength(double stepLength) {
     assert(stepLength > 0);
     m_stepLength = stepLength;
-    m_stepLengthDiffusion = 0.5*stepLength;
-    m_sqrtStepLength = sqrt(stepLength);
-    m_invFourStepLengthDiffusion = 1/(4*m_stepLengthDiffusion);
+
 }
 
 void System::setEquilibrationFraction(double equilibrationFraction) {
@@ -185,6 +187,16 @@ double System::getSumRiSquared() {
     return r2;
 }
 
-void System::setImportanceSampling(bool importanceSampling){
+void System::setImportanceSampling(bool importanceSampling, double timeStep){
+    if (importanceSampling) {assert(timeStep > 0);}
     m_importanceSampling = importanceSampling;
+    m_timeStep = timeStep;
+    m_timeStepDiffusion = 0.5*timeStep;
+    m_sqrtTimeStep = sqrt(timeStep);
+    m_invFourTimeStepDiffusion = 1/(4*m_timeStepDiffusion);
+}
+
+void System::setNumericalDoubleDerivative(bool numericalDoubleDerivative, double h){
+    m_numericalDoubleDerivative = numericalDoubleDerivative;
+    m_h = h;
 }

@@ -36,12 +36,53 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
      * This quantity is needed to compute the (local) energy (consider the
      * Schrödinger equation to see how the two are related).
      */
-    double twoAlpha = 2 * m_parameters.at(0);
-    double term = 0;
-    int dim = particles.at(0)->getPosition().size();
-    int N = particles.size();
-    double r2 = m_system->getSumRiSquared();
-    return -twoAlpha*(dim*N - twoAlpha*r2);
+
+    if (m_system->getNumericalDoubleDerivative()) {
+        // Compute the numerical double derivative
+        double h = m_system->getStepLength();
+        double h2 = h*h;
+        double minusalpha = - m_parameters.at(0);
+        double dim = particles[0]->getPosition().size();
+        // center piece of numerical double derivation
+        double doubleDerivative = -2*dim*this->evaluate(particles);
+        // NOTE: we will divide by h^2 in the end to reduce # of FLOPS
+        double r2 = m_system->getSumRiSquared();
+        // The idea is to have the full Sum((r_i)^2), and calculate
+        // the difference to obtain r_(i+h,j,k) and so on
+        std::vector<double> r2_plus(dim, r2);
+        std::vector<double> r2_minus(dim, r2);
+        double diff, xi;
+
+        for (auto particle : particles) { // loop over particles
+            for (int i=0; i<dim; i++) {
+                xi = particle->getPosition()[i];
+                diff = xi*xi;
+                // Remove this part from the sum
+                r2_plus[i] -= diff;
+                r2_minus[i] -= diff;
+                // Add the shifted position squared
+                r2_plus[i] += (xi+h) * (xi+h);
+                r2_minus[i] += (xi-h) * (xi-h);
+            }
+        }
+        // Now we have the shifted Sum((r_i)^2) which we will use to evaluate
+        // the wave function here:
+        for (int i=0; i<dim; i++) {
+            doubleDerivative += exp(minusalpha*r2_plus[i]);
+            doubleDerivative += exp(minusalpha*r2_minus[i]);
+        }
+        // Divide by step length squared
+        doubleDerivative /= h2;
+        return doubleDerivative;
+    } else {
+        // Use the analytic expression for the double derivative
+        double twoAlpha = 2 * m_parameters.at(0);
+        double term = 0;
+        int dim = particles.at(0)->getPosition().size();
+        int N = particles.size();
+        double r2 = m_system->getSumRiSquared();
+        return -twoAlpha*(dim*N - twoAlpha*r2);
+    }
 }
 
 std::vector<double> SimpleGaussian::computeQuantumForce(Particle* particle)

@@ -1,12 +1,18 @@
 #include "writefile.h"
 
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
+    bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,
     vector<double> variance, vector<double> acceptRatio, vector<double> sumRiSquared)
 {
     std::string filename = "./Data/vmc_";
     filename.append(to_string(numDim) + "d_");
-    filename.append(to_string(numPart) + "p.csv");
+    filename.append(to_string(numPart) + "p_");
+    if (numericalDoubleDerviative) {
+        filename.append("num.csv");
+    } else {
+        filename.append("ana.csv");
+    }
 
     ofstream outfile;
     outfile.open(filename, ofstream::out | ofstream::trunc);

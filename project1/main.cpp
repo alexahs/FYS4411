@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
@@ -41,14 +42,16 @@ int main() {
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions      = 3;
-    int numberOfParticles       = 10;
-    int numberOfSteps           = (int) 1e5;
-    double omega                = 1.0;          // Oscillator frequency.
-    double stepLength           = 0.1;         // Metropolis step length.
-    double equilibration        = 0.05;          // Amount of the total steps used for equilibration.
+    int numberOfParticles       = 1;
+    int numberOfSteps           = (int) 1e6;
+    double omega                = 1.0;    // Oscillator frequency.
+    double stepLength           = 0.1;   // Metropolis: step length
+    double timeStep             = 0.01;   // Metropolis-Hastings: time step
+    double h                    = 0.01;   // Double derivative step length
+    double equilibration        = 0.05;   // Amount of the total steps used for equilibration.
     double characteristicLength = 1.0;
     bool importanceSampling     = false;
-
+    bool numericalDoubleDerviative = false;
     double alpha = alpha_min;
     int numAlphas = int((alpha_max - alpha_min)/alpha_step) + 1;
     vector<double> alphaVec;
@@ -57,7 +60,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     vector<double> varianceVec;
     vector<double> acceptRatioVec;
     vector<double> sumRiSquaredVec;
-
+    // auto start = high_resolution_clock::now();
 
     for (int i=0; i<numAlphas; i++) {
         System* system = new System();
@@ -68,10 +71,13 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
                                                     numberOfParticles,
                                                     characteristicLength));
 
-        system->setEquilibrationFraction    (equilibration);
-        system->setStepLength               (stepLength);
-        system->setImportanceSampling       (importanceSampling);
-        system->runMetropolisSteps          (numberOfSteps);
+        system->setEquilibrationFraction     (equilibration);
+        system->setStepLength                (stepLength);
+        system->setStepLength                (stepLength);
+        system->setStepLength                (stepLength);
+        system->setImportanceSampling        (importanceSampling, timeStep);
+        system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
+        system->runMetropolisSteps           (numberOfSteps);
         Sampler* system_sampler = system->getSampler();
         alphaVec.push_back(alpha);
         energyVec.push_back(system_sampler->getEnergy());
@@ -81,7 +87,11 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
         sumRiSquaredVec.push_back(system->getSumRiSquared());
         alpha += alpha_step;
     }
+
+    // auto stop = high_resolution_clock::now()
+
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
-      int (equilibration*numberOfSteps), alphaVec, energyVec, energy2Vec,
+      int (equilibration*numberOfSteps), numericalDoubleDerviative,
+      alphaVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, sumRiSquaredVec);
 }
