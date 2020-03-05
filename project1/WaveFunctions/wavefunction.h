@@ -11,9 +11,11 @@ public:
     virtual double evaluate(std::vector<class Particle*> particles) = 0;
     virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
     virtual std::vector<double> computeQuantumForce(class Particle* particle) = 0;
+    virtual double evaluateDerivative(std::vector<class Particle*> particles) = 0; //wrt var. params
 
 protected:
     int     m_numberOfParameters = 0;
     std::vector<double> m_parameters = std::vector<double>();
     System* m_system = nullptr;
+
 };
