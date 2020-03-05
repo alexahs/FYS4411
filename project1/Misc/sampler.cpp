@@ -40,6 +40,7 @@ void Sampler::sample(bool acceptedStep) {
                          computeLocalEnergy(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
+    m_wfDerivative      += m_system->getWaveFunction()->evaluateDerivative(m_system->getParticles());
     m_stepNumber++;
 }
 

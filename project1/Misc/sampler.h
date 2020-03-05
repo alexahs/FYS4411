@@ -24,4 +24,7 @@ private:
     double  m_cumulativeEnergy = 0;
     double  m_cumulativeEnergy2 = 0;
     class System* m_system = nullptr;
+
+    //for gradient descent
+    double m_wfDerivative = 0;
 };
