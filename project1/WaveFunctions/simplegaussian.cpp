@@ -99,3 +99,15 @@ std::vector<double> SimpleGaussian::computeQuantumForce(Particle* particle)
 
     return qForce;
 }
+
+double SimpleGaussian::evaluateDerivative(std::vector<class Particle*> particles)
+{   /*
+    analytical expression: -sum{r_i^2}*exp(-alpha*sum{r_i^2}
+    */
+
+    double wf = this->evaluate(particles);
+    //save on computing ln once instead of sumRiSquared again
+    double negSumRi2 = log(wf)/m_parameters.at(0);
+
+    return negSumRi2*wf;
+}
