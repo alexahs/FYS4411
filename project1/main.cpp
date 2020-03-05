@@ -44,7 +44,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     int numberOfParticles          = 10;        // Particales in system
     int numberOfSteps              = (int) 1e6; // Monte Carlo cycles
     double omega                   = 1.0;       // Oscillator frequency.
-    double stepLength              = 2.0;       // Metropolis: step length
+    double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
