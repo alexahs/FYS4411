@@ -68,4 +68,8 @@ void Sampler::computeAverages() {
     m_energy2 = m_cumulativeEnergy2 / nMetropolisSteps;
     m_variance = m_energy2 - m_energy*m_energy;
     m_acceptRatio = double (m_acceptedSteps) / double (nMetropolisSteps);
+
+    m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
+    m_wfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
+
 }
