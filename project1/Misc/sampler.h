@@ -1,4 +1,5 @@
 #pragma once
+#include <iomanip>
 
 class Sampler {
 public:

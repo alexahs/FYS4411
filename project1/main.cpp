@@ -40,29 +40,29 @@ int main() {
 
 void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
-    int numberOfDimensions      = 3;
-    int numberOfParticles       = 500;
-    int numberOfSteps           = (int) 1e6;
-    double omega                = 1.0;     // Oscillator frequency.
-    double stepLength           = 0.1;     // Metropolis: step length
-    double timeStep             = 0.01;    // Metropolis-Hastings: time step
-    double h                    = 0.001;   // Double derivative step length
-    double equilibration        = 0.1;     // Amount of the total steps used for equilibration.
-    double characteristicLength = 1.0;
-    bool importanceSampling     = false;
-    bool numericalDoubleDerviative = true;
+    int numberOfDimensions         = 3;         // Dimensions
+    int numberOfParticles          = 10;        // Particales in system
+    int numberOfSteps              = (int) 1e6; // Monte Carlo cycles
+    double omega                   = 1.0;       // Oscillator frequency.
+    double stepLength              = 2.0;       // Metropolis: step length
+    double timeStep                = 0.01;      // Metropolis-Hastings: time step
+    double h                       = 0.001;     // Double derivative step length
+    double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
+    double characteristicLength    = 1.0;       // a_0: natural length scale of the system
+    bool importanceSampling        = false;     // Otherwise: normal Metropolis sampling
+    bool numericalDoubleDerviative = true;     // Otherwise: use analytical expression for 2nd derivative
+    // Initialize vectors where results will be stored
     vector<double> alphaVec;
-    for(double alpha = alpha_min; alpha <= alpha_max; alpha += alpha_step){
-        alphaVec.push_back(alpha);
-    }
+    for(double alpha=alpha_min; alpha<=alpha_max; alpha+=alpha_step) { alphaVec.push_back(alpha); }
     vector<double> energyVec(alphaVec.size(), 0);
     vector<double> energy2Vec(alphaVec.size(), 0);
     vector<double> varianceVec(alphaVec.size(), 0);
     vector<double> acceptRatioVec(alphaVec.size(), 0);
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     #pragma omp parallel for schedule(dynamic)
-        for(int i = 0; i < alphaVec.size(); i++){
+        for(int i=0; i<alphaVec.size(); i++) {
             System* system = new System();
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
             system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
@@ -87,7 +87,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
         //end parallel region
 
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    cout << "Time = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << " ms" << endl;
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,

@@ -11,6 +11,7 @@
 
 using std::cout;
 using std::endl;
+using std::setw;
 
 bool System::metropolisStep() {
     /* Perform the actual Metropolis step: Choose a particle at random and
@@ -141,7 +142,6 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
             m_sampler->sample(acceptedStep);
         }
     }
-
     m_sampler->computeAverages();
     m_sampler->printOutputToTerminal();
 }
@@ -187,7 +187,7 @@ double System::getSumRiSquared() {
     return r2;
 }
 
-void System::setImportanceSampling(bool importanceSampling, double timeStep){
+void System::setImportanceSampling(bool importanceSampling, double timeStep) {
     if (importanceSampling) {assert(timeStep > 0);}
     m_importanceSampling = importanceSampling;
     m_timeStep = timeStep;
@@ -196,7 +196,7 @@ void System::setImportanceSampling(bool importanceSampling, double timeStep){
     m_invFourTimeStepDiffusion = 1/(4*m_timeStepDiffusion);
 }
 
-void System::setNumericalDoubleDerivative(bool numericalDoubleDerivative, double h){
+void System::setNumericalDoubleDerivative(bool numericalDoubleDerivative, double h) {
     m_numericalDoubleDerivative = numericalDoubleDerivative;
     m_h = h;
 }

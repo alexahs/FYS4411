@@ -10,7 +10,8 @@
 
 using std::cout;
 using std::endl;
-
+using std::setw;
+using std::setprecision;
 
 Sampler::Sampler(System* system) {
     m_system = system;
@@ -40,45 +41,23 @@ void Sampler::sample(bool acceptedStep) {
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_stepNumber++;
-
 }
 
 void Sampler::printOutputToTerminal() {
-    int     np = m_system->getNumberOfParticles();
-    int     nd = m_system->getNumberOfDimensions();
-    int     ms = m_system->getNumberOfMetropolisSteps();
-    int     p  = m_system->getWaveFunction()->getNumberOfParameters();
-    double  ef = m_system->getEquilibrationFraction();
+    int p = m_system->getWaveFunction()->getNumberOfParameters();
     std::vector<double> pa = m_system->getWaveFunction()->getParameters();
-
-    cout << endl;
-    cout << "  -- System info -- " << endl;
-    cout << "   * Number of particles  : " << np << endl;
-    cout << "   * Number of dimensions : " << nd << endl;
-    cout << "   * Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
-    cout << "   * Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
-    cout << "   * Ratio of accepted steps        : " << m_acceptRatio << endl << endl;
-    cout << "  -- Wave function parameters -- " << endl;
-    cout << "   * Number of parameters : " << p << endl;
-    for (int i=0; i < p; i++) {
-        cout << "   * Parameter " << i+1 << " : " << pa.at(i) << endl << endl;
-    }
-    cout << "  -- Results -- " << endl;
-    cout << "   * Energy : " << m_energy << endl;
-    cout << "   * Energy^2 : " << m_energy2 << endl;
-    cout << "   * Variance : " << m_variance << endl;
-    cout << endl << endl;
+    for (int i=0; i<p; i++) { cout << setw(12) << pa.at(i) << "|"; }
+    cout << setw(12) << setprecision(6) << m_energy << "|";
+    cout << setw(12) << setprecision(6) << m_energy2 << "|";
+    cout << setw(12) << setprecision(6) << m_variance << "|";
+    cout << setw(12) << setprecision(6) << m_acceptRatio << endl << " ";
 }
-
-
 
 void Sampler::computeAverages() {
     /* Compute the averages of the sampled quantities. You need to think
      * thoroughly through what is written here currently; is this correct?
      */
-
     int nMetropolisSteps = m_system->getNumberOfMetropolisSteps();
-
     m_energy = m_cumulativeEnergy / nMetropolisSteps;
     m_energy2 = m_cumulativeEnergy2 / nMetropolisSteps;
     m_variance = m_energy2 - m_energy*m_energy;
