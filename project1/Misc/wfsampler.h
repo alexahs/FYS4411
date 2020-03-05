@@ -7,6 +7,7 @@ public:
     WfSampler(System* system);
     void sample(bool acceptedStep);
     void computeAverages();
+    double gradientDescent();
 
 // protected:
 //     //for gradient descent

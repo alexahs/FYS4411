@@ -27,9 +27,6 @@ void WfSampler::sample(bool acceptedStep) {
 
     if (acceptedStep) {m_acceptedSteps++;}
 
-    /* Here you should sample all the interesting things you want to measure.
-     * Note that there are (way) more than the single one here currently.
-     */
     double localEnergy = m_system->getHamiltonian()->
                             computeLocalEnergy(m_system->getParticles());
     double wfDeriv = m_system->getWaveFunction()->
@@ -51,4 +48,13 @@ void WfSampler::computeAverages(){
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
     m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
+}
+
+
+
+
+double WfSampler::gradientDescent(){
+
+    return 1.0; 
+
 }
