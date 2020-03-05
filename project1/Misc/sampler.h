@@ -26,9 +26,9 @@ private:
     class System* m_system = nullptr;
 
     //for gradient descent
-    double m_wfDerivative = 0;
-    double m_expectWfDerivTimesLocalE = 0;
-    double m_expectWfDerivExpectEl = 0;
+    double m_wfDerivative = 0;              //<wf^(-1)*dWf/d(params)>
+    double m_expectWfDerivTimesLocalE = 0;  //<wf^(-1)*dWf/d(params)*localEnergy>
+    double m_expectWfDerivExpectEl = 0;     //<wf^(-1)*dWf/d(params)>*<localEnergy>
 
     double m_cumulativeWfDerivative = 0;
     double m_cumulativeWfDerivTimesLocalE = 0;

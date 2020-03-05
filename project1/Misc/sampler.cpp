@@ -45,7 +45,7 @@ void Sampler::sample(bool acceptedStep) {
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_cumulativeWfDerivative += wfDeriv;
-    m_cumulativeWfDerivTimesLocalE += localEnergy*localEnergy;
+    m_cumulativeWfDerivTimesLocalE += wfDeriv*localEnergy;
     m_stepNumber++;
 }
 
