@@ -27,7 +27,8 @@ private:
 
     //for gradient descent
     double m_wfDerivative = 0;
-    double m_wfDerivTimesLocalE = 0;
+    double m_expectWfDerivTimesLocalE = 0;
+    double m_expectWfDerivExpectEl = 0;
 
     double m_cumulativeWfDerivative = 0;
     double m_cumulativeWfDerivTimesLocalE = 0;

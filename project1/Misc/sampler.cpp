@@ -70,6 +70,7 @@ void Sampler::computeAverages() {
     m_acceptRatio = double (m_acceptedSteps) / double (nMetropolisSteps);
 
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
-    m_wfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
+    m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
+    m_expectWfDerivExpectEl = m_wfDerivative*m_expectWfDerivTimesLocalE;
 
 }
