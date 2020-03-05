@@ -33,3 +33,14 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 
     return kineticEnergy + potentialEnergy;
 }
+
+
+double HarmonicOscillator::computeLocalEnergyDerivative(std::vector<class Particle*> particles)
+{
+    double sumRi2 = m_system->getSumRiSquared();
+    double alpha = m_system->getWaveFunction()->getParameters().at(0);
+    int N =  m_system->getNumberOfParticles();
+    int dims = m_system->getNumberOfDimensions();
+
+    return N*dims - 4*alpha*sumRi2;
+}
