@@ -11,8 +11,9 @@ particles = sys.argv[2]
 def sphericalVMC(dim, particles):
     df_ana = pd.read_csv(DATA_DIR + f"vmc_{dim}d_{particles}p_ana.csv")
     df_num = pd.read_csv(DATA_DIR + f"vmc_{dim}d_{particles}p_num.csv")
-    plt.errorbar(df_num["Alpha"], df_num["Energy"], np.sqrt(df_num["Variance"]), 0, label="numerical", fmt="bo")
-    plt.errorbar(df_ana["Alpha"], df_ana["Energy"], np.sqrt(df_ana["Variance"]), 0, label="analytic", fmt="yo")
+
+    plt.errorbar(df_num["Alpha"] + 0.005, df_num["Energy"], np.sqrt(df_num["Variance"]), label="numerical", fmt=".", capsize=3)
+    plt.errorbar(df_ana["Alpha"] - 0.005, df_ana["Energy"], np.sqrt(df_ana["Variance"]), label="analytic", fmt=".", capsize=3)
     plt.title(f"{dim} dimensions, {particles} particle(s)")
     plt.xlabel(r"$\alpha$")
     plt.ylabel(r"$\langle E\rangle$")
