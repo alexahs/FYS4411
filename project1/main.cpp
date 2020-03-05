@@ -12,6 +12,7 @@
 #include "Misc/system.h"
 #include "Misc/particle.h"
 #include "Misc/sampler.h"
+#include "Misc/wfsampler.h"
 #include "Misc/writefile.h"
 
 using namespace std;
@@ -64,6 +65,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     #pragma omp parallel for schedule(dynamic)
         for(int i=0; i<alphaVec.size(); i++) {
             System* system = new System();
+            system->setSampler                  (new WfSampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
             system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
             system->setInitialState             (new RandomUniform(system,

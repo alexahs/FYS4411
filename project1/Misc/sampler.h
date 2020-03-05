@@ -5,15 +5,15 @@ class Sampler {
 public:
     Sampler(class System* system);
     void setNumberOfMetropolisSteps(int steps);
-    void sample(bool acceptedStep);
+    virtual void sample(bool acceptedStep);
+    virtual void computeAverages();
     void printOutputToTerminal();
-    void computeAverages();
     double getEnergy()          { return m_energy; }
     double getEnergy2()         { return m_energy2; }
     double getVariance()        { return m_variance; }
     double getAcceptRatio()     { return m_acceptRatio; }
 
-private:
+protected:
     int     m_numberOfMetropolisSteps = 0;
     int     m_stepNumber = 0;
     int     m_acceptedSteps = 0;
@@ -25,7 +25,7 @@ private:
     double  m_cumulativeEnergy2 = 0;
     class System* m_system = nullptr;
 
-    //for gradient descent
+    //for gradient descent(out sourced in wfsampler)
     double m_wfDerivative = 0;              //<wf^(-1)*dWf/d(params)>
     double m_expectWfDerivTimesLocalE = 0;  //<wf^(-1)*dWf/d(params)*localEnergy>
     double m_expectWfDerivExpectLocalE = 0;     //<wf^(-1)*dWf/d(params)>*<localEnergy>

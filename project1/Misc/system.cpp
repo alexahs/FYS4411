@@ -1,5 +1,6 @@
 #include "system.h"
 #include "sampler.h"
+#include "wfsampler.h"
 #include "particle.h"
 #include "WaveFunctions/wavefunction.h"
 #include "Hamiltonians/hamiltonian.h"
@@ -106,7 +107,7 @@ bool System::importanceStep(){
 
 void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_particles                 = m_initialState->getParticles();
-    m_sampler                   = new Sampler(this);
+    // m_sampler                   = new Sampler(this);
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
     assert(m_stepLength > 0);
@@ -175,6 +176,10 @@ void System::setWaveFunction(WaveFunction* waveFunction) {
 
 void System::setInitialState(InitialState* initialState) {
     m_initialState = initialState;
+}
+
+void System::setSampler(Sampler* sampler){
+    m_sampler = sampler;
 }
 
 double System::getSumRiSquared() {

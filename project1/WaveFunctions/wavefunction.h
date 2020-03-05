@@ -12,7 +12,7 @@ public:
     virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
     virtual std::vector<double> computeQuantumForce(class Particle* particle) = 0;
 
-    //should return dWf/d(params)*1/wf
+    //implement to return dWf/d(params)*1/wf
     virtual double evaluateDerivative(std::vector<class Particle*> particles) = 0;
 
 protected:

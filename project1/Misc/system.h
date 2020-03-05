@@ -17,6 +17,7 @@ public:
     void setInitialState            (class InitialState* initialState);
     void setImportanceSampling      (bool importanceSampling, double timeStep);
     void setNumericalDoubleDerivative (bool numericalDoubleDerviative, double h);
+    void setSampler                 (class Sampler* sampler);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }
