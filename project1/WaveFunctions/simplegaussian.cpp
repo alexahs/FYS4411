@@ -102,7 +102,7 @@ std::vector<double> SimpleGaussian::computeQuantumForce(Particle* particle)
 
 double SimpleGaussian::evaluateDerivative(std::vector<class Particle*> particles)
 {   /*
-    analytical expression: -sum{r_i^2}*exp(-alpha*sum{r_i^2}
+    dWf/dAlpha = -sum{r_i^2}*exp(-alpha*sum{r_i^2})
     */
 
     double wf = this->evaluate(particles);
