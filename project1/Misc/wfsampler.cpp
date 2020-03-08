@@ -41,8 +41,8 @@ void WfSampler::sample(bool acceptedStep) {
 void WfSampler::computeAverages(){
     int nMetropolisSteps = m_system->getNumberOfMetropolisSteps();
     m_energy = m_cumulativeEnergy / nMetropolisSteps;
-    // m_energy2 = m_cumulativeEnergy2 / nMetropolisSteps;
-    // m_variance = m_energy2 - m_energy*m_energy;
+    m_energy2 = m_cumulativeEnergy2 / nMetropolisSteps;
+    m_variance = m_energy2 - m_energy*m_energy;
     m_acceptRatio = double (m_acceptedSteps) / double (nMetropolisSteps);
 
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
@@ -55,6 +55,6 @@ void WfSampler::computeAverages(){
 
 double WfSampler::gradientDescent(){
 
-    return 1.0; 
+    return 1.0;
 
 }
