@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <fstream>
+#include <cassert>
 #include "sampler.h"
 #include "wfsampler.h"
 #include "system.h"
@@ -32,7 +33,7 @@ void WfSampler::sample(bool acceptedStep) {
     double wfDeriv = m_system->getWaveFunction()->
                             evaluateDerivative(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
-    // m_cumulativeEnergy2 += localEnergy*localEnergy;
+    m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_cumulativeWfDerivative += wfDeriv;
     m_cumulativeWfDerivTimesLocalE += wfDeriv*localEnergy;
     m_stepNumber++;
@@ -48,13 +49,4 @@ void WfSampler::computeAverages(){
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
     m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
-}
-
-
-
-
-double WfSampler::gradientDescent(){
-
-    return 1.0;
-
 }

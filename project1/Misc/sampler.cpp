@@ -30,8 +30,8 @@ void Sampler::sample(bool acceptedStep) {
         m_cumulativeEnergy2 = 0;
         m_acceptedSteps = 0;
         m_acceptRatio = 0;
-        m_cumulativeWfDerivative = 0;
-        m_cumulativeWfDerivTimesLocalE = 0;
+        // m_cumulativeWfDerivative = 0;
+        // m_cumulativeWfDerivTimesLocalE = 0;
     }
 
     if (acceptedStep) {m_acceptedSteps++;}
@@ -41,12 +41,12 @@ void Sampler::sample(bool acceptedStep) {
      */
     double localEnergy = m_system->getHamiltonian()->
                             computeLocalEnergy(m_system->getParticles());
-    double wfDeriv = m_system->getWaveFunction()->
-                            evaluateDerivative(m_system->getParticles());
+    // double wfDeriv = m_system->getWaveFunction()->
+    //                         evaluateDerivative(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
-    m_cumulativeWfDerivative += wfDeriv;
-    m_cumulativeWfDerivTimesLocalE += wfDeriv*localEnergy;
+    // m_cumulativeWfDerivative += wfDeriv;
+    // m_cumulativeWfDerivTimesLocalE += wfDeriv*localEnergy;
     m_stepNumber++;
 }
 
