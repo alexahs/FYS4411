@@ -6,12 +6,21 @@ public:
     Sampler(class System* system);
     void setNumberOfMetropolisSteps(int steps);
     virtual void sample(bool acceptedStep);
+
+
+
     virtual void computeAverages();
     void printOutputToTerminal();
     double getEnergy()          { return m_energy; }
     double getEnergy2()         { return m_energy2; }
     double getVariance()        { return m_variance; }
     double getAcceptRatio()     { return m_acceptRatio; }
+
+    double getExpectWfDerivTimesLocalE()    { return m_expectWfDerivTimesLocalE; }
+    double getExpectWfDerivExpectLocalE()   { return m_expectWfDerivExpectLocalE; }
+
+
+    // void resetCounters();
 
 protected:
     int     m_numberOfMetropolisSteps = 0;

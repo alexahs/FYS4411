@@ -10,6 +10,8 @@
 #include "Hamiltonians/hamiltonian.h"
 #include "WaveFunctions/wavefunction.h"
 
+using namespace std;
+
 WfSampler::WfSampler(System* system) :
     Sampler(system) {
     m_system = system;
@@ -32,6 +34,9 @@ void WfSampler::sample(bool acceptedStep) {
                             computeLocalEnergy(m_system->getParticles());
     double wfDeriv = m_system->getWaveFunction()->
                             evaluateDerivative(m_system->getParticles());
+
+    // cout << localEnergy << endl;
+
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_cumulativeWfDerivative += wfDeriv;
@@ -48,5 +53,11 @@ void WfSampler::computeAverages(){
 
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
-    m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
+    // m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
+    m_expectWfDerivExpectLocalE = m_wfDerivative * m_energy;
+
+    // cout << "deriv        : " << m_wfDerivative << endl;
+    // cout << "expect term 1: " << m_expectWfDerivTimesLocalE << endl;
+    // cout << "expect term 2: " << m_expectWfDerivExpectLocalE << endl;
+
 }

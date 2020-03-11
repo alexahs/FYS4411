@@ -9,4 +9,5 @@ public:
     double computeDoubleDerivative(std::vector<class Particle*> particles);
     std::vector<double> computeQuantumForce(class Particle* particle);
     double evaluateDerivative(std::vector<class Particle*> particles);
+    double evaluateCostFunction();
 };

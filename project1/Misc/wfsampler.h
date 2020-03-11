@@ -4,9 +4,11 @@
 
 class WfSampler : public Sampler {
 public:
-    WfSampler(System* system);
+    WfSampler(class System* system);
     void sample(bool acceptedStep);
     void computeAverages();
 
-    
+    // double getExpectWfDerivTimesLocalE()    { return m_expectWfDerivTimesLocalE; }
+    // double getExpectWfDerivExpectLocalE()   { return m_expectWfDerivExpectLocalE; }
+
 };

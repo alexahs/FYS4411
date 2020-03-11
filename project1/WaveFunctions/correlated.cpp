@@ -24,3 +24,8 @@ double Correlated::computeDoubleDerivative(std::vector<class Particle*> particle
 
     return 1.0;
 }
+
+
+double Correlated::evaluateCostFunction(){
+    return 1.0;
+}

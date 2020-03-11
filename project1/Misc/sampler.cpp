@@ -74,4 +74,21 @@ void Sampler::computeAverages() {
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
     m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
 
+
 }
+
+// void Sampler::resetCounters(){
+//     m_stepNumber = 0;
+//     m_acceptedSteps = 0;
+//     m_acceptRatio = 0;
+//     m_energy = 0;
+//     m_energy2 = 0;
+//     m_variance = 0;
+//     m_cumulativeEnergy = 0;
+//     m_cumulativeEnergy2 = 0;
+//     m_wfDerivative = 0;
+//     m_expectWfDerivTimesLocalE = 0;
+//     m_expectWfDerivExpectLocalE = 0;
+//     m_cumulativeWfDerivative = 0;
+//     m_cumulativeWfDerivTimesLocalE = 0;
+// }

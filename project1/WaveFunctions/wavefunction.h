@@ -15,6 +15,8 @@ public:
     //implement to return dWf/d(params)*1/wf
     virtual double evaluateDerivative(std::vector<class Particle*> particles) = 0;
 
+    virtual double evaluateCostFunction() = 0;
+
 protected:
     int     m_numberOfParameters = 0;
     std::vector<double> m_parameters = std::vector<double>();
