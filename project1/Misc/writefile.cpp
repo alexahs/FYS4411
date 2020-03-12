@@ -26,6 +26,8 @@ void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilS
         outfile << acceptRatio[i] << endl;
     }
     outfile.close();
+
+    cout << " * Results written to " << filename << endl;
 }
 
 void printInitalSystemInfo(int numberOfDimensions, int numberOfParticles,

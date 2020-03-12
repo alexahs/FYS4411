@@ -21,8 +21,8 @@ using namespace std;
 TODO:
     - Add more generalized wavefunction and hamiltonian classes
     - Add functionality for writing to file (complete for 1 variational parameter)
-    - Add importance sampling. (in progress)
-    - Implement gradient descent
+    - Add importance sampling. (done)
+    - Implement gradient descent (done)
     - Implement functionality for resampling
         - bootstrap
         - blocking
@@ -36,7 +36,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 
 int main() {
     // run_vmc(0.1, 0.9, 0.05);
-    run_gradient_descent(500, 0.2, 0.01);
+    run_gradient_descent(500, 0.2, 0.001);
     return 0;
 }
 
@@ -56,10 +56,11 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
-    // vector<double> energyVec();
-    // vector<double> energy2Vec();
-    // vector<double> varianceVec();
-    // vector<double> acceptRatioVec();
+    vector <double> alphaVec;
+    vector<double> energyVec;
+    vector<double> energy2Vec;
+    vector<double> varianceVec;
+    vector<double> acceptRatioVec;
 
 
     int maxIter = 100;
@@ -80,7 +81,6 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
                                                     numberOfDimensions,
                                                     numberOfParticles,
                                                     characteristicLength));
-
         system->setEquilibrationFraction     (equilibration);
         system->setStepLength                (stepLength);
         system->setStepLength                (stepLength);
@@ -90,6 +90,15 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
         system->runMetropolisSteps           (numberOfSteps);
         Sampler* system_sampler = system->getSampler();
 
+
+        // save observables
+        alphaVec.push_back(alphaNew);
+        energyVec.push_back(system_sampler->getEnergy());
+        energy2Vec.push_back(system_sampler->getEnergy2());
+        varianceVec.push_back(system_sampler->getVariance());
+        acceptRatioVec.push_back(system_sampler->getAcceptRatio());
+
+
         // get cost
         double cost = system->getWaveFunction()->evaluateCostFunction();
 
@@ -98,27 +107,21 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
         // compute new alpha with GD
         alphaNew -= gamma*cost;
 
-        // save observables
-        // energyVec.push_back(system_sampler->getEnergy());
-        // energy2Vec.push_back(system_sampler->getEnergy2());
-        // varianceVec.push_back(system_sampler->getVariance());
-        // acceptRatioVec.push_back(system_sampler->getAcceptRatio());
-
         iter++;
 
     }
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    // writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
-    //   int (equilibration*numberOfSteps), numericalDoubleDerviative,
-    //   alphaVec, energyVec, energy2Vec,
-    //   varianceVec, acceptRatioVec);
+    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
+      int (equilibration*numberOfSteps), numericalDoubleDerviative,
+      alphaVec, energyVec, energy2Vec,
+      varianceVec, acceptRatioVec);
 
     if (iter < maxIter){
         cout << " * Converged in " << iter << " steps" << endl;
     }
     else{
-        cout << " * Did not converge within tol=" << tol << " in " << "maxIter=" << maxIter << " steps" << endl;
+        cout << " * Did not converge within tol=" << tol << " in "  << maxIter << " steps" << endl;
     }
 
 
