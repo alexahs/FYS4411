@@ -36,9 +36,12 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 void run_single_vmc(double alpha, int numberOfSteps);
 
 int main() {
+    // NOTE: number of metro steps must be a power of 2 for blocking resampling to run
+
+
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
-    run_single_vmc(0.4, 1e6);
+    run_single_vmc(0.3, pow(2, 20));
     return 0;
 }
 
@@ -130,7 +133,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
 void run_single_vmc(double alpha, int numberOfSteps){
     int numberOfDimensions         = 3;         // Dimensions
-    int numberOfParticles          = 10;        // Particales in system
+    int numberOfParticles          = 500;        // Particales in system
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step

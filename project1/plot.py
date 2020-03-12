@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from blocking import block
 plt.style.use('ggplot')
 
 DATA_DIR = "./Data/"
 dim = sys.argv[1]
 particles = sys.argv[2]
-logSteps = int(sys.argv[3])
+log2Steps = int(sys.argv[3])
 
 def sphericalVMC(dim, particles):
     df_ana = pd.read_csv(DATA_DIR + f"vmc_{dim}d_{particles}p_ana.csv")
@@ -21,19 +22,33 @@ def sphericalVMC(dim, particles):
     plt.legend()
     plt.show()
 
+def bootstrap(dim, particles, log2Steps):
+    #TODO
+
+    return 1
 
 
-def resample(dim, particles, logSteps):
 
+def blocking(dim, particles, log2Steps):
+    """
+    Data should must contain 2^(int x) points for blocking code to run properly
+    """
+    filename = DATA_DIR + f"vmc_energysamples_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
 
-
-    filename = DATA_DIR + f"vmc_energysamples_{dim}d_{particles}p_1e{logSteps}steps.bin"
 
     energySamples = np.fromfile(filename, dtype="double")
 
-    print(energySamples)
 
+    mean, var = block(energySamples)
+
+    std = np.sqrt(var)
+    import pandas as pd
+    from pandas import DataFrame
+    print(" -------- Resampling results -------- \n")
+    data ={'Mean':[mean], 'Var':[var], 'STDev':[std]}
+    frame = pd.DataFrame(data,index=['Values'])
+    print(frame)
 
 
 # sphericalVMC(dim, particles)
-resample(dim, particles, logSteps)
+blocking(dim, particles, log2Steps)

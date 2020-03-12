@@ -5,7 +5,7 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
     std::string filename = "./Data/vmc_energysamples_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
-    filename.append("1e" + to_string(int(log10(metroSteps))) + "steps.bin");
+    filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
 
     ofstream outfile;
     outfile.open(filename, ios::out | ios::binary | ios::trunc);
