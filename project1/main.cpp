@@ -31,12 +31,14 @@ TODO:
 */
 
 // Run VMC for spherical HO trap
-void run_vmc(double alpha_min, double alpha_max, double alpha_step);
+void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
+void run_single_vmc(double alpha, int numberOfSteps);
 
 int main() {
-    // run_vmc(0.1, 0.9, 0.05);
-    run_gradient_descent(500, 0.2, 0.001);
+    // run_bruteforce_vmc(0.1, 0.9, 0.05);
+    // run_gradient_descent(500, 0.2, 0.001);
+    run_single_vmc(0.4, 1e6);
     return 0;
 }
 
@@ -83,11 +85,10 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
                                                     characteristicLength));
         system->setEquilibrationFraction     (equilibration);
         system->setStepLength                (stepLength);
-        system->setStepLength                (stepLength);
-        system->setStepLength                (stepLength);
+        system->setNumberOfMetropolisSteps   (numberOfSteps);
         system->setImportanceSampling        (importanceSampling, timeStep);
         system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
-        system->runMetropolisSteps           (numberOfSteps);
+        system->runMetropolisSteps           ();
         Sampler* system_sampler = system->getSampler();
 
 
@@ -127,7 +128,47 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
 }
 
-void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
+void run_single_vmc(double alpha, int numberOfSteps){
+    int numberOfDimensions         = 3;         // Dimensions
+    int numberOfParticles          = 10;        // Particales in system
+    double omega                   = 1.0;       // Oscillator frequency.
+    double stepLength              = 1.0;       // Metropolis: step length
+    double timeStep                = 0.01;      // Metropolis-Hastings: time step
+    double h                       = 0.001;     // Double derivative step length
+    double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
+    double characteristicLength    = 1.0;       // a_0: natural length scale of the system
+    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
+
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
+
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+
+    System* system = new System();
+    system->setSampler                  (new Sampler(system));
+    system->setHamiltonian              (new HarmonicOscillator(system, omega));
+    system->setWaveFunction             (new SimpleGaussian(system, alpha));
+    system->setInitialState             (new RandomUniform(system,
+                                                numberOfDimensions,
+                                                numberOfParticles,
+                                                characteristicLength));
+
+    system->setEquilibrationFraction     (equilibration);
+    system->setStepLength                (stepLength);
+    system->setNumberOfMetropolisSteps   (numberOfSteps);
+    system->setImportanceSampling        (importanceSampling, timeStep);
+    system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
+    system->runMetropolisSteps           ();
+
+    vector<double> energySamples = system->getSampler()->getEnergySamples();
+
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
+    writeFileEnergy(energySamples, numberOfDimensions, numberOfParticles, numberOfSteps);
+
+}
+
+void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
     int numberOfDimensions         = 3;         // Dimensions
     int numberOfParticles          = 10;        // Particales in system
@@ -138,8 +179,9 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = false;     // Otherwise: normal Metropolis sampling
-    bool numericalDoubleDerviative = true;     // Otherwise: use analytical expression for 2nd derivative
+    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
+    bool saveEnergySamples         = true;
     // Initialize vectors where results will be stored
     vector<double> alphaVec;
     for(double alpha=alpha_min; alpha<=alpha_max; alpha+=alpha_step) { alphaVec.push_back(alpha); }
@@ -153,7 +195,7 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
     // #pragma omp parallel for schedule(dynamic)
         for(int i=0; i<alphaVec.size(); i++) {
             System* system = new System();
-            system->setSampler                  (new WfSampler(system));
+            system->setSampler                  (new Sampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
             system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
             system->setInitialState             (new RandomUniform(system,
@@ -163,11 +205,10 @@ void run_vmc(double alpha_min, double alpha_max, double alpha_step) {
 
             system->setEquilibrationFraction     (equilibration);
             system->setStepLength                (stepLength);
-            system->setStepLength                (stepLength);
-            system->setStepLength                (stepLength);
+            system->setNumberOfMetropolisSteps   (numberOfSteps);
             system->setImportanceSampling        (importanceSampling, timeStep);
             system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
-            system->runMetropolisSteps           (numberOfSteps);
+            system->runMetropolisSteps           ();
 
             Sampler* system_sampler = system->getSampler();
             energyVec.at(i) = (system_sampler->getEnergy());

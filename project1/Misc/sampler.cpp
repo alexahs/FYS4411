@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <fstream>
+#include <cassert>
 #include "sampler.h"
 #include "wfsampler.h"
 #include "system.h"
@@ -21,6 +22,7 @@ Sampler::Sampler(System* system) {
 
 void Sampler::setNumberOfMetropolisSteps(int steps) {
     m_numberOfMetropolisSteps = steps;
+    m_vecEnergySamples.reserve(steps);
 }
 
 void Sampler::sample(bool acceptedStep) {
@@ -30,8 +32,6 @@ void Sampler::sample(bool acceptedStep) {
         m_cumulativeEnergy2 = 0;
         m_acceptedSteps = 0;
         m_acceptRatio = 0;
-        // m_cumulativeWfDerivative = 0;
-        // m_cumulativeWfDerivTimesLocalE = 0;
     }
 
     if (acceptedStep) {m_acceptedSteps++;}
@@ -41,13 +41,14 @@ void Sampler::sample(bool acceptedStep) {
      */
     double localEnergy = m_system->getHamiltonian()->
                             computeLocalEnergy(m_system->getParticles());
-    // double wfDeriv = m_system->getWaveFunction()->
-    //                         evaluateDerivative(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
-    // m_cumulativeWfDerivative += wfDeriv;
-    // m_cumulativeWfDerivTimesLocalE += wfDeriv*localEnergy;
     m_stepNumber++;
+
+    m_vecEnergySamples.push_back(localEnergy);
+    // cout << localEnergy << endl;
+
+
 }
 
 void Sampler::printOutputToTerminal() {
@@ -74,21 +75,12 @@ void Sampler::computeAverages() {
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
     m_expectWfDerivExpectLocalE = m_wfDerivative*m_expectWfDerivTimesLocalE;
 
-
 }
 
-// void Sampler::resetCounters(){
-//     m_stepNumber = 0;
-//     m_acceptedSteps = 0;
-//     m_acceptRatio = 0;
-//     m_energy = 0;
-//     m_energy2 = 0;
-//     m_variance = 0;
-//     m_cumulativeEnergy = 0;
-//     m_cumulativeEnergy2 = 0;
-//     m_wfDerivative = 0;
-//     m_expectWfDerivTimesLocalE = 0;
-//     m_expectWfDerivExpectLocalE = 0;
-//     m_cumulativeWfDerivative = 0;
-//     m_cumulativeWfDerivTimesLocalE = 0;
+// void Sampler::setSaveEnergySamples(bool saveEnergySamples){
+//     m_saveEnergySamples = saveEnergySamples;
+//     if (saveEnergySamples){
+//         assert(m_numberOfMetropolisSteps > 0);
+//         m_vecEnergySamples.reserve(m_numberOfMetropolisSteps);
+//     }
 // }

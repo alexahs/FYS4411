@@ -7,6 +7,7 @@ plt.style.use('ggplot')
 DATA_DIR = "./Data/"
 dim = sys.argv[1]
 particles = sys.argv[2]
+logSteps = int(sys.argv[3])
 
 def sphericalVMC(dim, particles):
     df_ana = pd.read_csv(DATA_DIR + f"vmc_{dim}d_{particles}p_ana.csv")
@@ -21,4 +22,18 @@ def sphericalVMC(dim, particles):
     plt.show()
 
 
-sphericalVMC(dim, particles)
+
+def resample(dim, particles, logSteps):
+
+
+
+    filename = DATA_DIR + f"vmc_energysamples_{dim}d_{particles}p_1e{logSteps}steps.bin"
+
+    energySamples = np.fromfile(filename, dtype="double")
+
+    print(energySamples)
+
+
+
+# sphericalVMC(dim, particles)
+resample(dim, particles, logSteps)

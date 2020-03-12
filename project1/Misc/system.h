@@ -7,9 +7,10 @@ public:
 
     bool metropolisStep             ();
     bool importanceStep             ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps);
+    void runMetropolisSteps         ();
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
+    void setNumberOfMetropolisSteps (int numberOfMetropolisSteps);
     void setStepLength              (double stepLength);
     void setEquilibrationFraction   (double equilibrationFraction);
     void setHamiltonian             (class Hamiltonian* hamiltonian);

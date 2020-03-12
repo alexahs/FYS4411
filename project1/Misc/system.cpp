@@ -34,7 +34,6 @@ bool System::metropolisStep() {
     double wfNew = m_waveFunction->evaluate(m_particles); // Evaluate new wave function
 
     double probabilityRatio = wfNew*wfNew/(wfOld*wfOld);
-    // cout << probabilityRatio << endl;
 
     if (Random::nextDouble() <= probabilityRatio) {
         wfOld = wfNew;
@@ -103,13 +102,16 @@ bool System::importanceStep(){
     }
 }
 
-
-
-void System::runMetropolisSteps(int numberOfMetropolisSteps) {
-    m_particles                 = m_initialState->getParticles();
-    // m_sampler                   = new Sampler(this);
-    m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
+void System::setNumberOfMetropolisSteps(int numberOfMetropolisSteps){
+    assert(numberOfMetropolisSteps > 0);
+    m_numberOfMetropolisSteps = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
+}
+
+
+
+void System::runMetropolisSteps() {
+    m_particles = m_initialState->getParticles();
     assert(m_stepLength > 0);
 
     wfOld = m_waveFunction->evaluate(m_particles);
@@ -118,12 +120,12 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     if (m_importanceSampling) {
 
         //equilibriate the system
-        for (int i=0; i<numberOfMetropolisSteps*m_equilibrationFraction; i++) {
+        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
             bool acceptedEquilibriateStep = importanceStep();
         }
 
         //run with sampling
-        for (int i=0; i<numberOfMetropolisSteps; i++) {
+        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
             bool acceptedStep = importanceStep();
             m_sampler->sample(acceptedStep);
         }
@@ -132,13 +134,13 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     //standard metropolis sampling
     else {
         // Equilibriation
-        for (int i=0; i<numberOfMetropolisSteps*m_equilibrationFraction; i++) {
+        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
 
             //attempt single step
             bool acceptedEquilibriateStep = metropolisStep();
         }
 
-        for (int i=0; i<numberOfMetropolisSteps; i++) {
+        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
             bool acceptedStep = metropolisStep();
             m_sampler->sample(acceptedStep);
         }

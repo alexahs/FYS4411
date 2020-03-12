@@ -35,6 +35,7 @@ vmc
 
 # Data files
 *.dat
+*.bin
 *.txt
 !CMakeLists.txt
 *.csv

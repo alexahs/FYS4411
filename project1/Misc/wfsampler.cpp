@@ -17,6 +17,9 @@ WfSampler::WfSampler(System* system) :
     m_system = system;
 }
 
+void WfSampler::setNumberOfMetropolisSteps(int steps) {
+    m_numberOfMetropolisSteps = steps;
+}
 
 void WfSampler::sample(bool acceptedStep) {
     // Make sure the sampling variable(s) are initialized at the first step.
@@ -53,6 +56,5 @@ void WfSampler::computeAverages(){
     m_wfDerivative = m_cumulativeWfDerivative / nMetropolisSteps;
     m_expectWfDerivTimesLocalE = m_cumulativeWfDerivTimesLocalE / nMetropolisSteps;
     m_expectWfDerivExpectLocalE = m_wfDerivative * m_energy;
-
 
 }

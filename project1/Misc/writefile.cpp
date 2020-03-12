@@ -1,5 +1,23 @@
 #include "writefile.h"
 
+
+void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps){
+    std::string filename = "./Data/vmc_energysamples_";
+    filename.append(to_string(numDim) + "d_");
+    filename.append(to_string(numPart) + "p_");
+    filename.append("1e" + to_string(int(log10(metroSteps))) + "steps.bin");
+
+    ofstream outfile;
+    outfile.open(filename, ios::out | ios::binary | ios::trunc);
+    outfile.write(reinterpret_cast<const char*> (energySamples.data()),energySamples.size()*sizeof(double));
+    outfile.close();
+
+    cout << " * Results written to " << filename << endl;
+
+
+}
+
+
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,

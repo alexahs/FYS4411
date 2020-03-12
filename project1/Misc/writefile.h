@@ -13,3 +13,5 @@ void writeFileOneVariational(int, int, int, int, bool, vector<double>,
 void printInitalSystemInfo(int, int, int, double, int);
 
 void printFinal(int, double);
+
+void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps);
