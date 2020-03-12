@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <omp.h>
 
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
@@ -41,7 +42,7 @@ int main() {
 
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
-    run_single_vmc(0.3, pow(2, 20));
+    run_single_vmc(0.3, pow(2, 10));
     return 0;
 }
 
@@ -133,7 +134,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
 void run_single_vmc(double alpha, int numberOfSteps){
     int numberOfDimensions         = 3;         // Dimensions
-    int numberOfParticles          = 500;        // Particales in system
+    int numberOfParticles          = 10;        // Particales in system
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step
@@ -147,27 +148,42 @@ void run_single_vmc(double alpha, int numberOfSteps){
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    System* system = new System();
-    system->setSampler                  (new Sampler(system));
-    system->setHamiltonian              (new HarmonicOscillator(system, omega));
-    system->setWaveFunction             (new SimpleGaussian(system, alpha));
-    system->setInitialState             (new RandomUniform(system,
-                                                numberOfDimensions,
-                                                numberOfParticles,
-                                                characteristicLength));
+    // int nProcs = omp_get_num_procs();
+    // cout << nProcs << endl;
+    // #pragma omp parallel
 
-    system->setEquilibrationFraction     (equilibration);
-    system->setStepLength                (stepLength);
-    system->setNumberOfMetropolisSteps   (numberOfSteps);
-    system->setImportanceSampling        (importanceSampling, timeStep);
-    system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
-    system->runMetropolisSteps           ();
+    int nProcs = omp_get_num_procs();
+    int stepsPerProc = numberOfSteps/nProcs;
+    std::vector<std::vector<double>> allEnergies;
 
-    vector<double> energySamples = system->getSampler()->getEnergySamples();
 
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    writeFileEnergy(energySamples, numberOfDimensions, numberOfParticles, numberOfSteps);
+    #pragma omp parallel for schedule(dynamic)
+        for(int i=0; i < stepsPerProc; i++){
+            System* system = new System();
+            system->setSampler                  (new Sampler(system));
+            system->setHamiltonian              (new HarmonicOscillator(system, omega));
+            system->setWaveFunction             (new SimpleGaussian(system, alpha));
+            system->setInitialState             (new RandomUniform(system,
+                                                        numberOfDimensions,
+                                                        numberOfParticles,
+                                                        characteristicLength));
+
+            system->setEquilibrationFraction     (equilibration);
+            system->setStepLength                (stepLength);
+            system->setNumberOfMetropolisSteps   (numberOfSteps);
+            system->setImportanceSampling        (importanceSampling, timeStep);
+            system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
+            system->runMetropolisSteps           ();
+            vector<double> energySamples = system->getSampler()->getEnergySamples();
+            #pragma omp critial
+            allEnergies.push_back(energySamples);
+        }//end parallel
+
+    // cout << allEnergies.capacity() << endl;
+    //
+    // chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    // printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
+    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
 
 }
 
@@ -195,7 +211,7 @@ void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step) {
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    // #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(dynamic)
         for(int i=0; i<alphaVec.size(); i++) {
             System* system = new System();
             system->setSampler                  (new Sampler(system));

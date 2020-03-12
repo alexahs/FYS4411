@@ -1,6 +1,7 @@
 #pragma once
 #include <iomanip>
 #include <vector>
+// #include <omp.h>
 
 class Sampler {
 public:
@@ -21,6 +22,7 @@ public:
 
     std::vector <double> getEnergySamples() { return m_vecEnergySamples; }
 
+    void initializeParallelVecs();
 
 protected:
     int     m_numberOfMetropolisSteps = 0;
@@ -43,5 +45,6 @@ protected:
     double m_cumulativeWfDerivTimesLocalE = 0;
 
     std::vector <double> m_vecEnergySamples;
+    // std::vector <std::vector<double>> m_vecSharedEnergySamples;
 
 };

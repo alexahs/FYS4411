@@ -120,15 +120,19 @@ void System::runMetropolisSteps() {
     if (m_importanceSampling) {
 
         //equilibriate the system
-        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
-            bool acceptedEquilibriateStep = importanceStep();
-        }
+        int n_equilSteps = m_numberOfMetropolisSteps*m_equilibrationFraction;
+        // #pragma omp parallel for schedule(dynamic)
+            for (int i=0; i<n_equilSteps; i++) {
+                bool acceptedEquilibriateStep = importanceStep();
+            }
+        // #pragma omp barrier
 
         //run with sampling
-        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
-            bool acceptedStep = importanceStep();
-            m_sampler->sample(acceptedStep);
-        }
+        // #pragma omp parallel for schedule(dynamic)
+            for (int i=0; i<m_numberOfMetropolisSteps; i++) {
+                bool acceptedStep = importanceStep();
+                m_sampler->sample(acceptedStep);
+            }
     }
 
     //standard metropolis sampling

@@ -45,6 +45,8 @@ void Sampler::sample(bool acceptedStep) {
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_stepNumber++;
 
+    // int threadID = omp_get_thread_num();
+
     m_vecEnergySamples.push_back(localEnergy);
     // cout << localEnergy << endl;
 
@@ -77,10 +79,15 @@ void Sampler::computeAverages() {
 
 }
 
-// void Sampler::setSaveEnergySamples(bool saveEnergySamples){
-//     m_saveEnergySamples = saveEnergySamples;
-//     if (saveEnergySamples){
-//         assert(m_numberOfMetropolisSteps > 0);
-//         m_vecEnergySamples.reserve(m_numberOfMetropolisSteps);
-//     }
+// void Sampler::initializeParallelVecs(int threadID){
+//
+//
+//     // m_vecSharedEnergySamples.at(threadID)
+//
+//
+//
+//
+//
+//
+//
 // }
