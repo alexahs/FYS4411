@@ -148,9 +148,6 @@ void run_single_vmc(double alpha, int numberOfSteps){
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    // int nProcs = omp_get_num_procs();
-    // cout << nProcs << endl;
-    // #pragma omp parallel
 
     int nProcs = omp_get_num_procs();
     int stepsPerProc = numberOfSteps/nProcs;
