@@ -31,7 +31,7 @@ def bootstrap(dim, particles, log2Steps):
 
 def blocking(dim, particles, log2Steps):
     """
-    Data should must contain 2^(int x) points for blocking code to run properly
+    Data should contain 2^(int x) points for blocking code to run properly
     """
     filename = DATA_DIR + f"vmc_energysamples_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
 
