@@ -8,13 +8,11 @@ public:
     WaveFunction(class System* system);
     int getNumberOfParameters()                 { return m_numberOfParameters; }
     std::vector<double> getParameters()         { return m_parameters; }
+    double computeDoubleDerivative(std::vector<class Particle*> particles);
     virtual double evaluate(std::vector<class Particle*> particles) = 0;
-    virtual double computeDoubleDerivative(std::vector<class Particle*> particles) = 0;
+    virtual double analyticDoubleDerivative(std::vector<class Particle*> particles) = 0;
     virtual std::vector<double> computeQuantumForce(class Particle* particle) = 0;
-
-    //implement to return dWf/d(params)*1/wf
     virtual double evaluateDerivative(std::vector<class Particle*> particles) = 0;
-
     virtual double evaluateCostFunction() = 0;
 
 protected:
