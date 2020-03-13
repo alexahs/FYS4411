@@ -42,7 +42,7 @@ int main() {
 
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
-    run_single_vmc(0.3, pow(2, 10));
+    run_single_vmc(0.3, pow(2, 20));
     return 0;
 }
 
@@ -154,7 +154,8 @@ void run_single_vmc(double alpha, int numberOfSteps){
 
     int nProcs = omp_get_num_procs();
     int stepsPerProc = numberOfSteps/nProcs;
-    std::vector<std::vector<double>> allEnergies;
+    std::vector<std::vector<double>> tempEnergies;
+    std::vector<double> allEnergies;
 
 
     #pragma omp parallel for schedule(dynamic)
@@ -176,14 +177,19 @@ void run_single_vmc(double alpha, int numberOfSteps){
             system->runMetropolisSteps           ();
             vector<double> energySamples = system->getSampler()->getEnergySamples();
             #pragma omp critial
-            allEnergies.push_back(energySamples);
+            tempEnergies.push_back(energySamples);
         }//end parallel
 
-    // cout << allEnergies.capacity() << endl;
-    //
-    // chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    // printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
+
+    for(int i = 0; i < nProcs; i++){
+        allEnergies.insert(allEnergies.end(),
+        tempEnergies[i].begin(),
+        tempEnergies[i].end());
+    }
+
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
+    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
 
 }
 
