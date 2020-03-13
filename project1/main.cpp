@@ -158,7 +158,7 @@ void run_single_vmc(double alpha, int numberOfSteps){
 
 
     #pragma omp parallel for schedule(dynamic)
-        for(int i=0; i < stepsPerProc; i++){
+        for(int i=0; i < nProcs; i++){
             System* system = new System();
             system->setSampler                  (new Sampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
