@@ -9,6 +9,7 @@
 #include "Hamiltonians/harmonicoscillator.h"
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
+#include "InitialStates/uniformlattice.h"
 #include "Math/random.h"
 #include "Misc/system.h"
 #include "Misc/particle.h"
@@ -35,15 +36,33 @@ TODO:
 void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 void run_single_vmc(double alpha, int numberOfSteps);
+void run_correlated();
 
 int main() {
     // NOTE: number of metro steps must be a power of 2 for blocking resampling to run
 
-
-    run_bruteforce_vmc(0.1, 0.9, 0.05);
+    run_correlated();
+    // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.3, pow(2, 20));
     return 0;
+}
+
+void run_correlated(){
+
+    double omega = 1;
+    int numberOfDimensions = 3;
+    int numberOfParticles = 50;
+    double characteristicLength = 1;
+    double hardSphereRadius = 0.1;
+
+    System* system = new System();
+    // system->setSampler                  (new WfSampler(system));
+    system->setInitialState             (new UniformLattice(system,
+                                                numberOfDimensions,
+                                                numberOfParticles,
+                                                characteristicLength,
+                                                hardSphereRadius));
 }
 
 void run_gradient_descent(int nAlphas, double alpha0, double gamma){
