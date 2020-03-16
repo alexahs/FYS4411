@@ -20,15 +20,17 @@
 using namespace std;
 
 /*
-TODO:
-    - Add more generalized wavefunction and hamiltonian classes
-    - Add functionality for writing to file (complete for 1 variational parameter)
-    - Add importance sampling. (done)
-    - Implement gradient descent (done)
-    - Implement functionality for resampling
-        - bootstrap
-        - blocking
-        - (this involves appending cumulative energy to an array for each MC step)
+TODO: (updated 16.03)
+    - Finish implementing elliptic HO class
+    - Finish implementing correlated WF:
+        - evaluation of the WF(done)
+        - implement gradiet and local energy
+        - implement 2nd derivative
+    - Implement gradient descent for correlated WF
+    - Implement better particle initialization for correlated WF(done)  
+    - Implement oneBody density
+
+
 
 */
 
