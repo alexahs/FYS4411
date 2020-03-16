@@ -37,14 +37,16 @@ void UniformLattice::setupInitialState() {
 
     double l = m_hardShpereRadius*10;
 
-    int sideLength = round(pow(m_numberOfParticles, 1.0/3.0));
 
+    //formula for computing side length of lattice can be improved..
+    int sideLength = floor(pow(m_numberOfParticles, 1.0/3.0)) + 1;
 
     std::vector<std::vector<double>> latticePoint = std::vector<std::vector<double>>();
 
     int nPoints = 0;
     //creates a few more points than nessecary...
     for(int x = -sideLength/2; x <= sideLength/2; x++){
+        cout << x << endl;
         for(int y = -sideLength/2; y <= sideLength/2; y++){
             for(int z = -sideLength/2; z <= sideLength/2; z++){
 
@@ -56,11 +58,14 @@ void UniformLattice::setupInitialState() {
         }
     }
 
+
     std::vector<int> indices = std::vector<int>();
 
     for(int i = 0; i < m_numberOfParticles; i++){
         indices.push_back(i);
     }
+
+    assert(nPoints >= m_numberOfParticles);
 
 
     for(int i = 0; i < m_numberOfParticles; i++){

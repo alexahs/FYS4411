@@ -36,33 +36,85 @@ TODO:
 void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 void run_single_vmc(double alpha, int numberOfSteps);
-void run_correlated();
+void test_correlated(double alpha, int numberOfSteps, int numberOfParticles);
 
-int main() {
+int main(int argc, char* argv[]) {
     // NOTE: number of metro steps must be a power of 2 for blocking resampling to run
 
-    // run_correlated();
+    if (argc < 2){
+        cout << "Must provide number of particles as argument" << endl;
+        return 1;
+    }
+
+    int nParticles = atoi(argv[1]);
+
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
-    run_single_vmc(0.5, pow(2, 18));
+    // run_single_vmc(0.5, pow(2, 18));
+    test_correlated(0.5, pow(2, 18), nParticles);
     return 0;
 }
 
-void run_correlated(){
+void test_correlated(double alpha, int numberOfSteps, int numberOfParticles){
 
-    double omega = 1;
-    int numberOfDimensions = 3;
-    int numberOfParticles = 10;
-    double characteristicLength = 1;
-    double hardSphereRadius = 0.1;
 
-    System* system = new System();
-    // system->setSampler                  (new WfSampler(system));
-    system->setInitialState             (new UniformLattice(system,
-                                                numberOfDimensions,
-                                                numberOfParticles,
-                                                characteristicLength,
-                                                hardSphereRadius));
+    int numberOfDimensions         = 3;         // Dimensions
+    // int numberOfParticles          = 10;        // Particales in system
+    double omega                   = 1.0;       // Oscillator frequency.
+    double stepLength              = 1.0;       // Metropolis: step length
+    double timeStep                = 0.01;      // Metropolis-Hastings: time step
+    double h                       = 0.001;     // Double derivative step length
+    double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
+    double characteristicLength    = 1.0;       // a_0: natural length scale of the system
+    double hardSphereRadius        = 1;
+    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
+
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
+
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+
+
+    int nProcs = omp_get_num_procs();
+    int stepsPerProc = numberOfSteps/nProcs;
+    std::vector<std::vector<double>> tempEnergies;
+    std::vector<double> allEnergies;
+
+
+    // #pragma omp parallel for schedule(dynamic)
+        // for(int i=0; i < nProcs; i++){
+            System* system = new System();
+            system->setSampler                  (new Sampler(system));
+            system->setHamiltonian              (new HarmonicOscillator(system, omega));
+            system->setWaveFunction             (new SimpleGaussian(system, alpha));
+            system->setInitialState             (new UniformLattice(system,
+                                                        numberOfDimensions,
+                                                        numberOfParticles,
+                                                        characteristicLength,
+                                                        hardSphereRadius));
+            //
+            // system->setEquilibrationFraction     (equilibration);
+            // system->setStepLength                (stepLength);
+            // system->setNumberOfMetropolisSteps   (numberOfSteps);
+            // system->setImportanceSampling        (importanceSampling, timeStep);
+            // system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
+            // system->runMetropolisSteps           ();
+            // vector<double> energySamples = system->getSampler()->getEnergySamples();
+            // #pragma omp critial
+            // tempEnergies.push_back(energySamples);
+        // }//end parallel
+
+
+    // for(int i = 0; i < nProcs; i++){
+    //     allEnergies.insert(allEnergies.end(),
+    //     tempEnergies[i].begin(),
+    //     tempEnergies[i].end());
+    // }
+    //
+    // chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    // printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
+    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
+
 }
 
 void run_gradient_descent(int nAlphas, double alpha0, double gamma){
