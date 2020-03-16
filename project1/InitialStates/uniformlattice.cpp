@@ -1,6 +1,8 @@
 #include "uniformlattice.h"
 #include <iostream>
 #include <cassert>
+#include <cmath>
+#include <vector>
 #include "Math/random.h"
 #include "Misc/particle.h"
 #include "Misc/system.h"
@@ -11,12 +13,15 @@ using std::endl;
 UniformLattice::UniformLattice(System*    system,
                              int        numberOfDimensions,
                              int        numberOfParticles,
-                             double     characteristicLength)  :
+                             double     characteristicLength,
+                             double     hardSphereRadius)  :
         InitialState(system) {
-    assert(numberOfDimensions > 0 && numberOfParticles > 0);
+    assert(numberOfDimensions == 3 && numberOfParticles > 0);
+    assert(hardSphereRadius > 0);
     m_numberOfDimensions = numberOfDimensions;
     m_numberOfParticles  = numberOfParticles;
     m_characteristicLength = characteristicLength;
+    m_hardShpereRadius = hardSphereRadius;
 
 
 
@@ -26,17 +31,56 @@ UniformLattice::UniformLattice(System*    system,
 }
 
 void UniformLattice::setupInitialState() {
-    for (int i=0; i < m_numberOfParticles; i++) {
-        std::vector<double> position = std::vector<double>();
+    /*
+     attempt at initializing particles in a lattice
+    */
 
-        for (int j=0; j < m_numberOfDimensions; j++) {
+    double l = m_hardShpereRadius*10;
+
+    int sideLength = round(pow(m_numberOfParticles, 1.0/3.0));
 
 
-            position.push_back((Random::nextDouble() - 0.5)*m_characteristicLength);
+    std::vector<std::vector<double>> latticePoint = std::vector<std::vector<double>>();
 
+    int nPoints = 0;
+    //creates a few more points than nessecary...
+    for(int x = -sideLength/2; x <= sideLength/2; x++){
+        for(int y = -sideLength/2; y <= sideLength/2; y++){
+            for(int z = -sideLength/2; z <= sideLength/2; z++){
+
+                std::vector<double> position = {x*l, y*l, z*l};
+
+                latticePoint.push_back(position);
+                nPoints++;
+            }
         }
+    }
+
+    std::vector<int> indices = std::vector<int>();
+
+    for(int i = 0; i < m_numberOfParticles; i++){
+        indices.push_back(i);
+    }
+
+
+    for(int i = 0; i < m_numberOfParticles; i++){
         m_particles.push_back(new Particle());
         m_particles.at(i)->setNumberOfDimensions(m_numberOfDimensions);
-        m_particles.at(i)->setPosition(position);
+        int idx = Random::nextInt(m_numberOfParticles-i); //random index
+        m_particles.at(i)->setPosition(latticePoint[i]);
+        m_particles.at(i)->setPosition(latticePoint[indices[idx]]);
+        indices.erase(indices.begin() + idx);
+
     }
+
+    // for(int i = 0; i < m_numberOfParticles; i++){
+    //     for(int j = 0; j < 3; j++){
+    //         cout << m_particles.at(i)->getPosition()[j] << "  ";
+    //     }
+    //     cout << endl;
+    // }
+
+    cout << nPoints << " semi uniform lattice points created" << endl;
+    // cout << count << endl;
+    // cout << m_numberOfParticles << endl;
 }
