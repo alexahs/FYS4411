@@ -95,6 +95,13 @@ double Correlated::computeSingleInteractingPart(Particle* p1, Particle* p2){
     }
 }
 
+double Correlated::computeLaplacian(std::vector<class Particle*> particles){
+
+    
+
+    return 1;
+}
+
 
 
 double Correlated::computeDoubleDerivative(std::vector<class Particle*> particles) {

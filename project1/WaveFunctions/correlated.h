@@ -13,5 +13,6 @@ private:
     double computeFullOneBodyPart(std::vector<class Particle*> particles);
     double computeSingleInteractingPart(Particle* p1, Particle* p2);
     double computeSingleDistance(Particle* p1, Particle* p2);
+    double computeLaplacian(std::vector<class Particle*> particles);
     double m_hardShpereRadius = 1;
 };
