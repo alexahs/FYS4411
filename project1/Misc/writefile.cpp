@@ -1,4 +1,5 @@
 #include "writefile.h"
+#include <cmath>
 
 
 void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps){
@@ -26,7 +27,7 @@ void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilS
     std::string filename = "./Data/temp_results/brute_importance/vmc_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
-    filename.append(to_string(timeStep) + "dt_");
+    filename.append(to_string(log10(timeStep)) + "dt_");
     if (numericalDoubleDerviative) {
         filename.append("num.csv");
     } else {

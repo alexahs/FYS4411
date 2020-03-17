@@ -75,7 +75,7 @@ void vmc_brute_loop(){
     vector<int> vec_nParicles = {1, 10, 100, 500};
     vector<int> vec_dimensions = {1, 2, 3};
     int nCycles = (int) pow(2, 21);
-    vector<int> vec_metHaste = {-5, -4, -3, -2, -1, 0, 1, 2}
+    vector<int> vec_metHaste = {-5, -4, -3, -2, -1, 0, 1, 2};
 
 
     bool num = true;
@@ -238,7 +238,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
-      varianceVec, acceptRatioVec, elapsedTime);
+      varianceVec, acceptRatioVec, elapsedTime, timeStep);
 
     if (iter < maxIter){
         cout << " * Converged in " << iter << " steps" << endl;
