@@ -78,7 +78,7 @@ void vmc_brute_loop(){
     vector<int> vec_metHaste = {-5, -4, -3, -2, -1, 0, 1, 2};
 
 
-    bool num = true;
+    bool num = false;
 
     for(auto dt : vec_metHaste){
         for(auto dim : vec_dimensions){
