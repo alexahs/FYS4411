@@ -326,7 +326,7 @@ void run_bruteforce_vmc(double alpha_min,
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = false;     // Otherwise: normal Metropolis sampling
+    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = numerical;     // Otherwise: use analytical expression for 2nd derivative
     bool saveEnergySamples         = false;
     // Initialize vectors where results will be stored
