@@ -9,7 +9,7 @@ Correlated::Correlated(System* system, double alpha, double beta, double radius)
     assert(alpha >= 0);
     assert(beta >= 0);
     assert(system->getNumberOfDimensions() == 3);
-    assert(radius < 0);
+    assert(radius > 0);
     m_numberOfParameters = 2;
     m_parameters.reserve(2);
     m_parameters.push_back(alpha);
@@ -97,7 +97,7 @@ double Correlated::computeSingleInteractingPart(Particle* p1, Particle* p2){
 
 double Correlated::computeLaplacian(std::vector<class Particle*> particles){
 
-    
+
 
     return 1;
 }
