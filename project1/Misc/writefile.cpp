@@ -21,11 +21,12 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,
-    vector<double> variance, vector<double> acceptRatio, double elapsedTime)
+    vector<double> variance, vector<double> acceptRatio, double elapsedTime, double timeStep)
 {
-    std::string filename = "./Data/temp_results/brute_no_importance/vmc_";
+    std::string filename = "./Data/temp_results/brute_importance/vmc_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
+    filename.append(to_string(timeStep) + "dt_");
     if (numericalDoubleDerviative) {
         filename.append("num.csv");
     } else {
@@ -35,7 +36,7 @@ void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilS
     ofstream outfile;
     outfile.open(filename, ofstream::out | ofstream::trunc);
     // write header for columns
-    outfile << "Alpha,Energy,Energy2,Variance,AcceptRatio, ElapsedTimeMS" << endl;
+    outfile << "Alpha,Energy,Energy2,Variance,AcceptRatio,ElapsedTimeMS" << endl;
     for (int i=0; i<alpha.size(); i++) {
         outfile << alpha[i] << ",";
         outfile << energy[i] << ",";

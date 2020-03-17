@@ -41,6 +41,7 @@ void run_bruteforce_vmc(double alpha_min,
                         int dim,
                         int nParticles,
                         int nCycles,
+                        double metHasteStep,
                         bool numerical);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 void run_single_vmc(double alpha, int numberOfSteps);
@@ -73,25 +74,13 @@ void vmc_brute_loop(){
     double alpha_step = 0.1;
     vector<int> vec_nParicles = {1, 10, 100, 500};
     vector<int> vec_dimensions = {1, 2, 3};
-    vector<bool> numerical = {false, true};
     int nCycles = (int) pow(2, 21);
-
-    // for(int num = 0; num < numerical.size(); num++){
-    //     for(int dim = 0; dim < vec_dimensions.size(); dim++){
-    //         for(int nPart = 0; nPart < vec_nParicles.size(); nPart++){
-    //             run_bruteforce_vmc(alpha_min,
-    //                                alpha_max,
-    //                                alpha_step,
-    //                                vec_dimensions[dim],
-    //                                vec_nParicles[nPart],
-    //                                nCycles,
-    //                                numerical[num]);
-    //         }
-    //     }
-    // }
+    vector<int> vec_metHaste = {-5, -4, -3, -2, -1, 0, 1, 2}
 
 
-    for(auto num : numerical){
+    bool num = true;
+
+    for(auto dt : vec_metHaste){
         for(auto dim : vec_dimensions){
             for(auto nPart : vec_nParicles){
                 run_bruteforce_vmc(alpha_min,
@@ -100,8 +89,9 @@ void vmc_brute_loop(){
                                    dim,
                                    nPart,
                                    nCycles,
+                                   pow(10, dt),
                                    num);
-            }
+           }
         }
     }
 
@@ -324,6 +314,7 @@ void run_bruteforce_vmc(double alpha_min,
                         int dim,
                         int nParticles,
                         int nCycles,
+                        double metHasteStep,
                         bool numerical) {
 
     int numberOfDimensions         = dim;         // Dimensions
@@ -331,7 +322,7 @@ void run_bruteforce_vmc(double alpha_min,
     int numberOfSteps              = (int) nCycles;  // Monte Carlo cycles
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
-    double timeStep                = 0.01;      // Metropolis-Hastings: time step
+    double timeStep                = metHasteStep;      // Metropolis-Hastings: time step
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
@@ -380,5 +371,5 @@ void run_bruteforce_vmc(double alpha_min,
     writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
-      varianceVec, acceptRatioVec, elapsedTime);
+      varianceVec, acceptRatioVec, elapsedTime, timeStep);
 }
