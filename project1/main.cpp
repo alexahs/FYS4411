@@ -44,7 +44,7 @@ void run_bruteforce_vmc(double alpha_min,
                         double metHasteStep,
                         bool numerical);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
-void run_single_vmc(double alpha, int numberOfSteps);
+void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims);
 void test_correlated(double alpha, int numberOfSteps, int numberOfParticles);
 void vmc_brute_loop();
 
@@ -60,12 +60,16 @@ int main(int argc, char* argv[]) {
 
     vmc_brute_loop();
 
+
+    // run_single_vmc()
+
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
     // test_correlated(0.5, pow(2, 18), nParticles);
     return 0;
 }
+
 
 
 void vmc_brute_loop(){
@@ -79,27 +83,24 @@ void vmc_brute_loop(){
 
 
     bool num = false;
+    int dim = 3;
 
     for(auto dt : vec_metHaste){
-        for(auto dim : vec_dimensions){
-            for(auto nPart : vec_nParicles){
-                run_bruteforce_vmc(alpha_min,
-                                   alpha_max,
-                                   alpha_step,
-                                   dim,
-                                   nPart,
-                                   nCycles,
-                                   pow(10, dt),
-                                   num);
-           }
+        for(auto nPart : vec_nParicles){
+            run_bruteforce_vmc(alpha_min,
+                               alpha_max,
+                               alpha_step,
+                               dim,
+                               nPart,
+                               nCycles,
+                               pow(10, dt),
+                               num);
         }
     }
 
 
 
 }
-
-
 
 void test_correlated(double alpha, int numberOfSteps, int numberOfParticles){
 
@@ -250,9 +251,9 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
 }
 
-void run_single_vmc(double alpha, int numberOfSteps){
-    int numberOfDimensions         = 3;         // Dimensions
-    int numberOfParticles          = 100;        // Particales in system
+void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
+    int numberOfDimensions         = dims;         // Dimensions
+    int numberOfParticles          = nParticles;        // Particales in system
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step
