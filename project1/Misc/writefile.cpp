@@ -2,7 +2,7 @@
 
 
 void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps){
-    std::string filename = "./Data/vmc_energysamples_";
+    std::string filename = "./Data/temp_results/energy_dump/vmc_energysamples_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
@@ -21,9 +21,9 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,
-    vector<double> variance, vector<double> acceptRatio)
+    vector<double> variance, vector<double> acceptRatio, double elapsedTime)
 {
-    std::string filename = "./Data/vmc_";
+    std::string filename = "./Data/temp_results/brute_no_importance/vmc_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     if (numericalDoubleDerviative) {
@@ -35,13 +35,14 @@ void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilS
     ofstream outfile;
     outfile.open(filename, ofstream::out | ofstream::trunc);
     // write header for columns
-    outfile << "Alpha,Energy,Energy2,Variance,AcceptRatio" << endl;
+    outfile << "Alpha,Energy,Energy2,Variance,AcceptRatio, ElapsedTimeMS" << endl;
     for (int i=0; i<alpha.size(); i++) {
         outfile << alpha[i] << ",";
         outfile << energy[i] << ",";
         outfile << energy2[i] << ",";
         outfile << variance[i] << ",";
-        outfile << acceptRatio[i] << endl;
+        outfile << acceptRatio[i] << ",";
+        outfile << elapsedTime << endl;
     }
     outfile.close();
 
@@ -54,9 +55,9 @@ void printInitalSystemInfo(int numberOfDimensions, int numberOfParticles,
     cout << " -------- System info -------- " << endl;
     cout << " * Number of dimensions : " << numberOfDimensions << endl;
     cout << " * Number of particles  : " << numberOfParticles << endl;
-    cout << " * Number of Metropolis steps run : 10^" << log10(numberOfSteps) << endl;
-    cout << " * Number of equilibration steps  : 10^";
-    cout << log10(numberOfSteps*equilibration) << endl;
+    cout << " * Number of Metropolis steps run : 2^" << log2(numberOfSteps) << endl;
+    cout << " * Number of equilibration steps  : 2^";
+    cout << log2(numberOfSteps*equilibration) << endl;
     cout << " * Number of parameters : " << numberOfParameters << endl << endl;
 
     int numOfColumns = 4;
