@@ -77,24 +77,26 @@ void vmc_brute_loop(){
     double alpha_max = 0.9;
     double alpha_step = 0.1;
     vector<int> vec_nParicles = {1, 10, 100, 500};
-    vector<int> vec_dimensions = {1, 2, 3};
+    vector<int> vec_dimensions = {1, 2};
     int nCycles = (int) pow(2, 21);
     vector<int> vec_metHaste = {-4, -3, -2, -1, 0, 1, 2};
 
 
     bool num = false;
-    int dim = 3;
+    // int dim = 3;
 
-    for(auto dt : vec_metHaste){
-        for(auto nPart : vec_nParicles){
-            run_bruteforce_vmc(alpha_min,
-                               alpha_max,
-                               alpha_step,
-                               dim,
-                               nPart,
-                               nCycles,
-                               pow(10, dt),
-                               num);
+    for(auto dim : vec_dimensions){
+        for(auto dt : vec_metHaste){
+            for(auto nPart : vec_nParicles){
+                run_bruteforce_vmc(alpha_min,
+                                   alpha_max,
+                                   alpha_step,
+                                   dim,
+                                   nPart,
+                                   nCycles,
+                                   pow(10, dt),
+                                   num);
+            }
         }
     }
 
