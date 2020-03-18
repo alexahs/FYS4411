@@ -104,6 +104,7 @@ def getAllVariance():
             for p, particle in enumerate(particles):
                 for dt, timeStep in enumerate(timeSteps):
                     filename = RAW_DATA_DIR + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_2pow{log2Steps}steps.bin"
+                    print("Loaded", filename)
                     energySamples = np.fromfile(filename, dtype="double")
                     mean, var = block(energySamples)
 
