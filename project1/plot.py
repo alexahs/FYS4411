@@ -90,7 +90,7 @@ def getAllVariance():
     particles = [1, 10, 100, 500]
     dimensions = [1, 2, 3]
     timeSteps = [-4, -3, -2, -1, 0, 1, 2]
-    alphas = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    alphas = [2, 3, 4, 5, 6, 7, 8, 9] #1e-1
 
     nAlphas = len(alphas)
     nDims = len(dimensions)
@@ -100,10 +100,10 @@ def getAllVariance():
     variances = np.zeros((nAlphas, nDims, nParticles, nTimeSteps))
 
     for a, alpha in enumerate(alphas):
-        for d, dim in enumerate(dims):
+        for d, dim in enumerate(dimensions):
             for p, particle in enumerate(particles):
                 for dt, timeStep in enumerate(timeSteps):
-                    filename = DATA_DIR + f"vmc_energysamples_{dim}d_{particles}p_{alpha}alpha_{timeStep}dt_2pow{log2Steps}steps.bin"
+                    filename = RAW_DATA_DIR + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_2pow{log2Steps}steps.bin"
                     energySamples = np.fromfile(filename, dtype="double")
                     mean, var = block(energySamples)
 
