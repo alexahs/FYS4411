@@ -36,10 +36,10 @@ vmc
 # Data files
 *.dat
 *.bin
-#*.txt
+*.txt
 !CMakeLists.txt
-#*.csv
-#*.npy
+*.csv
+*.npy
 
 
 # Misc. files
