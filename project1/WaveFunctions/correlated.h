@@ -3,9 +3,11 @@
 
 class Correlated : public WaveFunction {
 public:
-    Correlated(class System* system, double alpha, double beta, double radius);
+    Correlated(class System* system, double alpha, double beta);
     double evaluate(std::vector<class Particle*> particles);
-    double computeDoubleDerivative(std::vector<class Particle*> particles);
+    double analyticDoubleDerivative(std::vector<class Particle*> particles, int k);
+    std::vector<double> computeQuantumForce(class Particle* particle);
+    double evaluateDerivative(std::vector<class Particle*> particles);
     double evaluateCostFunction();
 
 private:
@@ -13,6 +15,5 @@ private:
     double computeFullOneBodyPart(std::vector<class Particle*> particles);
     double computeSingleInteractingPart(Particle* p1, Particle* p2);
     double computeSingleDistance(Particle* p1, Particle* p2);
-    double computeLaplacian(std::vector<class Particle*> particles);
-    double m_hardShpereRadius = 1;
+    double m_hardShpereRadius = 0.0043; // Fixed as in refs. (see report)
 };

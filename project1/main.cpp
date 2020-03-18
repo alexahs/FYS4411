@@ -5,8 +5,10 @@
 
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
+#include "WaveFunctions/correlated.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "Hamiltonians/harmonicoscillator.h"
+#include "Hamiltonians/elliptic_harmonicoscillator.h"
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
 #include "InitialStates/uniformlattice.h"
@@ -27,18 +29,15 @@ TODO: (updated 16.03)
         - implement gradiet and local energy
         - implement 2nd derivative
     - Implement gradient descent for correlated WF
-    - Implement better particle initialization for correlated WF(done)  
+    - Implement better particle initialization for correlated WF(done)
     - Implement oneBody density
-
-
-
 */
 
 // Run VMC for spherical HO trap
 void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 void run_single_vmc(double alpha, int numberOfSteps);
-void test_correlated(double alpha, int numberOfSteps, int numberOfParticles);
+void run_correlated(double alpha, int numberOfSteps, int numberOfParticles);
 
 int main(int argc, char* argv[]) {
     // NOTE: number of metro steps must be a power of 2 for blocking resampling to run
@@ -53,16 +52,16 @@ int main(int argc, char* argv[]) {
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
-    test_correlated(0.5, pow(2, 18), nParticles);
+    run_correlated(0.5, pow(2, 6), nParticles);
     return 0;
 }
 
-void test_correlated(double alpha, int numberOfSteps, int numberOfParticles){
+void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
 
 
     int numberOfDimensions         = 3;         // Dimensions
     // int numberOfParticles          = 10;        // Particales in system
-    double omega                   = 1.0;       // Oscillator frequency.
+    double gamma                   = 2.82843;   // omega_z / omega_ho
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step
     double h                       = 0.001;     // Double derivative step length
@@ -72,11 +71,9 @@ void test_correlated(double alpha, int numberOfSteps, int numberOfParticles){
     bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
 
-    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
+    // printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-
-
     int nProcs = omp_get_num_procs();
     int stepsPerProc = numberOfSteps/nProcs;
     std::vector<std::vector<double>> tempEnergies;
@@ -86,15 +83,19 @@ void test_correlated(double alpha, int numberOfSteps, int numberOfParticles){
     // #pragma omp parallel for schedule(dynamic)
         // for(int i=0; i < nProcs; i++){
             System* system = new System();
-            system->setSampler                  (new Sampler(system));
-            system->setHamiltonian              (new HarmonicOscillator(system, omega));
-            system->setWaveFunction             (new SimpleGaussian(system, alpha));
-            system->setInitialState             (new UniformLattice(system,
+            system->setSampler                   (new Sampler(system));
+            system->setHamiltonian               (new EllipticHarmonicOscillator(
+                                                        system,
+                                                        gamma));
+            system->setInitialState              (new UniformLattice(
+                                                        system,
                                                         numberOfDimensions,
                                                         numberOfParticles,
                                                         characteristicLength,
                                                         hardSphereRadius));
-            //
+            // system->setWaveFunction              (new Correlated(system,
+            //                                             alpha,
+            //                                             gamma)); // gamma = beta = 2.82843
             // system->setEquilibrationFraction     (equilibration);
             // system->setStepLength                (stepLength);
             // system->setNumberOfMetropolisSteps   (numberOfSteps);

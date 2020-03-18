@@ -32,7 +32,7 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
     if (m_system->getNumericalDoubleDerivative()) {
         secondDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
     } else {
-        secondDerivative = m_system->getWaveFunction()->analyticDoubleDerivative(particles);
+        secondDerivative = m_system->getWaveFunction()->analyticDoubleDerivative(particles, 0);
     }
     double kineticEnergy = - 0.5*secondDerivative;
 

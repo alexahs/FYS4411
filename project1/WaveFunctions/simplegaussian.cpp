@@ -28,7 +28,7 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles)
     return waveFunc;
 }
 
-double SimpleGaussian::analyticDoubleDerivative(std::vector<class Particle*> particles)
+double SimpleGaussian::analyticDoubleDerivative(std::vector<class Particle*> particles, int dummy)
 {
     /* The analytic expression for the doubleDerivative. This function is
      * meant to be overwritten in classes that inherit from the wavefunction

@@ -1,6 +1,6 @@
-RM := rm -r
+RM := rm -rf
 
 .PHONY: clean
 
 clean:
-	$(RM) build vmc
+	$(RM) Build vmc

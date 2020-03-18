@@ -22,9 +22,6 @@ UniformLattice::UniformLattice(System*    system,
     m_numberOfParticles  = numberOfParticles;
     m_characteristicLength = characteristicLength;
     m_hardShpereRadius = hardSphereRadius;
-
-
-
     m_system->setNumberOfDimensions(numberOfDimensions);
     m_system->setNumberOfParticles(numberOfParticles);
     setupInitialState();
@@ -46,18 +43,14 @@ void UniformLattice::setupInitialState() {
     int nPoints = 0;
     //creates a few more points than nessecary...
     for(int x = -sideLength/2; x <= sideLength/2; x++){
-        cout << x << endl;
         for(int y = -sideLength/2; y <= sideLength/2; y++){
             for(int z = -sideLength/2; z <= sideLength/2; z++){
-
                 std::vector<double> position = {x*l, y*l, z*l};
-
                 latticePoint.push_back(position);
                 nPoints++;
             }
         }
     }
-
 
     std::vector<int> indices = std::vector<int>();
 
@@ -78,14 +71,5 @@ void UniformLattice::setupInitialState() {
 
     }
 
-    // for(int i = 0; i < m_numberOfParticles; i++){
-    //     for(int j = 0; j < 3; j++){
-    //         cout << m_particles.at(i)->getPosition()[j] << "  ";
-    //     }
-    //     cout << endl;
-    // }
-
     cout << nPoints << " semi uniform lattice points created" << endl;
-    // cout << count << endl;
-    // cout << m_numberOfParticles << endl;
 }
