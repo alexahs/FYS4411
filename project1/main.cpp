@@ -79,7 +79,7 @@ void vmc_brute_loop(){
     vector<int> vec_nParicles = {1, 10, 100, 500};
     vector<int> vec_dimensions = {1, 2, 3};
     int nCycles = (int) pow(2, 21);
-    vector<int> vec_metHaste = {-5, -4, -3, -2, -1, 0, 1, 2};
+    vector<int> vec_metHaste = {-4, -3, -2, -1, 0, 1, 2};
 
 
     bool num = false;
@@ -302,10 +302,11 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
         tempEnergies[i].begin(),
         tempEnergies[i].end());
     }
-
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
+
+    double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
+    printFinal(1, elapsedTime);
+    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
 
 }
 
@@ -363,6 +364,14 @@ void run_bruteforce_vmc(double alpha_min,
             energy2Vec.at(i) = (system_sampler->getEnergy2());
             varianceVec.at(i) = (system_sampler->getVariance());
             acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
+
+            std::vector<double> energySamples = system->getSampler()->getEnergySamples();
+            writeFileEnergy(energySamples,
+                            numberOfDimensions,
+                            numberOfParticles,
+                            numberOfSteps,
+                            alphaVec.at(i),
+                            timeStep);
         }
         //end parallel region
 

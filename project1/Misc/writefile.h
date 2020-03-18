@@ -14,4 +14,9 @@ void printInitalSystemInfo(int, int, int, double, int);
 
 void printFinal(int, double);
 
-void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps);
+void writeFileEnergy(std::vector<double>& energySamples,
+                     int numDim,
+                     int numPart,
+                     int metroSteps,
+                     double alpha,
+                     double timeStep);

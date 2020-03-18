@@ -2,10 +2,17 @@
 #include <cmath>
 
 
-void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps){
-    std::string filename = "./Data/temp_results/energy_dump/vmc_energysamples_";
+void writeFileEnergy(std::vector<double>& energySamples,
+                     int numDim,
+                     int numPart,
+                     int metroSteps,
+                     double alpha,
+                     double timeStep){
+    std::string filename = "./Data/temp_results/brute_importance_with_energies/vmc_energysamples_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
+    filename.append(to_string((int)(10*alpha)) + "alpha_");
+    filename.append(to_string(int(log10(timeStep))) + "dt_");
     filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
 
     ofstream outfile;
@@ -13,7 +20,7 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
     outfile.write(reinterpret_cast<const char*> (energySamples.data()),energySamples.size()*sizeof(double));
     outfile.close();
 
-    cout << " * Results written to " << filename << endl;
+    // cout << " * Results written to " << filename << endl;
 
 
 }
@@ -24,7 +31,7 @@ void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilS
     vector<double> alpha, vector<double> energy, vector<double> energy2,
     vector<double> variance, vector<double> acceptRatio, double elapsedTime, double timeStep)
 {
-    std::string filename = "./Data/temp_results/brute_importance/vmc_";
+    std::string filename = "./Data/temp_results/brute_importance_with_energies/vmc_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     filename.append(to_string(int(log10(timeStep))) + "dt_");
