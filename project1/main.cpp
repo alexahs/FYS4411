@@ -80,13 +80,13 @@ void vmc_brute_loop(){
     vector<int> vec_dimensions = {1, 2, 3};
     int nCycles = (int) pow(2, 21);
     vector<int> vec_metHaste = {-4, -3, -2, -1, 0, 1, 2};
-    vector<bool> vec_numerical = {false, true}
+    // vector<bool> vec_numerical = {false, true};
 
 
-    // bool num = false;
+    bool num = true;
     // int dim = 3;
 
-    for(auto num : vec_numerical){
+    // for(auto num : vec_numerical){
         for(auto dim : vec_dimensions){
             for(auto nPart : vec_nParicles){
                 run_bruteforce_vmc(alpha_min,
@@ -95,11 +95,11 @@ void vmc_brute_loop(){
                                    dim,
                                    nPart,
                                    nCycles,
-                                   pow(10, dt),
+                                   pow(10, -3),
                                    num);
             }
         }
-    }
+    // }
 
 
 
