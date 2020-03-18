@@ -84,6 +84,13 @@ def createTabulated_tasks_c_d(dim, particles, dt, variance_block):
 
     print(fnameAna, "formatted")
 
+def printResultsNumvsAna():
+
+    
+
+
+    return None
+
 
 def createTabulated_task_b(dim, particles):
 
