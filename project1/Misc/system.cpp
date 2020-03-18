@@ -109,41 +109,30 @@ void System::setNumberOfMetropolisSteps(int numberOfMetropolisSteps){
 }
 
 
-
 void System::runMetropolisSteps() {
     m_particles = m_initialState->getParticles();
     assert(m_stepLength > 0);
-
     wfOld = m_waveFunction->evaluate(m_particles);
 
-    //importance sampling
+    // Importance sampling
     if (m_importanceSampling) {
-
-        //equilibriate the system
-        int n_equilSteps = m_numberOfMetropolisSteps*m_equilibrationFraction;
-        // #pragma omp parallel for schedule(dynamic)
-            for (int i=0; i<n_equilSteps; i++) {
-                bool acceptedEquilibriateStep = importanceStep();
-            }
-        // #pragma omp barrier
-
-        //run with sampling
-        // #pragma omp parallel for schedule(dynamic)
-            for (int i=0; i<m_numberOfMetropolisSteps; i++) {
-                bool acceptedStep = importanceStep();
-                m_sampler->sample(acceptedStep);
-            }
-    }
-
-    //standard metropolis sampling
-    else {
         // Equilibriation
         for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
-
-            //attempt single step
+            bool acceptedEquilibriateStep = importanceStep();
+        }
+        // Sampling
+        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
+            bool acceptedStep = importanceStep();
+            m_sampler->sample(acceptedStep);
+        }
+    }
+    // Standard metropolis sampling
+    else {
+        // Equilibriation Cycles
+        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
             bool acceptedEquilibriateStep = metropolisStep();
         }
-
+        // Monte Carlo Cycles
         for (int i=0; i<m_numberOfMetropolisSteps; i++) {
             bool acceptedStep = metropolisStep();
             m_sampler->sample(acceptedStep);

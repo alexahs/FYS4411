@@ -34,23 +34,13 @@ void Sampler::sample(bool acceptedStep) {
         m_acceptRatio = 0;
     }
 
-    if (acceptedStep) {m_acceptedSteps++;}
+    if (acceptedStep) { m_acceptedSteps++; }
 
-    /* Here you should sample all the interesting things you want to measure.
-     * Note that there are (way) more than the single one here currently.
-     */
-    double localEnergy = m_system->getHamiltonian()->
-                            computeLocalEnergy(m_system->getParticles());
+    double localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_stepNumber++;
-
-    // int threadID = omp_get_thread_num();
-
     m_vecEnergySamples.push_back(localEnergy);
-    // cout << localEnergy << endl;
-
-
 }
 
 void Sampler::printOutputToTerminal() {
@@ -60,7 +50,7 @@ void Sampler::printOutputToTerminal() {
     cout << setw(12) << setprecision(6) << m_energy << "|";
     cout << setw(12) << setprecision(6) << m_energy2 << "|";
     cout << setw(12) << setprecision(6) << m_variance << "|";
-    cout << setw(12) << setprecision(6) << m_acceptRatio << endl << " ";
+    cout << setw(12) << setprecision(6) << m_acceptRatio << "\n ";
 }
 
 void Sampler::computeAverages() {

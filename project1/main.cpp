@@ -67,12 +67,11 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    double hardSphereRadius        = 1;
-    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    double bosonDiameter           = 0.0043;
+    bool importanceSampling        = false;     // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
 
-    // printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
-
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 2);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     int nProcs = omp_get_num_procs();
     int stepsPerProc = numberOfSteps/nProcs;
@@ -81,31 +80,31 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
 
 
     // #pragma omp parallel for schedule(dynamic)
-        // for(int i=0; i < nProcs; i++){
+        for (double alpha=0.1; alpha<1.0; alpha+=0.025) {
             System* system = new System();
             system->setSampler                   (new Sampler(system));
             system->setHamiltonian               (new EllipticHarmonicOscillator(
                                                         system,
                                                         gamma));
-            system->setInitialState              (new UniformLattice(
+            system->setInitialState              (new RandomUniform(
                                                         system,
                                                         numberOfDimensions,
                                                         numberOfParticles,
-                                                        characteristicLength,
-                                                        hardSphereRadius));
-            // system->setWaveFunction              (new Correlated(system,
-            //                                             alpha,
-            //                                             gamma)); // gamma = beta = 2.82843
-            // system->setEquilibrationFraction     (equilibration);
-            // system->setStepLength                (stepLength);
-            // system->setNumberOfMetropolisSteps   (numberOfSteps);
-            // system->setImportanceSampling        (importanceSampling, timeStep);
-            // system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
-            // system->runMetropolisSteps           ();
+                                                        characteristicLength));
+            system->setWaveFunction              (new Correlated(system,
+                                                        alpha,
+                                                        gamma)); // gamma = beta = 2.82843
+            system->setEquilibrationFraction     (equilibration);
+            system->setStepLength                (stepLength);
+            system->setNumberOfMetropolisSteps   (numberOfSteps);
+            system->setImportanceSampling        (importanceSampling, timeStep); // false
+            system->setNumericalDoubleDerivative (numericalDoubleDerviative, h); // false
+            system->runMetropolisSteps           ();
             // vector<double> energySamples = system->getSampler()->getEnergySamples();
             // #pragma omp critial
             // tempEnergies.push_back(energySamples);
-        // }//end parallel
+        } //end parallel
+
 
 
     // for(int i = 0; i < nProcs; i++){
@@ -114,8 +113,8 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
     //     tempEnergies[i].end());
     // }
     //
-    // chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    // printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
     // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
 
 }
