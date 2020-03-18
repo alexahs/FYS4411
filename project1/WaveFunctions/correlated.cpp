@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cassert>
 
+#include <iostream>
+
 
 Correlated::Correlated(System* system, double alpha, double beta) :
       WaveFunction(system) {
@@ -44,12 +46,11 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
     double alpha = m_parameters.at(0);
     double beta = m_parameters.at(1);
     double minus2Alpha = -2*alpha;
-    std::vector<double> nablaPhi;
+    std::vector<double> nablaPhi(3, 0);
     nablaPhi[0] = 2*minus2Alpha * xk2;
     nablaPhi[1] = 2*minus2Alpha * yk2;
     nablaPhi[2] = 2*beta * minus2Alpha * zk2;
     nabla2Phi = minus2Alpha*(2 + beta + minus2Alpha*(xk2 + yk2 + beta*beta*zk2));
-
     // First term of the laplacian
     double laplacian = nabla2Phi;
     double rjk, rik, fac_j, fac_i;
@@ -67,8 +68,8 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
             temp_j[1] = pos_k[1] - pos_j[1];
             temp_j[2] = pos_k[2] - pos_j[2];
             rjk = sqrt(temp_j[0]*temp_j[0] + temp_j[1]*temp_j[1] + temp_j[2]*temp_j[2]);
-            if (rjk > m_hardShpereRadius) {
-                fac_j = 1 / (rjk - m_hardShpereRadius);
+            if (rjk > m_bosonDiameter) {
+                fac_j = 1 / (rjk - m_bosonDiameter);
             } else {
                 fac_j = 0;
             }
@@ -87,14 +88,14 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
                     dot += temp_j[1]*temp_i[1];
                     dot += temp_j[2]*temp_i[2];
                     rik = sqrt(temp_i[0]*temp_i[0] + temp_i[1]*temp_i[1] + temp_i[2]*temp_i[2]);
-                    fac_i = 1 / (rik - m_hardShpereRadius);
+                    fac_i = 1 / (rik - m_bosonDiameter);
                     // Term 3 in the equation for the laplacian
                     laplacian += dot*fac_i*fac_j;
                 }
             }
 
-            uDoublePrime = fac_j * fac_j * m_hardShpereRadius;
-            uDoublePrime *= (m_hardShpereRadius - rjk);
+            uDoublePrime = fac_j * fac_j * m_bosonDiameter;
+            uDoublePrime *= (m_bosonDiameter - rjk);
             uDoublePrime /= rjk*rjk;
             // Term 4 in the equation for the laplacian
             laplacian += uDoublePrime + 2 * fac_j;
@@ -153,10 +154,10 @@ double Correlated::computeSingleInteractingPart(Particle* p1, Particle* p2) {
     Computes the interaction of two particles with eachother.
     */
     double dist = computeSingleDistance(p1, p2);
-    if (dist <= m_hardShpereRadius) {
+    if (dist <= m_bosonDiameter) {
         return 0;
     } else {
-        return (1.0 - m_hardShpereRadius/dist);
+        return (1.0 - m_bosonDiameter/dist);
     }
 }
 
