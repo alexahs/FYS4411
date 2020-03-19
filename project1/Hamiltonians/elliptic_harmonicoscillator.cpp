@@ -25,7 +25,7 @@ EllipticHarmonicOscillator::EllipticHarmonicOscillator(System* system, double ga
 
 double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 {
-    double localEnergy = 0, diff, Vint;
+    double localEnergy = 0, diff, Vint=0;
     std::vector<double> pos_i(3, 0);
     std::vector<double> pos_j(3, 0);
 
@@ -42,7 +42,7 @@ double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> par
             diff += (pos_j[1] - pos_i[1]) * (pos_j[1] - pos_i[1]);
             diff += (pos_j[2] - pos_i[2]) * (pos_j[2] - pos_i[2]);
             if (diff <= m_bosonDiameter2) {
-                Vint += 1000000;
+                Vint += 100000000.0;
             }
         }
     }

@@ -50,7 +50,7 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
     nablaPhi[0] = 2*minus2Alpha * xk2;
     nablaPhi[1] = 2*minus2Alpha * yk2;
     nablaPhi[2] = 2*beta * minus2Alpha * zk2;
-    nabla2Phi = minus2Alpha*(2 + beta + minus2Alpha*(xk2 + yk2 + beta*beta*zk2));
+    nabla2Phi = 2 * alpha * (2 * alpha * (xk2 + yk2 + beta * beta * zk2) - beta - 2);
     // First term of the laplacian
     double laplacian = nabla2Phi;
     double rjk, rik, fac_j, fac_i;
@@ -64,21 +64,26 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
     for (int j=0; j<num; j++) {
         if (j != k) {
             pos_j = particles[j]->getPosition();
+            // r_k - r_j
             temp_j[0] = pos_k[0] - pos_j[0];
             temp_j[1] = pos_k[1] - pos_j[1];
             temp_j[2] = pos_k[2] - pos_j[2];
+            // |r_k -  r_j|
             rjk = sqrt(temp_j[0]*temp_j[0] + temp_j[1]*temp_j[1] + temp_j[2]*temp_j[2]);
             if (rjk > m_bosonDiameter) {
                 fac_j = 1 / (rjk - m_bosonDiameter);
             } else {
                 fac_j = 0;
             }
+            // fac_j = u'(rjk) / rjk
             sumVec[0] += fac_j * temp_j[0];
             sumVec[1] += fac_j * temp_j[1];
             sumVec[2] += fac_j * temp_j[2];
+            // sumVec is the entire sum in the 2nd term of the laplacian,
+            // this is going to be dotted with 2* nablaPhi / phi
 
-            double dot=0;
-            for (int i=j+1; i<num; i++) {
+            for (int i=0; i<num; i++) {
+                double dot=0;
                 if (i != k) {
                     pos_i = particles[i]->getPosition();
                     temp_i[0] = pos_k[0] - pos_i[0];
@@ -94,14 +99,15 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
                 }
             }
 
+            // u''(rjk) = a(a - 2rjk) / ( rjk^2 (a - rjk)^2 )
             uDoublePrime = fac_j * fac_j * m_bosonDiameter;
-            uDoublePrime *= (m_bosonDiameter - rjk);
+            uDoublePrime *= (m_bosonDiameter - 2*rjk);
             uDoublePrime /= rjk*rjk;
             // Term 4 in the equation for the laplacian
             laplacian += uDoublePrime + 2 * fac_j;
         }
     }
-    // Second term of the laplacian
+    // Second term of the laplacian (dot product)
     laplacian += nablaPhi[0]*sumVec[0] + nablaPhi[1]*sumVec[1] + nablaPhi[2]*sumVec[2];
 
     return laplacian;

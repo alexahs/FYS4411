@@ -1,8 +1,9 @@
 #include "writefile.h"
 
 
-void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps){
-    std::string filename = "./Data/vmc_energysamples_";
+void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps,
+        std::string fileNamePrefix) {
+    std::string filename = "./Data/" + fileNamePrefix + "_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
@@ -81,4 +82,17 @@ void printFinal(int numberOfParameters, double elapsedTime) {
     }
     cout << "------------" << endl;
     cout << " * Execution time: " << elapsedTime << " ms" << endl << endl;
+}
+
+void writeParticles(vector<class Particle*> particles) {
+    ofstream outfile;
+    outfile.open("./Data/RandomUniform.csv", ofstream::out | ofstream::trunc);
+    outfile << "x,y,z" << endl;
+    vector<double> coor(3, 0);
+    cout << "num: " << particles.size() << endl;
+    for (auto particle : particles) {
+        coor = particle->getPosition();
+        outfile << coor[0] << "," << coor[1] << "," << coor[2] << endl;
+    }
+    outfile.close();
 }

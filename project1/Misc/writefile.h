@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <cmath>
 #include <iostream>
+#include "Misc/particle.h"
 
 using namespace std;
 
@@ -14,4 +15,6 @@ void printInitalSystemInfo(int, int, int, double, int);
 
 void printFinal(int, double);
 
-void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart, int metroSteps);
+void writeFileEnergy(vector<double>&, int, int, int, string);
+
+void writeParticles(vector<class Particle*>);
