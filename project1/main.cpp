@@ -52,12 +52,12 @@ int main(int argc, char* argv[]) {
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
-    run_correlated(0.5, pow(2, 6), nParticles);
+    run_correlated(0.5, pow(2, 17), nParticles);
     return 0;
 }
 
 void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
-
+``
 
     int numberOfDimensions         = 3;         // Dimensions
     // int numberOfParticles          = 10;        // Particales in system
@@ -80,12 +80,13 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
 
 
     // #pragma omp parallel for schedule(dynamic)
-        for (double alpha=0.1; alpha<1.0; alpha+=0.025) {
+        for (double alpha=0.1; alpha<1.0; alpha+=0.05) {
             System* system = new System();
             system->setSampler                   (new Sampler(system));
             system->setHamiltonian               (new EllipticHarmonicOscillator(
                                                         system,
-                                                        gamma));
+                                                        gamma,
+                                                        bosonDiameter));
             system->setInitialState              (new RandomUniform(
                                                         system,
                                                         numberOfDimensions,
@@ -100,7 +101,7 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
             system->setImportanceSampling        (importanceSampling, timeStep); // false
             system->setNumericalDoubleDerivative (numericalDoubleDerviative, h); // false
             system->runMetropolisSteps           ();
-            // vector<double> energySamples = system->getSampler()->getEnergySamples();
+            vector<double> energySamples = system->getSampler()->getEnergySamples();
             // #pragma omp critial
             // tempEnergies.push_back(energySamples);
         } //end parallel
@@ -115,7 +116,7 @@ void run_correlated(double alpha, int numberOfSteps, int numberOfParticles){
     //
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
+    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps);
 
 }
 

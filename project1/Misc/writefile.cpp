@@ -54,9 +54,8 @@ void printInitalSystemInfo(int numberOfDimensions, int numberOfParticles,
     cout << " -------- System info -------- " << endl;
     cout << " * Number of dimensions : " << numberOfDimensions << endl;
     cout << " * Number of particles  : " << numberOfParticles << endl;
-    cout << " * Number of Metropolis steps run : 10^" << log10(numberOfSteps) << endl;
-    cout << " * Number of equilibration steps  : 10^";
-    cout << log10(numberOfSteps*equilibration) << endl;
+    cout << " * Number of Metropolis steps run : " << numberOfSteps << endl;
+    cout << " * Number of equilibration steps  : " << int(numberOfSteps*equilibration) << endl;
     cout << " * Number of parameters : " << numberOfParameters << endl << endl;
 
     int numOfColumns = 4;
