@@ -445,8 +445,8 @@ def createTabulated_task_b(dim, particles, dt):
     captionNum = "\caption{Numerical derivative. CPU time: " + str(CPUtimeNum[0]*1e-3) + "s" + "}" + "\n"
 
 
-    fnameAna = FORMATTED_DATA + "task_b/" + "table_task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
-    fnameNum = FORMATTED_DATA + "task_b/" + "table_task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
+    fnameAna = FORMATTED_DATA + "tasks_c_d/" + "table_task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
+    fnameNum = FORMATTED_DATA + "tasks_c_d/" + "table_task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
     outfileAna = open(fnameAna, "w")
     outfileNum = open(fnameNum, "w")
 

@@ -68,15 +68,15 @@ int main(int argc, char* argv[]) {
 
     // run_bruteforce_vmc(0.2, 10, 10, 3);
 
-    vector<int> nParticles = {1, 10, 100, 500};
-    vector<int> timeStep = {-1, -1, -1, -4};
-    int nRuns = 4;
+    vector<int> nParticles = {500};
+    vector<int> timeStep = {-4};
+    int nRuns = 1;
     bool numerical = false;
-    for(int j = 0; j < 2; j++){
+    // for(int j = 0; j < 2; j++){
         for(int i = 0; i < nRuns; i++){
             run_bruteforce_vmc(0.2, 0.9, 0.1, 3, nParticles[i], (int) pow(2, 21), pow(10, timeStep[i]), numerical);
-        }
-        numerical = true;
+        // }
+        // numerical = false;
     }
 
     // run_gradient_descent(500, 0.2, 0.001);
