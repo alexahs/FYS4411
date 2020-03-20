@@ -37,13 +37,20 @@ def plotSphericalVMC(dim, particles):
 
 def printBlockStd():
 
-    std_block_1_10_100_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_1num.npy"))
-    std_block_1_10_100_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_0num.npy"))
-    std_block_500_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_1num.npy"))
-    std_block_500_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_0num.npy"))
+    # std_block_1_10_100_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_1num.npy"))
+    # std_block_1_10_100_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_0num.npy"))
+    # std_block_500_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_1num.npy"))
+    # std_block_500_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_0num.npy"))
+    #
+    # print(std_block_1_10_100_num)
+    # print(std_block_500_num)
 
-    print(std_block_1_10_100_num)
-    print(std_block_500_num)
+    dt = -1
+
+    file = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_energysamples_3d_500p_5alpha_{dt}dt_1num_2pow20steps.bin"
+    x = np.load(file, allow_pickle=True)
+
+    print(block(x))
 
 
 printBlockStd()
