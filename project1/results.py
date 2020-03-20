@@ -487,12 +487,12 @@ def createTabulated_task_b(dim, particles, dt):
 def blockAllEnergySamples():
     inDir = "brute_importance_with_energies/"
     log2Steps = 21
-    particles = [1, 10, 100]
+    particles = [500]
     dimensions = [3]
-    timeSteps = [-1]
+    timeSteps = [-4]
     alphas = [5] #1e-1
 
-    num = 1
+    num = 0
 
     nAlphas = len(alphas)
     nDims = len(dimensions)
@@ -514,7 +514,7 @@ def blockAllEnergySamples():
                     variances[a, d, p, dt] = var
 
 
-    outfile = RAW_DATA_DIR + f"variances_blocking_1_10_100p_3d_{num}num.npy"
+    outfile = RAW_DATA_DIR + f"variances_blocking_500p_3d_{num}num.npy"
     np.save(outfile, variances)
 
 blockAllEnergySamples()
