@@ -502,16 +502,16 @@ def blockAllEnergySamples():
     variances = np.zeros((nAlphas, nDims, nParticles, nTimeSteps))
     # vmc_energysamples_3d_1p_9alpha_-1dt_1num_2pow21steps.bin
     # for num in [0, 1]:
-        for a, alpha in enumerate(alphas):
-            for d, dim in enumerate(dimensions):
-                for p, particle in enumerate(particles):
-                    for dt, timeStep in enumerate(timeSteps):
-                        filename = RAW_DATA_DIR + inDir + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_{num}num_2pow{log2Steps}steps.bin"
-                        print("Loaded", filename[12:])
-                        energySamples = np.fromfile(filename, dtype="double")
-                        mean, var = block(energySamples)
+    for a, alpha in enumerate(alphas):
+        for d, dim in enumerate(dimensions):
+            for p, particle in enumerate(particles):
+                for dt, timeStep in enumerate(timeSteps):
+                    filename = RAW_DATA_DIR + inDir + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_{num}num_2pow{log2Steps}steps.bin"
+                    print("Loaded", filename[12:])
+                    energySamples = np.fromfile(filename, dtype="double")
+                    mean, var = block(energySamples)
 
-                        variances[a, d, p, dt] = var
+                    variances[a, d, p, dt] = var
 
 
     outfile = RAW_DATA_DIR + f"variances_blocking_1_10_100p_3d_{num}num.npy"
