@@ -44,7 +44,7 @@ void run_bruteforce_vmc(double alpha_min,
                         double metHasteStep,
                         bool numerical);
 void run_gradient_descent(int nAlphas, double alpha0, double gamma);
-void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims);
+void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, bool importance);
 void test_correlated(double alpha, int numberOfSteps, int numberOfParticles);
 void vmc_brute_loop();
 
@@ -58,12 +58,16 @@ int main(int argc, char* argv[]) {
     //
     // int nParticles = atoi(argv[1]);
 
-    vmc_brute_loop();
+    // vmc_brute_loop();
 
+    bool importance = true;
+    for(int i = 0; i < 2; i++){
+        run_single_vmc(0.45, 10, 500, 3, importance);
+        importance = false;
+    }
 
-    // run_single_vmc()
+    // run_bruteforce_vmc(0.1, 10, 10, 3);
 
-    // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
     // test_correlated(0.5, pow(2, 18), nParticles);
@@ -239,7 +243,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
-    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
+    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);
@@ -254,7 +258,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
 
 }
 
-void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
+void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, bool importance){
     int numberOfDimensions         = dims;         // Dimensions
     int numberOfParticles          = nParticles;        // Particales in system
     double omega                   = 1.0;       // Oscillator frequency.
@@ -263,10 +267,9 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    bool importanceSampling        = importance;     // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
 
-    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
@@ -277,8 +280,23 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
     std::vector<double> allEnergies;
 
 
+    vector<double> stepVec = {12, 13, 14, 15, 16, 17, 18, 19, 20};
+
+    int nnSteps = stepVec.size();
+
+
+    // vector<double> alphaVec;
+    vector<double> energyVec(nnSteps, 0);
+    vector<double> energy2Vec(nnSteps, 0);
+    vector<double> varianceVec(nnSteps, 0);
+    vector<double> acceptRatioVec(nnSteps, 0);
+    // vector<double> alphaVec(stepVec.size(), 0);
+    // for(int i = 0; i < stepVec.size(); i++){alphaVec[i] = alpha}
+
     #pragma omp parallel for schedule(dynamic)
-        for(int i=0; i < nProcs; i++){
+        for(int i=0; i < nnSteps; i++){
+            int nSteps = pow(2, stepVec[i]);
+            printInitalSystemInfo(numberOfDimensions, numberOfParticles, nSteps, equilibration, 1);
             System* system = new System();
             system->setSampler                  (new Sampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -290,26 +308,42 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims){
 
             system->setEquilibrationFraction     (equilibration);
             system->setStepLength                (stepLength);
-            system->setNumberOfMetropolisSteps   (numberOfSteps);
+            system->setNumberOfMetropolisSteps   (nSteps);
             system->setImportanceSampling        (importanceSampling, timeStep);
             system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
             system->runMetropolisSteps           ();
             vector<double> energySamples = system->getSampler()->getEnergySamples();
-            #pragma omp critial
-            tempEnergies.push_back(energySamples);
+            // #pragma omp critial
+            // tempEnergies.push_back(energySamples);
+            Sampler* system_sampler = system->getSampler();
+            energyVec.at(i) = (system_sampler->getEnergy());
+            energy2Vec.at(i) = (system_sampler->getEnergy2());
+            varianceVec.at(i) = (system_sampler->getVariance());
+            acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
         }//end parallel
 
 
-    for(int i = 0; i < nProcs; i++){
-        allEnergies.insert(allEnergies.end(),
-        tempEnergies[i].begin(),
-        tempEnergies[i].end());
-    }
+    // Sampler* system_sampler = system->getSampler();
+    // energyVec.at(0) = (system_sampler->getEnergy());
+    // energy2Vec.at(0) = (system_sampler->getEnergy2());
+    // varianceVec.at(0) = (system_sampler->getVariance());
+    // acceptRatioVec.at(0) = (system_sampler->getAcceptRatio());
+    // for(int i = 0; i < nProcs; i++){
+    //     allEnergies.insert(allEnergies.end(),
+    //     tempEnergies[i].begin(),
+    //     tempEnergies[i].end());
+    // }
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
 
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
-    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
+
+    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
+      int (equilibration*numberOfSteps), numericalDoubleDerviative,
+      stepVec, energyVec, energy2Vec,
+      varianceVec, acceptRatioVec, elapsedTime, timeStep);
+
+    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
 
 }
 
@@ -349,7 +383,7 @@ void run_bruteforce_vmc(double alpha_min,
             System* system = new System();
             system->setSampler                  (new Sampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
-            // system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
+            system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
             system->setWaveFunction             (new SimpleGaussian(system, alphaVec.at(i)));
             system->setInitialState             (new RandomUniform(system,
                                                         numberOfDimensions,
@@ -369,21 +403,21 @@ void run_bruteforce_vmc(double alpha_min,
             varianceVec.at(i) = (system_sampler->getVariance());
             acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
             //
-            // std::vector<double> energySamples = system->getSampler()->getEnergySamples();
-            // writeFileEnergy(energySamples,
-            //                 numberOfDimensions,
-            //                 numberOfParticles,
-            //                 numberOfSteps,
-            //                 // alphaVec.at(i),
-            //                 alpha,
-            //                 timeStep);
+            std::vector<double> energySamples = system->getSampler()->getEnergySamples();
+            writeFileEnergy(energySamples,
+                            numberOfDimensions,
+                            numberOfParticles,
+                            numberOfSteps,
+                            // alphaVec.at(i),
+                            alpha,
+                            timeStep);
         }
         //end parallel region
 
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
-    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
+    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);

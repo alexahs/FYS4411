@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void writeFileOneVariational(int, int, int, int, bool, vector<double>,
+void writeFileOneVariational(bool, int, int, int, int, bool, vector<double>,
      vector<double>, vector<double>, vector<double>, vector<double>, double, double);
 
 void printInitalSystemInfo(int, int, int, double, int);
