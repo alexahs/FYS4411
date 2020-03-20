@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     vector<int> nParticles = {500};
     vector<int> timeStep = {-4};
     int nRuns = 1;
-    bool numerical = false;
+    bool numerical = true;
     // for(int j = 0; j < 2; j++){
         for(int i = 0; i < nRuns; i++){
             run_bruteforce_vmc(0.2, 0.9, 0.1, 3, nParticles[i], (int) pow(2, 21), pow(10, timeStep[i]), numerical);
