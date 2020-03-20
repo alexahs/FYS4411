@@ -347,7 +347,7 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, b
       stepVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);
 
-    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
+    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
 
 }
 
@@ -413,7 +413,8 @@ void run_bruteforce_vmc(double alpha_min,
                             numberOfSteps,
                             alphaVec.at(i),
                             // alpha,
-                            timeStep);
+                            timeStep,
+                            numerical);
         }
         //end parallel region
 
