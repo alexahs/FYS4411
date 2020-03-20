@@ -26,16 +26,16 @@ void writeFileEnergy(std::vector<double>& energySamples,
 }
 
 
-void writeFileOneVariational(bool importance, int numDim, int numPart, int metroSteps, int equilSteps,
+void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,
     vector<double> variance, vector<double> acceptRatio, double elapsedTime, double timeStep)
 {
-    std::string filename = "./Data/temp_results/brute_vs_importance/vmc_";
+    std::string filename = "./Data/temp_results/brute_importance_with_energies/vmc_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     filename.append(to_string(int(log10(timeStep))) + "dt_");
-    filename.append("importance_"+to_string(importance));
+    // filename.append("importance_"+to_string(importance));
     if (numericalDoubleDerviative) {
         filename.append("num.csv");
     } else {

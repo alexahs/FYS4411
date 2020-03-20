@@ -60,13 +60,20 @@ int main(int argc, char* argv[]) {
 
     // vmc_brute_loop();
 
-    bool importance = true;
-    for(int i = 0; i < 2; i++){
-        run_single_vmc(0.45, 10, 500, 3, importance);
-        importance = false;
-    }
+    // bool importance = true;
+    // for(int i = 0; i < 2; i++){
+    //     run_single_vmc(0.45, 10, 500, 3, importance);
+    //     importance = false;
+    // }
 
-    // run_bruteforce_vmc(0.1, 10, 10, 3);
+    // run_bruteforce_vmc(0.2, 10, 10, 3);
+
+    vector<int> nParticles = {1, 10, 100, 500};
+    vector<int> timeStep = {-1, -1, -1, -4};
+    int nRuns = 4;
+    for(int i = 0; i < nRuns; i++){
+        run_bruteforce_vmc(0.2, 0.9, 0.1, 3, nParticles[i], (int) pow(2, 21), pow(10, timeStep[i]), true);
+    }
 
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
@@ -243,7 +250,7 @@ void run_gradient_descent(int nAlphas, double alpha0, double gamma){
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
-    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
+    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);
@@ -284,19 +291,16 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, b
 
     int nnSteps = stepVec.size();
 
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
 
     // vector<double> alphaVec;
     vector<double> energyVec(nnSteps, 0);
     vector<double> energy2Vec(nnSteps, 0);
     vector<double> varianceVec(nnSteps, 0);
     vector<double> acceptRatioVec(nnSteps, 0);
-    // vector<double> alphaVec(stepVec.size(), 0);
-    // for(int i = 0; i < stepVec.size(); i++){alphaVec[i] = alpha}
 
     #pragma omp parallel for schedule(dynamic)
-        for(int i=0; i < nnSteps; i++){
-            int nSteps = pow(2, stepVec[i]);
-            printInitalSystemInfo(numberOfDimensions, numberOfParticles, nSteps, equilibration, 1);
+        for(int i=0; i < nProcs; i++){
             System* system = new System();
             system->setSampler                  (new Sampler(system));
             system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -308,20 +312,20 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, b
 
             system->setEquilibrationFraction     (equilibration);
             system->setStepLength                (stepLength);
-            system->setNumberOfMetropolisSteps   (nSteps);
+            system->setNumberOfMetropolisSteps   (numberOfSteps);
             system->setImportanceSampling        (importanceSampling, timeStep);
             system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
             system->runMetropolisSteps           ();
-            vector<double> energySamples = system->getSampler()->getEnergySamples();
-            // #pragma omp critial
-            // tempEnergies.push_back(energySamples);
             Sampler* system_sampler = system->getSampler();
-            energyVec.at(i) = (system_sampler->getEnergy());
-            energy2Vec.at(i) = (system_sampler->getEnergy2());
-            varianceVec.at(i) = (system_sampler->getVariance());
-            acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
+            vector<double> energySamples = system->getSampler()->getEnergySamples();
+            #pragma omp critial
+            tempEnergies.push_back(energySamples);
         }//end parallel
 
+        // energyVec.at(i) = (system_sampler->getEnergy());
+        // energy2Vec.at(i) = (system_sampler->getEnergy2());
+        // varianceVec.at(i) = (system_sampler->getVariance());
+        // acceptRatioVec.at(i) = (system_sampler->getAcceptRatio());
 
     // Sampler* system_sampler = system->getSampler();
     // energyVec.at(0) = (system_sampler->getEnergy());
@@ -338,12 +342,12 @@ void run_single_vmc(double alpha, int numberOfSteps, int nParticles, int dims, b
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
 
-    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
+    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       stepVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);
 
-    // writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
+    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps, alpha, timeStep);
 
 }
 
@@ -355,17 +359,16 @@ void run_bruteforce_vmc(double alpha_min,
                         int nCycles,
                         double metHasteStep,
                         bool numerical) {
-    double alpha = 0.8;
     int numberOfDimensions         = dim;         // Dimensions
     int numberOfParticles          = nParticles;        // Particales in system
     int numberOfSteps              = (int) nCycles;  // Monte Carlo cycles
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = metHasteStep;      // Metropolis-Hastings: time step
-    double h                       = 0.0001;     // Double derivative step length
+    double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = false;     // Otherwise: normal Metropolis sampling
+    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = numerical;     // Otherwise: use analytical expression for 2nd derivative
     bool saveEnergySamples         = false;
     // Initialize vectors where results will be stored
@@ -408,8 +411,8 @@ void run_bruteforce_vmc(double alpha_min,
                             numberOfDimensions,
                             numberOfParticles,
                             numberOfSteps,
-                            // alphaVec.at(i),
-                            alpha,
+                            alphaVec.at(i),
+                            // alpha,
                             timeStep);
         }
         //end parallel region
@@ -417,7 +420,7 @@ void run_bruteforce_vmc(double alpha_min,
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     double elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - begin).count();
     printFinal(1, elapsedTime);
-    writeFileOneVariational(importanceSampling, numberOfDimensions, numberOfParticles, numberOfSteps,
+    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
       int (equilibration*numberOfSteps), numericalDoubleDerviative,
       alphaVec, energyVec, energy2Vec,
       varianceVec, acceptRatioVec, elapsedTime, timeStep);
