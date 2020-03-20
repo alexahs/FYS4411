@@ -34,6 +34,20 @@ def plotSphericalVMC(dim, particles):
     # plt.show()
     plt.clf()
 
+
+def printBlockStd():
+
+    std_block_1_10_100_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_1num.npy"))
+    std_block_1_10_100_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_1_10_100p_3d_0num.npy"))
+    std_block_500_num = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_1num.npy"))
+    std_block_500_ana = np.sqrt(np.load(RAW_DATA_DIR + "variances_blocking_500p_3d_0num.npy"))
+
+    print(std_block_1_10_100_num)
+    print(std_block_500_num)
+
+
+printBlockStd()
+
 def subPlotsShperical():
 
 
@@ -264,9 +278,6 @@ def timingStandardVsImport():
     print("File written to ", outfilename)
 
 
-
-# timingStandardVsImport()
-
 # "Alpha,Energy,Energy2,Variance,AcceptRatio,ElapsedTimeMS"
 # timeDep()
 
@@ -411,78 +422,6 @@ def printResultsNumvsAna():
     print("file written to ", fname)
 
 
-def createTabulated_task_b(dim, particles, dt):
-
-    # vmc_1d_100p_0dt_ana.csv
-    # vmc_1d_100p_-1dt_ana.csv
-
-    # infileAna = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_{dt}dt_ana.csv"
-    # infileNum = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_{dt}dt_num.csv"
-
-    infileAna = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_{dim}d_{particles}p_{dt}_dt_ana.csv"
-    infileNum = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_{dim}d_{particles}p_{dt}_dt_num.csv"
-
-
-    df_ana = pd.read_csv(infileAna)
-    df_num = pd.read_csv(infileNum)
-
-    nLines = len(df_ana["Energy"])
-
-    CPUtimeAna = df_ana["ElapsedTimeMS"]
-    CPUtimeNum = df_num["ElapsedTimeMS"]
-
-    arrAna = df_ana.to_numpy()
-    arrNum = df_num.to_numpy()
-
-    tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $sigma_{block}$ & AcceptRatio \\" + "\n"
-
-    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & AcceptRatio \\" + "\n"
-
-    labelAna = "\label{tab:task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + "}" + "\n"
-    labelNum = "\label{tab:task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + "}" + "\n"
-
-    captionAna = "\caption{Analytic derivative. CPU time: " + str(CPUtimeAna[0]*1e-3) + "s" + "}" + "\n"
-    captionNum = "\caption{Numerical derivative. CPU time: " + str(CPUtimeNum[0]*1e-3) + "s" + "}" + "\n"
-
-
-    fnameAna = FORMATTED_DATA + "tasks_c_d/" + "table_task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
-    fnameNum = FORMATTED_DATA + "tasks_c_d/" + "table_task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
-    outfileAna = open(fnameAna, "w")
-    outfileNum = open(fnameNum, "w")
-
-
-    outfileAna.write(labelAna)
-    outfileAna.write(captionAna)
-    outfileAna.write(tableHeader)
-
-    outfileNum.write(labelNum)
-    outfileNum.write(captionNum)
-    outfileNum.write(tableHeader)
-
-    # float_formatter = "{:.5f}".format
-    # np.set_printoptions(formatter={'float_kind':float_formatter})
-
-    # "Alpha,Energy,Energy2,Variance,AcceptRatio,ElapsedTimeMS"
-
-    # print((arrAna[:,3])**(0.5))
-
-    stdAna = np.sqrt(arrAna[:,3])
-    stdNum = np.sqrt(arrNum[:,3])
-
-    stdAna[np.isnan(stdAna)] = 0
-    stdNum[np.isnan(stdNum)] = 0
-
-    for i in range(nLines):
-        outfileAna.write("%.1f & %5.5f & %5.5f & %5.5f " %(arrAna[i,0], arrAna[i,1], stdAna[i], arrAna[i,4]) + r"\\" + "\n")
-        outfileNum.write("%.1f & %5.5f & %5.5f & %5.5f " %(arrNum[i,0], arrNum[i,1], stdNum[i], arrNum[i,4]) + r"\\" + "\n")
-
-
-    outfileAna.close()
-    outfileNum.close()
-
-    print(fnameAna, "formatted")
-    print(fnameNum, "formatted")
-
 
 def blockAllEnergySamples():
     inDir = "brute_importance_with_energies/"
@@ -492,7 +431,7 @@ def blockAllEnergySamples():
     timeSteps = [-4]
     alphas = [5] #1e-1
 
-    num = 1
+    num = 0
 
     nAlphas = len(alphas)
     nDims = len(dimensions)
@@ -517,7 +456,6 @@ def blockAllEnergySamples():
     outfile = RAW_DATA_DIR + f"variances_blocking_500p_3d_{num}num.npy"
     np.save(outfile, variances)
 
-blockAllEnergySamples()
 
 
 def blocking(dim, particles, log2Steps):

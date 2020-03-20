@@ -69,12 +69,12 @@ int main(int argc, char* argv[]) {
     // run_bruteforce_vmc(0.2, 10, 10, 3);
 
     vector<int> nParticles = {500};
-    vector<int> timeStep = {-4};
+    vector<int> timeStep = {-1};
     int nRuns = 1;
     bool numerical = true;
     // for(int j = 0; j < 2; j++){
         for(int i = 0; i < nRuns; i++){
-            run_bruteforce_vmc(0.2, 0.9, 0.1, 3, nParticles[i], (int) pow(2, 21), pow(10, timeStep[i]), numerical);
+            run_bruteforce_vmc(0.4, 0.7, 0.1, 3, nParticles[i], (int) pow(2, 20), pow(10, timeStep[i]), numerical);
         // }
         // numerical = false;
     }
