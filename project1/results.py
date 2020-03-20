@@ -265,7 +265,7 @@ def timingStandardVsImport():
 
 
 
-timingStandardVsImport()
+# timingStandardVsImport()
 
 # "Alpha,Energy,Energy2,Variance,AcceptRatio,ElapsedTimeMS"
 # timeDep()
@@ -485,12 +485,14 @@ def createTabulated_task_b(dim, particles, dt):
 
 
 def blockAllEnergySamples():
-
+    inDir = "brute_importance_with_energies/"
     log2Steps = 21
-    particles = [1, 10, 100, 500]
-    dimensions = [1, 2, 3]
-    timeSteps = [-4, -3, -2, -1, 0, 1, 2]
-    alphas = [2, 3, 4, 5, 6, 7, 8, 9] #1e-1
+    particles = [1, 10, 100]
+    dimensions = [3]
+    timeSteps = [-1]
+    alphas = [5] #1e-1
+
+    num = 0
 
     nAlphas = len(alphas)
     nDims = len(dimensions)
@@ -498,20 +500,24 @@ def blockAllEnergySamples():
     nParticles = len(particles)
 
     variances = np.zeros((nAlphas, nDims, nParticles, nTimeSteps))
+    # vmc_energysamples_3d_1p_9alpha_-1dt_1num_2pow21steps.bin
+    # for num in [0, 1]:
+        for a, alpha in enumerate(alphas):
+            for d, dim in enumerate(dimensions):
+                for p, particle in enumerate(particles):
+                    for dt, timeStep in enumerate(timeSteps):
+                        filename = RAW_DATA_DIR + inDir + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_{num}num_2pow{log2Steps}steps.bin"
+                        print("Loaded", filename[12:])
+                        energySamples = np.fromfile(filename, dtype="double")
+                        mean, var = block(energySamples)
 
-    for a, alpha in enumerate(alphas):
-        for d, dim in enumerate(dimensions):
-            for p, particle in enumerate(particles):
-                for dt, timeStep in enumerate(timeSteps):
-                    filename = RAW_DATA_DIR + f"vmc_energysamples_{dim}d_{particle}p_{alpha}alpha_{timeStep}dt_2pow{log2Steps}steps.bin"
-                    print("Loaded", filename[12:])
-                    energySamples = np.fromfile(filename, dtype="double")
-                    mean, var = block(energySamples)
+                        variances[a, d, p, dt] = var
 
-                    variances[a, d, p, dt] = var
 
-    outfile = "variance_blocking_importance_all_configs.npy"
+    outfile = RAW_DATA_DIR + f"variances_blocking_1_10_100p_3d_{num}num.npy"
     np.save(outfile, variances)
+
+blockAllEnergySamples()
 
 
 def blocking(dim, particles, log2Steps):
