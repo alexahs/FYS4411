@@ -21,6 +21,7 @@ def plotSphericalVMC(dim, particles):
     df_ana = pd.read_csv(RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_ana.csv")
     df_num = pd.read_csv(RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_num.csv")
 
+
     outfile = FIGURE_DIR + "task_b/" + f"fig_brute_vmc_task_b_{dim}d_{particles}p.pdf"
 
     plt.errorbar(df_num["Alpha"] + 0.005, df_num["Energy"], np.sqrt(df_num["Variance"]), label="Numerical derivative", fmt=".", capsize=3)
@@ -94,37 +95,65 @@ def subPlotsShperical():
 
     plt.show()
 
-def import_vs_no():
+def timeDepTable():
 
-    inDir = "brute_vs_importance/"
+    inDir = "brute_importance_with_energies/"
 
     # vmc_3d_10p_-2dt_importance_0ana
 
-    particles = 500
+    particle = 100
     dim = 3
-    dt = -2
-
-    df_brute = pd.read_csv(RAW_DATA_DIR + inDir + f"vmc_{dim}d_{particles}p_{dt}dt_importance_0ana.csv")
-    df_importance = pd.read_csv(RAW_DATA_DIR+ inDir + f"vmc_{dim}d_{particles}p_{dt}dt_importance_1ana.csv")
-
-    steps = np.array([12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
-    steps = 2**steps
-
-    var_brute = df_brute["Variance"].to_numpy()
-    var_importance = df_importance["Variance"].to_numpy()
-    std_brute = np.sqrt(var_brute)
-    std_importance = np.sqrt(var_importance)
-
-    print(std_importance)
-    print(std_brute)
 
 
-    plt.semilogx(steps, std_brute, label="Standard Metropolis Sampling")
-    plt.semilogx(steps, std_importance, label="Importance Sampling")
-    plt.legend()
-    plt.show()
+    particles = np.array([1, 10, 100, 500])
+    dims = [1, 2, 3]
+    timesteps = [-4, -3, -2, -1, 0, 1, 2]
+    alphas = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-import_vs_no()
+    d = dim -1
+    p = np.where(particles == particle)[0]
+    print(p)
+
+    var_block = np.load(RAW_DATA_DIR + "variance_blocking_importance_all_configs.npy")
+    #(alpha, dim, particles, timesteps))
+
+    outfilename = FORMATTED_DATA + "tasks_c_d/" + f"dt_dependence_{particle}p_{dim}d.txt"
+    outfile = open(outfilename, "w")
+
+    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $\sigma_{block}$ & AcceptRatio \\" + "\n"
+    tableHeader = r"$\Delta t$ & \alpha_{min} & $\langle E_{min} \rangle$  & $\sigma_{mc}$ & $\sigma_{block}$ & ratio \\" + "\n"
+    outfile.write(tableHeader)
+
+    for t, dt in enumerate(timesteps):
+        df = pd.read_csv(RAW_DATA_DIR + inDir + f"vmc_{dim}d_{particle}p_{dt}dt_ana.csv")
+        E_min = df["Energy"].min()
+        alpha = df["Alpha"][df.Energy == E_min].to_numpy()[0]
+        alphaIdx = np.where(alphas == alpha)[0][0]
+        ratio = df["AcceptRatio"][df.Energy == E_min].to_numpy()[0]
+        std_mc = np.sqrt(df["Variance"][df.Energy == E_min].to_numpy()[0])
+        std_block = np.sqrt(var_block[alphaIdx, d, p, t])[0]
+
+        outfile.write(f" {dt} & {alpha} & {E_min} & {std_mc} & {std_block} & {ratio}" + r" \\" + "\n")
+
+
+        print(alphaIdx)
+
+        print(" ")
+        print(f"-----dt = {dt}-----")
+        print(f" * E_min = {E_min}")
+        print(f" * Alpha = {alpha}")
+        print(f" * ratio = {ratio}")
+        print(f" * std_mc = {std_mc}")
+        print(f" * std_block = {std_block}")
+        print(" ")
+        # print(E_min)
+        # print(alpha_min)
+
+    outfile.close()
+    print("File written to ", outfilename)
+
+
+# timeDepTable()
 
 def timeDep():
     inDir = "brute_importance_with_energies/"
@@ -175,9 +204,68 @@ def timeDep():
     plt.legend()
     plt.show()
 
+def timingStandardVsImport():
+    inDirImportance = "brute_importance_with_energies/"
+    inDirStandard = "brute_no_importance/"
+
+    particle = 100
+    dim = 3
+    dt = -1
+
+    particles = np.array([1, 10, 100, 500])
+    dims = [1, 2, 3]
+    timesteps = np.array([-4, -3, -2, -1, 0, 1, 2])
+    alphas = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+    d = dim -1
+    p = np.where(particles == particle)[0][0]
+    t = np.where(timesteps == dt)[0][0]
 
 
 
+    var_block = np.load(RAW_DATA_DIR + "variance_blocking_importance_all_configs.npy")
+    #(alpha, dim, particles, timesteps))
+
+    outfilename = FORMATTED_DATA + "tasks_c_d/" + f"block_and_import_vs_standard_{particle}p_{dim}d_{dt}dt.txt"
+    outfile = open(outfilename, "w")
+
+    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $\sigma_{block}$ & AcceptRatio \\" + "\n"
+    # tableHeader = r"$\Delta t$ & \alpha_{min} & $\langle E_{min} \rangle$  & $\sigma_{mc}$ & $\sigma_{block}$ & ratio \\" + "\n"
+    tableHeader = r" $\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $\sigma_{block} & ratio_{importance} $ & ratio$_{standard}$ \\" + "\n"
+
+    outfile.write(tableHeader)
+
+    df1 = pd.read_csv(RAW_DATA_DIR + inDirImportance + f"vmc_{dim}d_{particle}p_{dt}dt_ana.csv")
+    df2 = pd.read_csv(RAW_DATA_DIR + inDirStandard + f"vmc_{dim}d_{particle}p_ana.csv")
+
+    for i, alpha in enumerate(alphas):
+        alpha = df1["Alpha"][df1.Alpha == alpha].to_numpy()[0]
+        alphaIdx = np.where(alphas == alpha)[0][0]
+        ratio_imp = df1["AcceptRatio"][df1.Alpha == alpha].to_numpy()[0]
+        std_mc = np.sqrt(df1["Variance"][df1.Alpha == alpha].to_numpy()[0])
+        std_block = np.sqrt(var_block[alphaIdx, d, p, t])
+        energy = df1["Energy"][df1.Alpha == alpha].to_numpy()[0]
+
+        ratio_standard = df2["AcceptRatio"][df2.Alpha == alpha].to_numpy()[0]
+
+        # float_formatter = "{:.4f}".format
+        # np.set_printoptions(formatter={'float_kind':float_formatter})
+        outfile.write("%.2f & %.4f & %.4f& %.4f& %.4f& %.4f" \
+                        %(alpha, energy, std_mc, std_block, ratio_imp, ratio_standard) + r"\\" + "\n")
+
+        # outfile.write(f"{alpha} & {energy} & {std_mc} & {std_block} & {ratio_imp} & {ratio_standard}" + r"\\" + "\n")
+
+
+
+    # outfile.write(f" {dt} & {alpha} & {E_min} & {std_mc} & {std_block} & {ratio}" + r" \\" + "\n")
+
+
+    outfile.close()
+    print("File written to ", outfilename)
+
+
+
+timingStandardVsImport()
 
 # "Alpha,Energy,Energy2,Variance,AcceptRatio,ElapsedTimeMS"
 # timeDep()
