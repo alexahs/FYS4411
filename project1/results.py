@@ -47,8 +47,8 @@ def printBlockStd():
 
     dt = -1
 
-    file = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_energysamples_3d_500p_5alpha_-1dt_1num_2pow20steps.bin"
-    x = np.load(file)
+    file = RAW_DATA_DIR + "brute_importance_with_energies/" + "vmc_energysamples_3d_500p_5alpha_-1dt_1num_2pow20steps.bin"
+    x = np.load(file, allow_pickle=True)
 
     print(block(x))
 
