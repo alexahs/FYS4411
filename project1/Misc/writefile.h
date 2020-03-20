@@ -19,4 +19,5 @@ void writeFileEnergy(std::vector<double>& energySamples,
                      int numPart,
                      int metroSteps,
                      double alpha,
-                     double timeStep);
+                     double timeStep,
+                     bool num);

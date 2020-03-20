@@ -411,7 +411,7 @@ def printResultsNumvsAna():
     print("file written to ", fname)
 
 
-def createTabulated_task_b(dim, particles):
+def createTabulated_task_b(dim, particles, dt):
 
     # vmc_1d_100p_0dt_ana.csv
     # vmc_1d_100p_-1dt_ana.csv
@@ -419,8 +419,8 @@ def createTabulated_task_b(dim, particles):
     # infileAna = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_{dt}dt_ana.csv"
     # infileNum = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_{dt}dt_num.csv"
 
-    infileAna = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_ana.csv"
-    infileNum = RAW_DATA_DIR + "brute_no_importance/" + f"vmc_{dim}d_{particles}p_num.csv"
+    infileAna = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_{dim}d_{particles}p_{dt}_dt_ana.csv"
+    infileNum = RAW_DATA_DIR + "brute_importance_with_energies/" + f"vmc_{dim}d_{particles}p_{dt}_dt_num.csv"
 
 
     df_ana = pd.read_csv(infileAna)
@@ -428,26 +428,25 @@ def createTabulated_task_b(dim, particles):
 
     nLines = len(df_ana["Energy"])
 
-    CPUtimeAna = df_ana[" ElapsedTimeMS"]
-    CPUtimeNum = df_num[" ElapsedTimeMS"]
+    CPUtimeAna = df_ana["ElapsedTimeMS"]
+    CPUtimeNum = df_num["ElapsedTimeMS"]
 
     arrAna = df_ana.to_numpy()
     arrNum = df_num.to_numpy()
 
-    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & \langle E^2 \rangle & $\sigma^2$ & AcceptRatio \\" + "\n"
-    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $sigma_{block}$ & AcceptRatio \\" + "\n"
+    tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & $sigma_{block}$ & AcceptRatio \\" + "\n"
 
-    tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & AcceptRatio \\" + "\n"
+    # tableHeader = r"$\alpha$ & $\langle E \rangle$ & $\sigma_{mc}$ & AcceptRatio \\" + "\n"
 
-    labelAna = "\label{tab:task_b_ana_dim" + str(dim) + "_part" + str(particles) + "}" + "\n"
-    labelNum = "\label{tab:task_b_num_dim" + str(dim) + "_part" + str(particles) + "}" + "\n"
+    labelAna = "\label{tab:task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + "}" + "\n"
+    labelNum = "\label{tab:task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + "}" + "\n"
 
     captionAna = "\caption{Analytic derivative. CPU time: " + str(CPUtimeAna[0]*1e-3) + "s" + "}" + "\n"
-    captionNum = "\caption{Analytic derivative. CPU time: " + str(CPUtimeNum[0]*1e-3) + "s" + "}" + "\n"
+    captionNum = "\caption{Numerical derivative. CPU time: " + str(CPUtimeNum[0]*1e-3) + "s" + "}" + "\n"
 
 
-    fnameAna = FORMATTED_DATA + "task_b/" + "table_task_b_ana_dim" + str(dim) + "_part" + str(particles) + ".txt"
-    fnameNum = FORMATTED_DATA + "task_b/" + "table_task_b_num_dim" + str(dim) + "_part" + str(particles) + ".txt"
+    fnameAna = FORMATTED_DATA + "task_b/" + "table_task_d_ana_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
+    fnameNum = FORMATTED_DATA + "task_b/" + "table_task_d_num_dim" + str(dim) + "_part" + str(particles) + "dt_" + str(dt) + ".txt"
     outfileAna = open(fnameAna, "w")
     outfileNum = open(fnameNum, "w")
 

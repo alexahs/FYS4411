@@ -7,12 +7,14 @@ void writeFileEnergy(std::vector<double>& energySamples,
                      int numPart,
                      int metroSteps,
                      double alpha,
-                     double timeStep){
+                     double timeStep,
+                     bool num){
     std::string filename = "./Data/temp_results/brute_importance_with_energies/vmc_energysamples_";
     filename.append(to_string(numDim) + "d_");
     filename.append(to_string(numPart) + "p_");
     filename.append(to_string((int)(10*alpha)) + "alpha_");
     filename.append(to_string(int(log10(timeStep))) + "dt_");
+    filename.append(to_string(num) + "num_");
     filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
 
     ofstream outfile;
