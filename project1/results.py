@@ -492,7 +492,7 @@ def blockAllEnergySamples():
     timeSteps = [-1]
     alphas = [5] #1e-1
 
-    num = 0
+    num = 1
 
     nAlphas = len(alphas)
     nDims = len(dimensions)
