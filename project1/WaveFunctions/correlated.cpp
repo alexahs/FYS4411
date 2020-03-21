@@ -6,7 +6,7 @@
 #include <iostream>
 using namespace std;
 
-Correlated::Correlated(System* system, double alpha, double beta) :
+Correlated::Correlated(System* system, double alpha, double beta, double bosonDiameter) :
       WaveFunction(system) {
     assert(alpha >= 0);
     assert(beta >= 0);
@@ -15,6 +15,7 @@ Correlated::Correlated(System* system, double alpha, double beta) :
     m_parameters.reserve(2);
     m_parameters.push_back(alpha);
     m_parameters.push_back(beta);
+    m_bosonDiameter = bosonDiameter;
 }
 
 double Correlated::evaluate(std::vector<class Particle*> particles) {

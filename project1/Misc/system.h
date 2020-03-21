@@ -4,7 +4,6 @@
 
 class System {
 public:
-
     bool metropolisStep             ();
     bool importanceStep             ();
     void runMetropolisSteps         ();
@@ -16,9 +15,11 @@ public:
     void setHamiltonian             (class Hamiltonian* hamiltonian);
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
-    void setImportanceSampling      (bool importanceSampling, double timeStep);
-    void setNumericalDoubleDerivative (bool numericalDoubleDerviative, double h);
     void setSampler                 (class Sampler* sampler);
+    // false by default -> Normal Metropolis sampling
+    void setImportanceSampling      (bool importanceSampling, double timeStep);
+    // false by default -> analytic expression for double derivative
+    void setNumericalDoubleDerivative (bool numericalDoubleDerviative, double h);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }
@@ -32,25 +33,22 @@ public:
     double getSumRiSquared          ();
 
 private:
-    bool                            m_importanceSampling = false;
+    bool                            m_importanceSampling        = false;
     bool                            m_numericalDoubleDerivative = false;
-    int                             m_numberOfParticles = 0;
-    int                             m_numberOfDimensions = 0;
-    int                             m_numberOfMetropolisSteps = 0;
-    double                          m_equilibrationFraction = 0.0;
-    double                          m_stepLength = 0.0;
-    double                          m_timeStep = 0.0;
-    double                          m_h = 0.0;
-    double                          m_timeStepDiffusion = 0.0;
-    double                          m_sqrtTimeStep = 0.0;
-    double                          m_invFourTimeStepDiffusion = 0.0;
-    class WaveFunction*             m_waveFunction = nullptr;
-    class Hamiltonian*              m_hamiltonian = nullptr;
-    class InitialState*             m_initialState = nullptr;
-    class Sampler*                  m_sampler = nullptr;
+    int                             m_numberOfParticles         = 0;
+    int                             m_numberOfDimensions        = 0;
+    int                             m_numberOfMetropolisSteps   = 0;
+    double                          m_equilibrationFraction     = 0.0;
+    double                          m_stepLength                = 0.0;
+    double                          m_timeStep                  = 0.0;
+    double                          wfOld                       = 0.0;
+    double                          m_h                         = 0.0;
+    double                          m_timeStepDiffusion         = 0.0;
+    double                          m_sqrtTimeStep              = 0.0;
+    double                          m_invFourTimeStepDiffusion  = 0.0;
+    class WaveFunction*             m_waveFunction              = nullptr;
+    class Hamiltonian*              m_hamiltonian               = nullptr;
+    class InitialState*             m_initialState              = nullptr;
+    class Sampler*                  m_sampler                   = nullptr;
     std::vector<class Particle*>    m_particles = std::vector<class Particle*>();
-
-    //temporary storage of the wavefunction in metropolis steps
-    double                          wfOld = 0;
-
 };

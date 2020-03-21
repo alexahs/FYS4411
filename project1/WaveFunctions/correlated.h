@@ -3,7 +3,7 @@
 
 class Correlated : public WaveFunction {
 public:
-    Correlated(class System* system, double alpha, double beta);
+    Correlated(class System* system, double alpha, double beta, double bosonDiameter);
     double evaluate(std::vector<class Particle*> particles);
     double analyticDoubleDerivative(std::vector<class Particle*> particles, int k);
     std::vector<double> computeQuantumForce(class Particle* particle);

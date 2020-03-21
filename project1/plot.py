@@ -56,14 +56,15 @@ def blocking(dim, particles, log2Steps):
 
 def correlated(dim, particles, log2Steps):
     DATA_DIR = "./Data/correlated_bruteforce/alpha_"
-    alphas = np.arange(0.2, 1.2, 0.1)
+    alphas = np.arange(0.2, 0.8, 0.1)
     Emean = np.zeros(alphas.shape)
     Estd = np.zeros(alphas.shape)
 
     for i,alpha in enumerate(alphas):
         alpha_str = f"{alpha:1.3f}"
         filename = DATA_DIR + alpha_str + f"_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
-        size = 2**19
+        size = 2**17
+        print(f"Blocking for alpha={alpha:1.1f}", end=", ")
         DataAnalysis = DataAnalysisClass(filename, size)
         DataAnalysis.blocking()
         Emean[i] = DataAnalysis.blockingAvg
@@ -136,3 +137,9 @@ def animate_3D(particles):
 correlated(dim, particles, log2Steps)
 # plotInitialState()
 # animate_3D(particles)
+
+
+# Histogram of RNGs, just a test to verify that they're uniform and in range (0.0, 1.0)
+# x = np.fromfile("./Data/random_numbers_test_3d_10p_2pow10steps.bin")
+# plt.hist(x)
+# plt.show()

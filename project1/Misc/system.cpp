@@ -11,16 +11,38 @@
 #include <iostream>
 #include <cmath>
 
-using std::cout;
-using std::endl;
-using std::setw;
+using namespace std;
+
+void System::runMetropolisSteps() {
+    m_particles = m_initialState->getParticles();
+    assert(m_stepLength > 0);
+    // Important to initialize variable wfOld
+    wfOld = m_waveFunction->evaluate(m_particles);
+    int eqSteps = m_numberOfMetropolisSteps*m_equilibrationFraction;
+    int mSteps = m_numberOfMetropolisSteps;
+    // Importance sampling (Only if importanceSampling is set to true)
+    if (m_importanceSampling) {
+        for (int i=0; i<eqSteps; i++) { importanceStep(); } // Equilibration (not sampled)
+        for (int i=0; i<m_numberOfMetropolisSteps; i++) { m_sampler->sample(importanceStep()); }
+    }
+    // Standard Metropolis sampling (Default)
+    else {
+        for (int i=0; i<eqSteps; i++) { metropolisStep(); } // Equilibration (not sampled)
+        for (int i=0; i<m_numberOfMetropolisSteps; i++) { m_sampler->sample(metropolisStep()); }
+    }
+    m_sampler->computeAverages();
+    // m_sampler->printOutputToTerminal();
+}
 
 bool System::metropolisStep() {
     /* Perform the actual Metropolis step: Choose a particle at random and
-     * change it's position by a random amount, and check if the step is
-     * accepted by the Metropolis test (compare the wave function evaluated
-     * at this new position with the one at the old position).
-     */
+    * change it's position by a random amount, and check if the step is
+    * accepted by the Metropolis test (compare the wave function evaluated
+    * at this new position with the one at the old position).
+    * Returns
+    * true, if step is accepted
+    * false, if step is rejected
+    */
     int rndIdx = Random::nextInt(m_numberOfParticles);
     Particle* randomParticle = m_particles.at(rndIdx);
     std::vector<double> proposedSteps = std::vector<double>();
@@ -46,34 +68,28 @@ bool System::metropolisStep() {
 }
 
 bool System::importanceStep(){
-
-
+    /* Perform one step according to Metropolis-Hastings algorithm
+    * Returns
+    * true, if step is accepted
+    * false, if step is rejected
+    */
     int rndIdx = Random::nextInt(m_numberOfParticles);
     Particle* randomParticle = m_particles.at(rndIdx);
     std::vector<double> proposedSteps = std::vector<double>();
-
-    //evaluate old quantities
+    // Evaluate old quantities
     std::vector<double> posOld = randomParticle->getPosition();
     std::vector<double> qForceOld = m_waveFunction->computeQuantumForce(randomParticle);
-
     for (int dim=0; dim<m_numberOfDimensions; dim++){
-        //calculate new position based on the langevin equation
-        double step = qForceOld.at(dim)*m_timeStepDiffusion
-                      + Random::nextGaussian(0, 1.0)*m_sqrtTimeStep;
+        // Calculate new position based on the langevin equation
+        double step = qForceOld.at(dim)*m_timeStepDiffusion + Random::nextGaussian(0, 1.0)*m_sqrtTimeStep;
         proposedSteps.push_back(step);
         randomParticle->adjustPosition(proposedSteps.at(dim), dim);
     }
-
-    //evaluate new quantities
+    // Evaluate new quantities
     double wfNew = m_waveFunction->evaluate(m_particles);
     std::vector<double> posNew = randomParticle->getPosition();
     std::vector<double> qForceNew = m_waveFunction->computeQuantumForce(randomParticle);
-
-
-
-
-
-    //compute greens function
+    // Compute greens function
     double greensFunctionRatio = 0;
     for (int dim=0; dim<m_numberOfDimensions; dim++){
         double term1 = posOld.at(dim) - posNew.at(dim) - m_timeStepDiffusion*qForceNew.at(dim);
@@ -82,11 +98,8 @@ bool System::importanceStep(){
     }
     greensFunctionRatio *= m_invFourTimeStepDiffusion;
     greensFunctionRatio = exp(greensFunctionRatio);
-
     double probabilityRatio = greensFunctionRatio*wfNew*wfNew/(wfOld*wfOld);
-    // cout << probabilityRatio << endl;
-
-    //perform test
+    // Perform Metropolis-Hastings test
     if (Random::nextDouble() <= probabilityRatio) {
         wfOld = wfNew;
         return true;
@@ -103,44 +116,6 @@ void System::setNumberOfMetropolisSteps(int numberOfMetropolisSteps){
     assert(numberOfMetropolisSteps > 0);
     m_numberOfMetropolisSteps = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
-}
-
-
-void System::runMetropolisSteps() {
-    m_particles = m_initialState->getParticles();
-    assert(m_stepLength > 0);
-    wfOld = m_waveFunction->evaluate(m_particles);
-
-    // Importance sampling
-    if (m_importanceSampling) {
-        // Equilibriation
-        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
-            bool acceptedEquilibriateStep = importanceStep();
-        }
-        // Sampling
-        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
-            bool acceptedStep = importanceStep();
-            m_sampler->sample(acceptedStep);
-        }
-    }
-    // Standard metropolis sampling
-    else {
-        // Equilibriation Cycles
-        for (int i=0; i<m_numberOfMetropolisSteps*m_equilibrationFraction; i++) {
-            bool acceptedEquilibriateStep = metropolisStep();
-        }
-        // Monte Carlo Cycles
-        int frame=0;
-        for (int i=0; i<m_numberOfMetropolisSteps; i++) {
-            bool acceptedStep = metropolisStep();
-            m_sampler->sample(acceptedStep);
-            // if (i%100 == 0) {
-            //     writeParticles(m_particles, "frame" + to_string(frame++));
-            // }
-        }
-    }
-    m_sampler->computeAverages();
-    m_sampler->printOutputToTerminal();
 }
 
 void System::setNumberOfParticles(int numberOfParticles) {
