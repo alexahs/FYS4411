@@ -5,6 +5,7 @@
 #include "WaveFunctions/wavefunction.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "InitialStates/initialstate.h"
+#include "Misc/writefile.h"
 #include "Math/random.h"
 #include <cassert>
 #include <iostream>
@@ -20,26 +21,22 @@ bool System::metropolisStep() {
      * accepted by the Metropolis test (compare the wave function evaluated
      * at this new position with the one at the old position).
      */
-
-
     int rndIdx = Random::nextInt(m_numberOfParticles);
     Particle* randomParticle = m_particles.at(rndIdx);
     std::vector<double> proposedSteps = std::vector<double>();
-
+    // Propose a move of one particle
     for (int dim=0; dim<m_numberOfDimensions; dim++){
         double step = m_stepLength*(Random::nextDouble() - 0.5);
         proposedSteps.push_back(step);
         randomParticle->adjustPosition(proposedSteps.at(dim), dim); // Adjust position
     }
-    double wfNew = m_waveFunction->evaluate(m_particles); // Evaluate new wave function
-
+    // Evaluate new wave function
+    double wfNew = m_waveFunction->evaluate(m_particles);
     double probabilityRatio = wfNew*wfNew/(wfOld*wfOld);
-
     if (Random::nextDouble() <= probabilityRatio) {
         wfOld = wfNew;
         return true;
-    }
-    else {
+    } else {
         // If move is rejected, then revert to the old position
         for (int dim=0; dim<m_numberOfDimensions; dim++) {
             randomParticle->adjustPosition(- proposedSteps.at(dim), dim);
@@ -133,9 +130,13 @@ void System::runMetropolisSteps() {
             bool acceptedEquilibriateStep = metropolisStep();
         }
         // Monte Carlo Cycles
+        int frame=0;
         for (int i=0; i<m_numberOfMetropolisSteps; i++) {
             bool acceptedStep = metropolisStep();
             m_sampler->sample(acceptedStep);
+            // if (i%100 == 0) {
+            //     writeParticles(m_particles, "frame" + to_string(frame++));
+            // }
         }
     }
     m_sampler->computeAverages();

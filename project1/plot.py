@@ -2,8 +2,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import mpl_toolkits.mplot3d.axes3d as p3
+import matplotlib.animation as animation
 import sys
 from blocking import block
+from analysis import DataAnalysisClass, timeFunction
 
 
 plt.style.use('ggplot')
@@ -53,19 +56,25 @@ def blocking(dim, particles, log2Steps):
 
 def correlated(dim, particles, log2Steps):
     DATA_DIR = "./Data/correlated_bruteforce/alpha_"
-    alphas = np.arange(0.10, 0.75, 0.025)
+    alphas = np.arange(0.2, 1.2, 0.1)
     Emean = np.zeros(alphas.shape)
-    Evar = np.zeros(alphas.shape)
+    Estd = np.zeros(alphas.shape)
 
     for i,alpha in enumerate(alphas):
         alpha_str = f"{alpha:1.3f}"
-        E = np.fromfile(DATA_DIR + alpha_str + f"_{dim}d_{particles}p_2pow{log2Steps}steps.bin")
-        Emean[i], Evar[i] = block(E)
+        filename = DATA_DIR + alpha_str + f"_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
+        size = 2**19
+        DataAnalysis = DataAnalysisClass(filename, size)
+        DataAnalysis.blocking()
+        Emean[i] = DataAnalysis.blockingAvg
+        Estd[i] = DataAnalysis.blockingStd
 
+    Emean /= float(particles)
+    Estd /= float(particles)
     plt.title(f"{particles} particles")
-    plt.errorbar(alphas, Emean, np.sqrt(Evar), fmt=".", capsize=3, label=r"$E\pm \sigma_E$")
+    plt.errorbar(alphas, Emean, Estd, fmt=".", capsize=3, label=r"$E\pm \sigma_E$")
     plt.xlabel(r"$\alpha$")
-    plt.ylabel(r"$\langle E\rangle$")
+    plt.ylabel(r"$\langle E\rangle$ / N")
     plt.legend()
     plt.show()
     plt.show()
@@ -78,8 +87,52 @@ def plotInitialState():
     ax.plot(df["x"], df["y"], df["z"], "bo")
     plt.show()
 
+
+def animate_3D(particles):
+    data = [] # list over particles
+    frames = 20470
+    for i in range(1, frames + 1):
+        df = pd.read_csv(f"./Data/particles/frame{i}.csv")
+        data.append(df.values)
+
+    data = np.asarray(data)
+    data = np.transpose(data, [1,2,0])
+    print(data.shape)
+
+    fig = plt.figure()
+    ax = p3.Axes3D(fig)
+    limit = [-1, 1]
+    ax.set_xlim3d(limit)
+    ax.set_ylim3d(limit)
+    ax.set_zlim3d(limit)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    ax.set_title("Frame 0")
+    plot = ax.plot(data[:,0,0], data[:,1,0], data[:,2,0], "o")
+
+    def update_plot(num, plot, data):
+        ax.clear()
+        plot = ax.plot(data[:,0,num], data[:,1,num], data[:,2,num], "o")
+        ax.set_xlim3d(limit)
+        ax.set_ylim3d(limit)
+        ax.set_zlim3d(limit)
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_zlabel("Z")
+        ax.set_title(f"Frame {num}")
+        return None
+
+    ani = animation.FuncAnimation(
+        fig, update_plot, frames, fargs=(plot, data), interval=8, blit=False
+    )
+
+    plt.show()
+    # ani.save("/Data/particles.gif", writer="imagemagick", fps=30)
+
+
 # sphericalVMC(dim, particles)
 # blocking(dim, particles, log2Steps)
-# correlated(dim, particles, log2Steps)
-
-plotInitialState()
+correlated(dim, particles, log2Steps)
+# plotInitialState()
+# animate_3D(particles)

@@ -17,4 +17,4 @@ void printFinal(int, double);
 
 void writeFileEnergy(vector<double>&, int, int, int, string);
 
-void writeParticles(vector<class Particle*>);
+void writeParticles(vector<class Particle*>, string);

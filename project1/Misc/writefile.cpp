@@ -84,12 +84,12 @@ void printFinal(int numberOfParameters, double elapsedTime) {
     cout << " * Execution time: " << elapsedTime << " ms" << endl << endl;
 }
 
-void writeParticles(vector<class Particle*> particles) {
+void writeParticles(vector<class Particle*> particles, string filename) {
     ofstream outfile;
-    outfile.open("./Data/RandomUniform.csv", ofstream::out | ofstream::trunc);
+    string folder = "./Data/particles/";
+    outfile.open(folder + filename + ".csv", ofstream::out | ofstream::trunc);
     outfile << "x,y,z" << endl;
     vector<double> coor(3, 0);
-    cout << "num: " << particles.size() << endl;
     for (auto particle : particles) {
         coor = particle->getPosition();
         outfile << coor[0] << "," << coor[1] << "," << coor[2] << endl;

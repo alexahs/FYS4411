@@ -1,7 +1,6 @@
 #pragma once
 #include <iomanip>
 #include <vector>
-// #include <omp.h>
 
 class Sampler {
 public:
@@ -9,19 +8,15 @@ public:
     virtual void setNumberOfMetropolisSteps(int steps);
     // void setSaveEnergySamples(bool saveEnergySamples);
     virtual void sample(bool acceptedStep);
-
     virtual void computeAverages();
     void printOutputToTerminal();
     double getEnergy()          { return m_energy; }
     double getEnergy2()         { return m_energy2; }
     double getVariance()        { return m_variance; }
     double getAcceptRatio()     { return m_acceptRatio; }
-
     double getExpectWfDerivTimesLocalE()    { return m_expectWfDerivTimesLocalE; }
     double getExpectWfDerivExpectLocalE()   { return m_expectWfDerivExpectLocalE; }
-
     std::vector <double> getEnergySamples() { return m_vecEnergySamples; }
-
     void initializeParallelVecs();
 
 protected:
@@ -46,5 +41,4 @@ protected:
 
     std::vector <double> m_vecEnergySamples;
     // std::vector <std::vector<double>> m_vecSharedEnergySamples;
-
 };

@@ -20,34 +20,33 @@ EllipticHarmonicOscillator::EllipticHarmonicOscillator(System* system, double ga
     */
     assert(gamma > 0);
     m_gamma2  = gamma * gamma;
-    m_bosonDiameter2 = bosonDiameter * bosonDiameter;
+    m_bosonDiameter = bosonDiameter;
 }
 
 double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 {
-    double localEnergy = 0, diff, Vint=0;
-    std::vector<double> pos_i(3, 0);
-    std::vector<double> pos_j(3, 0);
-
-    for (int i=0; i<particles.size(); i++) {
-        localEnergy += m_system->getWaveFunction()->analyticDoubleDerivative(particles, i);
-        pos_i = particles[i]->getPosition();
-        localEnergy += pos_i[0]*pos_i[0] + pos_i[1]*pos_i[1] + m_gamma2*pos_i[2]*pos_i[2];
+    double localEnergy=0, rkj;
+    std::vector<double> rk(3, 0);
+    std::vector<double> rj(3, 0);
+    // Loop over all particles
+    for (int k=0; k<particles.size(); k++) {
+        localEnergy -= 0.5*m_system->getWaveFunction()->analyticDoubleDerivative(particles, k);
+        rk = particles[k]->getPosition();
+        localEnergy += 0.5 * (rk[0]*rk[0] + rk[1]*rk[1] + m_gamma2*rk[2]*rk[2]);
 
         // Repulsive potential
-        double distance = 0;
-        for (int j=i+1; j<particles.size(); j++) {
-            pos_j = particles[j]->getPosition();
-            diff = (pos_j[0] - pos_i[0]) * (pos_j[0] - pos_i[0]);
-            diff += (pos_j[1] - pos_i[1]) * (pos_j[1] - pos_i[1]);
-            diff += (pos_j[2] - pos_i[2]) * (pos_j[2] - pos_i[2]);
-            if (diff <= m_bosonDiameter2) {
-                Vint += 100000000.0;
+        for (int j=k+1; j<particles.size(); j++) {
+            rj = particles[j]->getPosition();
+            rkj =  (rj[0] - rk[0]) * (rj[0] - rk[0]);
+            rkj += (rj[1] - rk[1]) * (rj[1] - rk[1]);
+            rkj += (rj[2] - rk[2]) * (rj[2] - rk[2]);
+            if (sqrt(rkj) <= m_bosonDiameter) {
+                localEnergy += 10000;
+                cout << "Particle " << k << " and " << j << " has crashed!\n";
             }
         }
     }
-
-    return localEnergy + Vint;
+    return localEnergy;
 }
 
 

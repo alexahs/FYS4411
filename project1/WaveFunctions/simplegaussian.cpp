@@ -68,16 +68,11 @@ double SimpleGaussian::evaluateDerivative(std::vector<class Particle*> particles
 
 
 double SimpleGaussian::evaluateCostFunction(){
-
-
-
     double term1 = m_system->getSampler()->getExpectWfDerivTimesLocalE();
     double term2 = m_system->getSampler()->getExpectWfDerivExpectLocalE();
 
     double cost = 2*(term1/term2 - 1);
     cost *= term2;
-
-
 
     return cost;
 }

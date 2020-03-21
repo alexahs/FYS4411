@@ -10,5 +10,5 @@ public:
 
 private:
     double m_gamma2 = 0;
-    double m_bosonDiameter2 = 0;
+    double m_bosonDiameter = 0;
 };

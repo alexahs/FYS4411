@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include <iostream>
-
+using namespace std;
 
 Correlated::Correlated(System* system, double alpha, double beta) :
       WaveFunction(system) {
@@ -38,78 +38,43 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
     Actually computes the (Laplacian / wave function). This is the
     analytic expression for the fully correlated wave function.
     */
-    std::vector<double> pos_k = particles[k]->getPosition();
-    double xk2 = pos_k[0] * pos_k[0];
-    double yk2 = pos_k[1] * pos_k[1];
-    double zk2 = pos_k[2] * pos_k[2];
-    double nabla2Phi, uPrime, uDoublePrime;
+    double term1=0, term2=0, term3=0, term4=0;
+    std::vector<double> rk = particles[k]->getPosition();
+    double xk2 = rk[0] * rk[0];
+    double yk2 = rk[1] * rk[1];
+    double zk2 = rk[2] * rk[2];
+    double rjk, uPrimeOverR, uDoublePrime;
     double alpha = m_parameters.at(0);
     double beta = m_parameters.at(1);
-    double minus2Alpha = -2*alpha;
-    std::vector<double> nablaPhi(3, 0);
-    nablaPhi[0] = 2*minus2Alpha * xk2;
-    nablaPhi[1] = 2*minus2Alpha * yk2;
-    nablaPhi[2] = 2*beta * minus2Alpha * zk2;
-    nabla2Phi = 2 * alpha * (2 * alpha * (xk2 + yk2 + beta * beta * zk2) - beta - 2);
-    // First term of the laplacian
-    double laplacian = nabla2Phi;
-    double rjk, rik, fac_j, fac_i;
+    double a = m_bosonDiameter;
+    // 2 * nabla Phi / Phi:
+    std::vector<double> nablaPhi(3, -4 * alpha);
+    nablaPhi[0] *= xk2;
+    nablaPhi[1] *= yk2;
+    nablaPhi[2] *= beta * zk2;
+    // First term of the laplacian: nabla^2 Phi / Phi
+    double laplacian = 2*alpha*(2*alpha*(xk2 + yk2 + beta*beta*zk2) - beta - 2);
     int num = m_system->getNumberOfParticles();
-    std::vector<double> sumVec(3, 0);
-    std::vector<double> temp_j(3, 0);
-    std::vector<double> temp_i(3, 0);
-    std::vector<double> pos_i(3, 0);
-    std::vector<double> pos_j(3, 0);
+    std::vector<double> gradCorrelation(3, 0), rj(3, 0);
 
     for (int j=0; j<num; j++) {
-        if (j != k) {
-            pos_j = particles[j]->getPosition();
-            // r_k - r_j
-            temp_j[0] = pos_k[0] - pos_j[0];
-            temp_j[1] = pos_k[1] - pos_j[1];
-            temp_j[2] = pos_k[2] - pos_j[2];
-            // |r_k -  r_j|
-            rjk = sqrt(temp_j[0]*temp_j[0] + temp_j[1]*temp_j[1] + temp_j[2]*temp_j[2]);
-            if (rjk > m_bosonDiameter) {
-                fac_j = 1 / (rjk - m_bosonDiameter);
-            } else {
-                fac_j = 0;
-            }
-            // fac_j = u'(rjk) / rjk
-            sumVec[0] += fac_j * temp_j[0];
-            sumVec[1] += fac_j * temp_j[1];
-            sumVec[2] += fac_j * temp_j[2];
-            // sumVec is the entire sum in the 2nd term of the laplacian,
-            // this is going to be dotted with 2* nablaPhi / phi
-
-            for (int i=0; i<num; i++) {
-                double dot=0;
-                if (i != k) {
-                    pos_i = particles[i]->getPosition();
-                    temp_i[0] = pos_k[0] - pos_i[0];
-                    temp_i[1] = pos_k[1] - pos_i[1];
-                    temp_i[2] = pos_k[2] - pos_i[2];
-                    dot += temp_j[0]*temp_i[0];
-                    dot += temp_j[1]*temp_i[1];
-                    dot += temp_j[2]*temp_i[2];
-                    rik = sqrt(temp_i[0]*temp_i[0] + temp_i[1]*temp_i[1] + temp_i[2]*temp_i[2]);
-                    fac_i = 1 / (rik - m_bosonDiameter);
-                    // Term 3 in the equation for the laplacian
-                    laplacian += dot*fac_i*fac_j;
-                }
-            }
-
-            // u''(rjk) = a(a - 2rjk) / ( rjk^2 (a - rjk)^2 )
-            uDoublePrime = fac_j * fac_j * m_bosonDiameter;
-            uDoublePrime *= (m_bosonDiameter - 2*rjk);
-            uDoublePrime /= rjk*rjk;
-            // Term 4 in the equation for the laplacian
-            laplacian += uDoublePrime + 2 * fac_j;
+        if (j == k) { continue; }
+        rjk = computeSingleDistance(particles[k], particles[j]);
+        rj = particles[j]->getPosition();
+        if (rjk > a) {
+            uPrimeOverR = a / (rjk * rjk * (rjk - a));
+            gradCorrelation[0] += uPrimeOverR * (rk[0] - rj[0]);
+            gradCorrelation[1] += uPrimeOverR * (rk[1] - rj[1]);
+            gradCorrelation[2] += uPrimeOverR * (rk[2] - rj[2]);
+            // Fourth term of the laplacian
+            uDoublePrime = uPrimeOverR * (a - 2*rjk) / (a - rjk);
+            laplacian += uDoublePrime + 2*uPrimeOverR;
         }
     }
-    // Second term of the laplacian (dot product)
-    laplacian += nablaPhi[0]*sumVec[0] + nablaPhi[1]*sumVec[1] + nablaPhi[2]*sumVec[2];
-
+    // Second term of the laplacian
+    laplacian += dotProduct(nablaPhi, gradCorrelation);
+    // Third term of the laplacian
+    laplacian += dotProduct(gradCorrelation, gradCorrelation);
     return laplacian;
 }
 
@@ -178,4 +143,12 @@ std::vector<double> Correlated::computeQuantumForce(class Particle* particle) {
 
 double Correlated::evaluateDerivative(std::vector<class Particle*> particles) {
     return 0;
+}
+
+double Correlated::dotProduct(std::vector<double> v1, std::vector<double> v2) {
+    double sum = 0;
+    for (int i=0; i<v1.size(); i++) {
+        sum += v1[i]*v2[i];
+    }
+    return sum;
 }

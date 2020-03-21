@@ -53,13 +53,7 @@ int main(int argc, char** argv) {
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
-    // run_correlated(pow(2, 20), nParticles);
-
-    // Test print of initialState
-    int dim = 3;
-    double L = 1.0;
-    RandomUniform* initialState = new RandomUniform(new System(), dim, nParticles, L);
-    writeParticles(initialState->getParticles());
+    run_correlated(pow(2, 20), nParticles);
     return 0;
 }
 
@@ -73,22 +67,22 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
      */
     // Fixed parameters (should not be changed)
     int numberOfDimensions         = 3;         // Dimensions
-    double gamma                   = 2.82843;   // omega_z / omega_ho.
+    double gamma                   = 1;//2.82843;   // omega_z / omega_ho.
     double beta                    = gamma;
-    double characteristicLength    = 1.0;       // a_0: natural length scale of the system
+    double characteristicLength    = 2.5;       // a_0: natural length scale of the system
     int numVarParameters           = 2;
     std::vector<std::vector<double>> tempEnergies;
     std::vector<double> allEnergies;
     // Tweakable parameters
-    double stepLength              = 1.0;       // Metropolis: step length
-    double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
-    double bosonDiameter           = 0.0043;    // Fixed as in refs.
-    double alphaMin                = 0.10;
-    double alphaMax                = 0.75;
-    double alphaStep               = 0.025;
+    double stepLength              = 0.1;        // Metropolis: step length
+    double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
+    double bosonDiameter           = 0.00433;    // Fixed as in refs.
+    double alphaMin                = 0.2;
+    double alphaMax                = 1.11;
+    double alphaStep               = 0.1;
     int numAlphas                  = 0;
     std::vector<double> alphaVec;
-    for (double alpha=alphaMin; alpha<=alphaMax; alpha+=alphaStep) {
+    for (double alpha=alphaMin; alpha<=alphaMax+0.001; alpha+=alphaStep) {
         alphaVec.push_back(alpha);
         numAlphas++;
     }
