@@ -28,12 +28,6 @@ def sphericalVMC(dim, particles):
     plt.legend()
     plt.show()
 
-def bootstrap(dim, particles, log2Steps):
-    #TODO
-
-    return 1
-
-
 
 def blocking(dim, particles, log2Steps):
     """

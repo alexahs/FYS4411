@@ -87,6 +87,7 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
         equilibration, numVarParameters);
     // Main loop: brute-force over alphas
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     Random::setSeed(- 1 - omp_get_thread_num());
     #pragma omp parallel for schedule(dynamic)
     for (int i=0; i<numAlphas; ++i) {
@@ -121,6 +122,8 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
              "correlated_bruteforce/alpha_" + to_string(alpha).substr(0, 5));
         cout << "alpha = " << alpha << " completed.\n";
     } // End parallel
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
 void run_gradient_descent(int nAlphas, double alpha0, double gamma){
