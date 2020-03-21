@@ -39,26 +39,23 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
     Actually computes the (Laplacian / wave function). This is the
     analytic expression for the fully correlated wave function.
     */
-    double term1=0, term2=0, term3=0, term4=0;
     std::vector<double> rk = particles[k]->getPosition();
-    double xk2 = rk[0] * rk[0];
-    double yk2 = rk[1] * rk[1];
-    double zk2 = rk[2] * rk[2];
-    double rjk, uPrimeOverR, uDoublePrime;
+    double rjk, uPrimeOverR, uDoublePrime, laplacian;
+    double xk2   = rk[0] * rk[0];
+    double yk2   = rk[1] * rk[1];
+    double zk2   = rk[2] * rk[2];
     double alpha = m_parameters.at(0);
-    double beta = m_parameters.at(1);
-    double a = m_bosonDiameter;
+    double beta  = m_parameters.at(1);
+    double a     = m_bosonDiameter;
     // 2 * nabla Phi / Phi:
-    std::vector<double> nablaPhi(3, -4 * alpha);
+    std::vector<double> nablaPhi(3, -4 * alpha), gradCorrelation(3, 0), rj(3, 0);
     nablaPhi[0] *= xk2;
     nablaPhi[1] *= yk2;
     nablaPhi[2] *= beta * zk2;
     // First term of the laplacian: nabla^2 Phi / Phi
-    double laplacian = 2*alpha*(2*alpha*(xk2 + yk2 + beta*beta*zk2) - beta - 2);
-    int num = m_system->getNumberOfParticles();
-    std::vector<double> gradCorrelation(3, 0), rj(3, 0);
-
-    for (int j=0; j<num; j++) {
+    laplacian = 4*alpha*alpha*(xk2 + yk2 + beta*beta*zk2);
+    laplacian -= 2*alpha*(2 + beta);
+    for (int j=0; j<m_system->getNumberOfParticles(); j++) {
         if (j == k) { continue; }
         rjk = computeSingleDistance(particles[k], particles[j]);
         rj = particles[j]->getPosition();
@@ -68,8 +65,11 @@ double Correlated::analyticDoubleDerivative(std::vector<class Particle*> particl
             gradCorrelation[1] += uPrimeOverR * (rk[1] - rj[1]);
             gradCorrelation[2] += uPrimeOverR * (rk[2] - rj[2]);
             // Fourth term of the laplacian
-            uDoublePrime = uPrimeOverR * (a - 2*rjk) / (a - rjk);
-            laplacian += uDoublePrime + 2*uPrimeOverR;
+            laplacian += (a*a - 2*a*rjk) / (rjk*rjk * (rjk - a) * (rjk - a)); // Do not optimize this!
+            // The line above caused numerical unstabilities when "optimized", I
+            // spent roughly a day trying to figure out why the energy kept decreasing
+            // with larger alphas. So leave the line as it is :P
+            laplacian += uPrimeOverR;
         }
     }
     // Second term of the laplacian

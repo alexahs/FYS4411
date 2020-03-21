@@ -48,30 +48,33 @@ def blocking(dim, particles, log2Steps):
     print(frame)
 
 
-def correlated(dim, particles, log2Steps):
+def plot_correlated(log2Steps):
     DATA_DIR = "./Data/correlated_bruteforce/alpha_"
     alphas = np.arange(0.2, 0.8, 0.1)
-    Emean = np.zeros(alphas.shape)
-    Estd = np.zeros(alphas.shape)
 
-    for i,alpha in enumerate(alphas):
-        alpha_str = f"{alpha:1.3f}"
-        filename = DATA_DIR + alpha_str + f"_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
-        size = 2**17
-        print(f"Blocking for alpha={alpha:1.1f}", end=", ")
-        DataAnalysis = DataAnalysisClass(filename, size)
-        DataAnalysis.blocking()
-        Emean[i] = DataAnalysis.blockingAvg
-        Estd[i] = DataAnalysis.blockingStd
+    for p in [10, 50, 100]:
+        Emean = np.zeros(alphas.shape)
+        Estd = np.zeros(alphas.shape)
 
-    Emean /= float(particles)
-    Estd /= float(particles)
-    plt.title(f"{particles} particles")
-    plt.errorbar(alphas, Emean, Estd, fmt=".", capsize=3, label=r"$E\pm \sigma_E$")
+        for i,alpha in enumerate(alphas):
+            alpha_str = f"{alpha:1.3f}"
+            filename = DATA_DIR + alpha_str + f"_{dim}d_{p}p_2pow{log2Steps}steps.bin"
+            size = 2**20
+            print(f"Blocking for alpha={alpha:1.1f}", end=", ")
+            DataAnalysis = DataAnalysisClass(filename, size)
+            DataAnalysis.blocking()
+            Emean[i] = DataAnalysis.blockingAvg
+            Estd[i] = DataAnalysis.blockingStd
+
+        Emean /= float(particles)
+        Estd /= float(particles)
+        plt.errorbar(alphas, Emean, Estd, fmt=".", capsize=3, label=f"{p} particles")
+
     plt.xlabel(r"$\alpha$")
-    plt.ylabel(r"$\langle E\rangle$ / N")
+    plt.ylabel(r"$\frac{\langle E\rangle}{N}$", rotation=0)
     plt.legend()
     plt.savefig(f"./Figures/correlated_{particles}p_2pow{log2Steps}.png")
+    return None
 
 
 def plotInitialState():
@@ -127,7 +130,7 @@ def animate_3D(particles):
 
 # sphericalVMC(dim, particles)
 # blocking(dim, particles, log2Steps)
-correlated(dim, particles, log2Steps)
+plot_correlated(log2Steps)
 # plotInitialState()
 # animate_3D(particles)
 
@@ -135,4 +138,38 @@ correlated(dim, particles, log2Steps)
 # Histogram of RNGs, just a test to verify that they're uniform and in range (0.0, 1.0)
 # x = np.fromfile("./Data/random_numbers_test_3d_10p_2pow10steps.bin")
 # plt.hist(x)
+# plt.show()
+
+
+
+# alpha2 = [4.79495, -0.009344, -0.0116655, -1.06681, 15.1935]
+# alpha3 = [7.61478, -0.00429117, -0.0166995, -1.51494, 9.54238]
+# alpha4 = [9.08412, 0.00458998, -0.112504, -4.09997, 7.99187]
+# alpha5 = [12.324, 0.0141608, -0.0966263, -3.77252, 5.90905]
+# alpha6 = [14.0648, -0.00654367, -0.157027, -5.71573, 5.17561]
+# alpha7 = [15.3739, 0.0181476, -0.151434, -6.17339, 4.70027]
+# alpha8 = [18.5588, 0.0715338, -0.295847, -8.71794, 3.91965]
+
+
+# alpha800=[19.879,0.0265097,-0.241368,2.52009,3.66181]
+# alpha700=[16.415,0.079911,-0.198962,1.86431,4.4347]
+# alpha500=[12.9838,0.00046371,-0.23286,1.62812,5.57916]
+# alpha200=[4.83961,-0.000494919,-0.037456,0.484489,15.0539]
+# alpha600=[14.8137,0.0207176,-0.177458,1.54319,4.91557]
+# alpha300=[7.50715,0.0160751,-0.042799,0.602857,9.69187]
+# alpha400=[10.1977,0.00116509,-0.0407901,0.767628,7.12186]
+#
+#
+#
+# dat = np.array([alpha200, alpha300, alpha400, alpha500, alpha600, alpha700, alpha800])
+# dat /= 10
+# alpha = np.arange(0.2, 0.8, 0.1)
+# plt.plot(alpha, dat[:, 0], label="term1")
+# plt.plot(alpha, dat[:, 1], label="term2")
+# plt.plot(alpha, dat[:, 2], label="term3")
+# plt.plot(alpha, dat[:, 3], label="term4")
+# plt.plot(alpha, dat[:, 4], label="potential")
+# # dat[:, 3] = np.zeros(dat[:, 3].shape)
+# plt.plot(alpha, np.sum(dat, axis=1), "g--",  label="Total")
+# plt.legend()
 # plt.show()

@@ -37,9 +37,9 @@ TODO: (updated 16.03)
 */
 
 // Run VMC for spherical HO trap
-void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
-void run_gradient_descent(int nAlphas, double alpha0, double gamma);
-void run_single_vmc(double alpha, int numberOfSteps);
+// void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
+// void run_gradient_descent(int nAlphas, double alpha0, double gamma);
+// void run_single_vmc(double alpha, int numberOfSteps);
 void run_correlated(int numberOfSteps, int numberOfParticles);
 
 int main(int argc, char** argv) {
@@ -120,7 +120,7 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
         vector<double> energySamples = system->getSampler()->getEnergySamples();
         writeFileEnergy(energySamples, numberOfDimensions, numberOfParticles, numberOfSteps,
              "correlated_bruteforce/alpha_" + to_string(alpha).substr(0, 5));
-        cout << "alpha = " << alpha << " completed.\n";
+        // cout << "alpha = " << alpha << " completed.\n";
     } // End parallel
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());

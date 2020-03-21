@@ -25,27 +25,39 @@ EllipticHarmonicOscillator::EllipticHarmonicOscillator(System* system, double ga
 
 double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 {
-    double localEnergy=0, rkj;
+    double localEnergy=0, rkj, potential=0;
     std::vector<double> rk(3, 0);
     std::vector<double> rj(3, 0);
     // Loop over all particles
     for (int k=0; k<particles.size(); k++) {
         localEnergy -= 0.5*m_system->getWaveFunction()->analyticDoubleDerivative(particles, k);
         rk = particles[k]->getPosition();
+        // localEnergy += 0.5 * (rk[0]*rk[0] + rk[1]*rk[1] + m_gamma2*rk[2]*rk[2]);
+        potential += 0.5 * (rk[0]*rk[0] + rk[1]*rk[1] + m_gamma2*rk[2]*rk[2]);
         localEnergy += 0.5 * (rk[0]*rk[0] + rk[1]*rk[1] + m_gamma2*rk[2]*rk[2]);
 
-        // Repulsive potential
-        for (int j=k+1; j<particles.size(); j++) {
-            rj = particles[j]->getPosition();
-            rkj =  (rj[0] - rk[0]) * (rj[0] - rk[0]);
-            rkj += (rj[1] - rk[1]) * (rj[1] - rk[1]);
-            rkj += (rj[2] - rk[2]) * (rj[2] - rk[2]);
-            if (sqrt(rkj) <= m_bosonDiameter) {
-                localEnergy += 10000;
-                cout << "Particle " << k << " and " << j << " has crashed!\n";
-            }
-        }
+
+        // // Repulsive potential
+        // for (int j=k+1; j<particles.size(); j++) {
+        //     rj = particles[j]->getPosition();
+        //     rkj =  (rj[0] - rk[0]) * (rj[0] - rk[0]);
+        //     rkj += (rj[1] - rk[1]) * (rj[1] - rk[1]);
+        //     rkj += (rj[2] - rk[2]) * (rj[2] - rk[2]);
+        //     if (sqrt(rkj) <= m_bosonDiameter) {
+        //         localEnergy += 10000;
+        //         cout << "Particle " << k << " and " << j << " has crashed!\n";
+        //     }
+        // }
     }
+    // Debugging purposes
+    // std::vector<double> terms = m_system->getWaveFunction()->getTerms();
+    // term1 -= 0.5*terms[0];
+    // term2 -= 0.5*terms[1];
+    // term3 -= 0.5*terms[2];
+    // term4 -= 0.5*terms[3];
+    // term5 += 0.5*potential;
+    //
+    // m_system->getWaveFunction()->resetTerms();
     return localEnergy;
 }
 

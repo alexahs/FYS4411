@@ -7,7 +7,7 @@ public:
     EllipticHarmonicOscillator(System* system, double gamma, double bosonDiameter);
     double computeLocalEnergy(std::vector<Particle*> particles);
     double computeLocalEnergyDerivative(std::vector<class Particle*> particles);
-
+    
 private:
     double m_gamma2 = 0;
     double m_bosonDiameter = 0;
