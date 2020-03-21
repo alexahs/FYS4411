@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
-    run_correlated(pow(2, 19), nParticles);
+    run_correlated(pow(2, 20), nParticles);
     return 0;
 }
 
