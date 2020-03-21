@@ -77,8 +77,7 @@ def correlated(dim, particles, log2Steps):
     plt.xlabel(r"$\alpha$")
     plt.ylabel(r"$\langle E\rangle$ / N")
     plt.legend()
-    plt.show()
-    plt.show()
+    plt.savefig(f"./Figures/correlated_{particles}p_2pow{log2Steps}.png")
 
 
 def plotInitialState():
