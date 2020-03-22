@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     // run_single_vmc(0.5, pow(2, 18));
     // correlated_brute_force(nParticles);
     vector<double> alphas;
-    for(double alpha = 0.4; alpha < 0.6; alpha+=0.025) alphas.push_back(alpha);
+    for(double alpha = 0.4; alpha < 0.5; alpha+=0.0125) alphas.push_back(alpha);
 
     #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < alphas.size(); i++) correlated_gradient_descent(nParticles, alphas[i]);
@@ -144,7 +144,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
     int numberOfSteps              = int (pow(2, 17)); // Metropolis steps per alpha
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
-    double tol                     = 1e-5;
+    double tol                     = 1e-7;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
     double learningRate            = 0.01;
     int iter                       = 0;
@@ -155,7 +155,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    double decay = 0.01;
+    double decay = 0.001;
     do {
         alphaVec.push_back(alpha);     // Save alpha
         // Please note that system by default uses
@@ -186,7 +186,6 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
 
         // Get cost
         learningRate /= 1 + decay*iter;
-        counter++;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
         cout << "Iteration " << ++iter << ", alpha = ";

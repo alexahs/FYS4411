@@ -50,7 +50,7 @@ def plotGD():
     plt.ylabel(r"$\alpha$")
     plt.show()
 
-# plotGD()
+plotGD()
 
 def lr():
 
@@ -64,7 +64,7 @@ def lr():
     plt.semilogy(range(len(etas)), etas)
     plt.show()
 
-lr()
+#lr()
 
 
 
