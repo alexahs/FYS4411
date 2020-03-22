@@ -37,30 +37,27 @@ void correlated_gradient_descent(int numberOfParticles, double alpha, double lea
 
 int main(int argc, char** argv) {
     // NOTE: number of Metropolis steps must be a 2^N for blocking resampling to run
-    if (argc < 4) {
-        cout << "Usage: \n\t./vmc <number_of_particles> <learning rate> <decay rate>" << endl;
-        cout << "Example: \n\t./vmc 100 0.001 0.01" << endl;
+    if (argc < 2) {
+        cout << "Usage: \n\t./vmc <number_of_particles>" << endl;
+        cout << "Example: \n\t./vmc 100" << endl;
         return 1;
     }
     int nParticles = atoi(argv[1]);
-    double learningRate = atof(argv[2]);
-    double decayRate = atof(argv[3]);
+    // double learningRate = atof(argv[2]);
+    // double decayRate = atof(argv[3]);
     // Control which analysis to perform:
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
     // correlated_brute_force(nParticles);
-    vector<double> alphas;
-    for(double alpha = 0.2; alpha < 0.9; alpha+=0.1){
-        cout << alpha << endl;
-        alphas.push_back(alpha);
+    // vector<double> alphas;
+    // for(double alpha = 0.2; alpha < 0.9; alpha+=0.1) alphas.push_back(alpha);
+    vector<int> vec_particles = {10, 50, 100};
+    for (int i = 0; i < 3; i++){
+        correlated_brute_force(vec_particles[i]);
     }
 
-    #pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < alphas.size(); i++){
-        correlated_gradient_descent(nParticles, alphas[i], learningRate, decayRate);
 
-    }
     return 0;
 }
 
@@ -82,7 +79,7 @@ void correlated_brute_force(int numberOfParticles) {
     std::vector<std::vector<double>> tempEnergies;
     std::vector<double> allEnergies;
     // Tweakable parameters
-    int numberOfSteps              = int (pow(2, 20)); // Metropolis steps
+    int numberOfSteps              = int (pow(2, 21)); // Metropolis steps
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
     double alphaMin                = 0.2;
