@@ -146,7 +146,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
     double tol                     = 1e-5;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
-    double learningRate            = 0.0001;
+    double learningRate            = 0.01;
     int iter                       = 0;
     int maxIter                    = 50;
     std::vector<double> alphaVec;

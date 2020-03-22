@@ -25,13 +25,16 @@ def plotGD():
 
     n_alpha0 = 8
 
-    alpha_0_arr = np.array([i*0.1 for i in range(2, 10)])
+    # alpha_0_arr = np.array([i*0.1 for i in range(2, 10)])
+    alpha_0_arr = np.linspace(0.4, 0.575, 8)
+    print(alpha_0_arr)
+
 
     arr_alpha_opt = np.zeros(n_alpha0)
 
     for i, alpha in enumerate(alpha_0_arr):
 
-        gd_alphas = np.fromfile(dataDir + f"alpha_{alpha:0.1f}_10p_2pow17steps.bin", dtype="double")
+        gd_alphas = np.fromfile(dataDir + f"alpha_{alpha:0.3f}_10p_2pow17steps.bin", dtype="double")
         iters = range(0, len(gd_alphas))
         plt.plot(iters, gd_alphas, label=r"$\alpha_0=$" + f"{alpha:0.1f}")
         arr_alpha_opt[i] = gd_alphas[-1]
