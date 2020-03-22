@@ -33,16 +33,18 @@ using namespace std;
 
 // Correlated = Interacting Bosons. Two approaches for finding optimal alpha:
 void correlated_brute_force(int numberOfParticles);
-void correlated_gradient_descent(int numberOfParticles, double alpha);
+void correlated_gradient_descent(int numberOfParticles, double alpha, double learningRate, double decayRate);
 
 int main(int argc, char** argv) {
     // NOTE: number of Metropolis steps must be a 2^N for blocking resampling to run
-    if (argc < 2) {
-        cout << "Usage: \n\t./vmc <number_of_particles>" << endl;
-        cout << "Example: \n\t./vmc 100" << endl;
+    if (argc < 4) {
+        cout << "Usage: \n\t./vmc <number_of_particles> <learning rate> <decay rate>" << endl;
+        cout << "Example: \n\t./vmc 100 0.001 0.01" << endl;
         return 1;
     }
     int nParticles = atoi(argv[1]);
+    double learningRate = atof(argv[2]);
+    double decayRate = atof(argv[3]);
     // Control which analysis to perform:
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
@@ -54,8 +56,11 @@ int main(int argc, char** argv) {
         alphas.push_back(alpha);
     }
 
-    // #pragma omp parallel for schedule(dynamic)
-    // for (int i = 0; i < alphas.size(); i++) correlated_gradient_descent(nParticles, alphas[i]);
+    #pragma omp parallel for schedule(dynamic)
+    for (int i = 0; i < alphas.size(); i++){
+        correlated_gradient_descent(nParticles, alphas[i], learningRate, decayRate);
+
+    }
     return 0;
 }
 
@@ -127,7 +132,7 @@ void correlated_brute_force(int numberOfParticles) {
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
-void correlated_gradient_descent(int numberOfParticles, double alpha) {
+void correlated_gradient_descent(int numberOfParticles, double alpha, double learningRate, double decayRate) {
     /* This case is done for only:
      *      3 Dimensions,
      *      Metropolis sampling rule (and not importance sampling)
@@ -149,7 +154,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
     double tol                     = 1e-7;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
-    double learningRate            = 0.1;
+    // double learningRate            = 0.1;
     int iter                       = 0;
     int maxIter                    = 50;
     std::vector<double> alphaVec;
@@ -158,7 +163,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    double decay = 0.01;
+    // double decay = 0.01;
     do {
         alphaVec.push_back(alpha);     // Save alpha
         // Please note that system by default uses
@@ -188,7 +193,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         system->runMetropolisSteps           ();
 
         // Get cost
-        learningRate /= 1 + decay*iter;
+        learningRate /= 1 + decayRate*iter;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
         cout << "Iteration " << ++iter << ", alpha = ";
