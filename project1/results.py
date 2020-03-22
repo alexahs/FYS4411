@@ -39,7 +39,10 @@ def plotGD():
         plt.plot(iters, gd_alphas, label=r"$\alpha_0=$" + f"{alpha:0.1f}")
         arr_alpha_opt[i] = gd_alphas[-1]
 
+    print("last alphas:")
+    print(arr_alpha_opt)
     alpha_opt = np.mean(arr_alpha_opt)
+    print("mean alpha: ", alpha_opt)
 
     plt.plot([0, 100], [alpha_opt, alpha_opt] , "r--", label=r"$\overline{\alpha_{opt}}=$" + f"{alpha_opt:0.5f}")
     plt.legend()
@@ -51,8 +54,8 @@ def plotGD():
 
 def lr():
 
-    decay = 0.01
-    learningRate = 0.1
+    decay = 0.005
+    learningRate = 0.001
     etas = []
     for i in range(50):
         etas.append(learningRate)

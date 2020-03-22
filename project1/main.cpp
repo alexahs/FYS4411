@@ -155,7 +155,6 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    int counter = 0;
     double decay = 0.01;
     do {
         alphaVec.push_back(alpha);     // Save alpha
@@ -186,12 +185,13 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         system->runMetropolisSteps           ();
 
         // Get cost
-        learningRate /= 1 + decay*counter;
+        learningRate /= 1 + decay*iter;
         counter++;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
         cout << "Iteration " << ++iter << ", alpha = ";
         cout << fixed << setprecision(12) << alpha;
+        cout << "Learning Rate = " << learningRate;
         cout << ", cost = " << cost << endl;
     } while (abs(alpha - alphaVec[iter-1]) > tol && iter < maxIter);
     // Print timing results
