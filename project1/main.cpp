@@ -154,6 +154,9 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
         equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+
+    int counter = 0;
+    double decay = 0.01;
     do {
         alphaVec.push_back(alpha);     // Save alpha
         // Please note that system by default uses
@@ -183,6 +186,8 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         system->runMetropolisSteps           ();
 
         // Get cost
+        learningRate /= 1 + decay*counter
+        counter++;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
         cout << "Iteration " << ++iter << ", alpha = ";
