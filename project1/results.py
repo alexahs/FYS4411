@@ -23,15 +23,25 @@ if not os.path.exists(FIGURE_DIR):
 def plotGD():
     dataDir = "./Data/correlated_gd/"
 
+    n_alpha0 = 8
+
     alpha_0_arr = np.array([i*0.1 for i in range(2, 10)])
 
+    arr_alpha_opt = np.zeros(n_alpha0)
 
-    for alpha in alpha_0_arr:
+    for i, alpha in enumerate(alpha_0_arr):
 
         gd_alphas = np.fromfile(dataDir + f"alpha_{alpha:0.1f}_10p_2pow17steps.bin", dtype="double")
         iters = range(0, len(gd_alphas))
-        plt.plot(iters, gd_alphas)
+        plt.plot(iters, gd_alphas, label=r"$\alpha_0=$" + f"{alpha:0.1f}")
+        arr_alpha_opt[i] = gd_alphas[-1]
 
+    alpha_opt = np.mean(arr_alpha_opt)
+
+    plt.plot([0, 100], [alpha_opt, alpha_opt] , "r--", label=r"$\overline{\alpha_{opt}}=$" + f"{alpha_opt:0.5f}")
+    plt.legend()
+    plt.xlabel("Iteration")
+    plt.ylabel(r"$\alpha$")
     plt.show()
 
 plotGD()

@@ -48,13 +48,11 @@ int main(int argc, char** argv) {
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
     // correlated_brute_force(nParticles);
-    vector<double> alphas = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    vector<double> alphas;
+    for(double alpha = 0.4; alpha < 0.6; alpha+=0.025) alphas.push_back(alpha);
+
     #pragma omp parallel for schedule(dynamic)
-        for (int i = 0; i < alphas.size(); i++){
-
-            correlated_gradient_descent(nParticles, alphas[i]);
-        }
-
+    for (int i = 0; i < alphas.size(); i++) correlated_gradient_descent(nParticles, alphas[i]);
     return 0;
 }
 
@@ -146,11 +144,11 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
     int numberOfSteps              = int (pow(2, 17)); // Metropolis steps per alpha
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
-    double tol                     = 1e-4;
+    double tol                     = 1e-5;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
-    double learningRate            = 0.001;
+    double learningRate            = 0.0001;
     int iter                       = 0;
-    int maxIter                    = 100;
+    int maxIter                    = 50;
     std::vector<double> alphaVec;
     // Inital print
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
