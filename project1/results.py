@@ -50,12 +50,12 @@ def plotGD():
     plt.ylabel(r"$\alpha$")
     plt.show()
 
-plotGD()
+# plotGD()
 
 def lr():
 
-    decay = 0.005
-    learningRate = 0.001
+    decay = 0.01
+    learningRate = 0.1
     etas = []
     for i in range(50):
         etas.append(learningRate)
@@ -64,7 +64,7 @@ def lr():
     plt.semilogy(range(len(etas)), etas)
     plt.show()
 
-#lr()
+lr()
 
 
 
