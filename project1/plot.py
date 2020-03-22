@@ -51,29 +51,34 @@ def blocking(dim, particles, log2Steps):
 def plot_correlated(log2Steps):
     DATA_DIR = "./Data/correlated_bruteforce/alpha_"
     alphas = np.arange(0.2, 0.8, 0.1)
+    ALLDATA = np.zeros((7,2,3))
 
-    for p in [10, 50, 100]:
+    for j,p in enumerate([10, 50, 100]):
         Emean = np.zeros(alphas.shape)
         Estd = np.zeros(alphas.shape)
 
         for i,alpha in enumerate(alphas):
             alpha_str = f"{alpha:1.3f}"
             filename = DATA_DIR + alpha_str + f"_{dim}d_{p}p_2pow{log2Steps}steps.bin"
-            size = 2**20
+            size = 2**17
             print(f"Blocking for alpha={alpha:1.1f}", end=", ")
             DataAnalysis = DataAnalysisClass(filename, size)
             DataAnalysis.blocking()
             Emean[i] = DataAnalysis.blockingAvg
             Estd[i] = DataAnalysis.blockingStd
 
-        Emean /= float(particles)
-        Estd /= float(particles)
-        plt.errorbar(alphas, Emean, Estd, fmt=".", capsize=3, label=f"{p} particles")
+        Emean /= float(p)
+        Estd /= float(p)
+        ALLDATA[:,0,j] = Emean
+        ALLDATA[:,1,j] = Estd
+        plt.errorbar(alphas, Emean, Estd, fmt="o--", capsize=3, label=f"{p} particles")
 
     plt.xlabel(r"$\alpha$")
     plt.ylabel(r"$\frac{\langle E\rangle}{N}$", rotation=0)
     plt.legend()
-    plt.savefig(f"./Figures/correlated_{particles}p_2pow{log2Steps}.png")
+    np.savez("blocking_correlated.npz", ALLDATA)
+    # plt.savefig(f"./Figures/correlated_{particles}p_2pow{log2Steps}.png")
+    plt.savefig(f"./Figures/correlated_with_blocking.png")
     return None
 
 
