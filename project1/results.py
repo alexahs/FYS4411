@@ -26,7 +26,7 @@ def plotGD():
     n_alpha0 = 8
 
     # alpha_0_arr = np.array([i*0.1 for i in range(2, 10)])
-    alpha_0_arr = np.linspace(0.4, 0.575, 8)
+    alpha_0_arr = []
     print(alpha_0_arr)
 
 
@@ -35,15 +35,15 @@ def plotGD():
     for i, alpha in enumerate(alpha_0_arr):
 
         gd_alphas = np.fromfile(dataDir + f"alpha_{alpha:0.3f}_10p_2pow17steps.bin", dtype="double")
+        alpha_0_arr.append[gd_alphas[0]]
         iters = range(0, len(gd_alphas))
-        plt.plot(iters, gd_alphas, label=r"$\alpha_0=$" + f"{alpha:0.3f}")
+        plt.plot(iters, gd_alphas, label=r"$\alpha_0=$" + f"{alpha:0.1f}")
         arr_alpha_opt[i] = gd_alphas[-1]
 
     print("last alphas:")
     print(arr_alpha_opt)
     alpha_opt = np.mean(arr_alpha_opt)
-    std_alpha_opt = np.std(arr_alpha_opt)
-    print("mean alpha: ", alpha_opt, "std: ", std_alpha_opt)
+    print("mean alpha: ", alpha_opt)
 
     plt.plot([0, 100], [alpha_opt, alpha_opt] , "r--", label=r"$\overline{\alpha_{opt}}=$" + f"{alpha_opt:0.5f}")
     plt.legend()
@@ -51,12 +51,12 @@ def plotGD():
     plt.ylabel(r"$\alpha$")
     plt.show()
 
-plotGD()
+# plotGD()
 
 def lr():
 
-    decay = 0.01
-    learningRate = 0.1
+    decay = 0.0005
+    learningRate = 0.001
     etas = []
     for i in range(50):
         etas.append(learningRate)
@@ -65,7 +65,7 @@ def lr():
     plt.semilogy(range(len(etas)), etas)
     plt.show()
 
-#lr()
+lr()
 
 
 
