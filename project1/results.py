@@ -50,7 +50,7 @@ def plotGD():
     plt.ylabel(r"$\alpha$")
     plt.show()
 
-plotGD()
+# plotGD()
 
 def lr():
 
@@ -519,26 +519,33 @@ def blockAllEnergySamples():
 
 
 
-def blocking(dim, particles, log2Steps):
+def blocking():
     """
     Data should contain 2^(int x) points for blocking code to run properly
     """
-    filename = DATA_DIR + f"energy_dump/vmc_energysamples_{dim}d_{particles}p_2pow{log2Steps}steps.bin"
+    inDir = "./Data/correlated_bruteforce/"
 
+    t_CPU = np.array([13068, 263979, 1.03318*1e6])*1e-3
 
-    energySamples = np.fromfile(filename, dtype="double")
+    outfilename = "./Data/formatted/correlated/alpha_opt_results.txt"
 
+    columns = r"$\langle E \rangle$ & $\sigma_{block}$ & \t_{CPU} \\" + "\n"
 
-    mean, var = block(energySamples)
+    outfile = open(outfilename, "w")
+    outfile.write(columns)
 
-    std = np.sqrt(var)
-    import pandas as pd
-    from pandas import DataFrame
-    print(" -------- Resampling results -------- \n")
-    data ={'Mean':[mean], 'Var':[var], 'STDev':[std]}
-    frame = pd.DataFrame(data,index=['Values'])
-    print(frame)
+    for i, p in enumerate([10, 50, 100]):
+        filename = inDir + f"energies_alpha_0.474_3d_{p}p_2pow21steps.bin"
+        energySamples = np.fromfile(filename, dtype="double")
+        mean, var = block(energySamples)
+        std = np.sqrt(var)
+        # print(mean, std)
+        line = f"{mean:0.3f} & {std:0.3f} & {t_CPU[i]:0.3f}" + r"  \\" + "\n"
+        outfile.write(line)
 
+    outfile.close()
+
+blocking()
 
 def bruteForceResults():
     dims = [1, 2, 3]

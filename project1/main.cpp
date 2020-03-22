@@ -34,6 +34,7 @@ using namespace std;
 // Correlated = Interacting Bosons. Two approaches for finding optimal alpha:
 void correlated_brute_force(int numberOfParticles);
 void correlated_gradient_descent(int numberOfParticles, double alpha, double learningRate, double decayRate);
+void correlated_single_alpha(int numberOfParticles, double alpha);
 
 int main(int argc, char** argv) {
     // NOTE: number of Metropolis steps must be a 2^N for blocking resampling to run
@@ -53,12 +54,91 @@ int main(int argc, char** argv) {
     // vector<double> alphas;
     // for(double alpha = 0.2; alpha < 0.9; alpha+=0.1) alphas.push_back(alpha);
     vector<int> vec_particles = {10, 50, 100};
+    double alpha_opt = 0.4740;
     for (int i = 0; i < 3; i++){
-        correlated_brute_force(vec_particles[i]);
+        correlated_single_alpha(vec_particles[i], alpha_opt);
     }
 
 
     return 0;
+}
+
+void correlated_single_alpha(int numberOfParticles, double alpha) {
+    /* This case is done for only:
+     *      3 Dimensions,
+     *      Metropolis sampling rule (and not importance sampling)
+     *      Analytic double derivative (numerical algorithm is slower by ~ 3 times)
+     * This is the brute-force method for finding the optimal variational parameter
+     * which is only alpha.
+     */
+    // Fixed parameters (should not be changed)
+    int numberOfDimensions         = 3;          // Dimensions
+    double gamma                   = 2.82843;    // omega_z / omega_ho.
+    double beta                    = gamma;
+    double characteristicLength    = 2.5;        // Side length of box to initialize particles within
+    double bosonDiameter           = 0.00433;    // Fixed as in refs.
+    int numVarParameters           = 2;
+    // Tweakable parameters
+    int numberOfSteps              = int (pow(2, 21)); // Metropolis steps
+    double stepLength              = 0.1;        // Metropolis: step length
+    double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
+    bool importanceSampling        = true;
+    double timeStep                = 0.1;
+    // Inital print
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
+        equilibration, numVarParameters);
+    // Main loop: brute-force over alphas
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    Random::setSeed(- 1 - omp_get_thread_num());
+
+    int nProcs = omp_get_num_procs();
+    int stepsPerProc = numberOfSteps/nProcs;
+    vector<vector<double>> tempEnergies;
+    vector<double> allEnergies;
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int i=0; i < nProcs; i++) {
+        System* system = new System();
+        // Please note that system by default uses
+        // * Analytic double derivative
+        // * Standard Metropolis sampling
+        system->setNumberOfParticles         (numberOfParticles);
+        system->setNumberOfDimensions        (numberOfDimensions);
+        system->setSampler                   (new Sampler(system));
+        system->setHamiltonian               (new EllipticHarmonicOscillator(
+                                                    system,
+                                                    gamma,
+                                                    bosonDiameter));
+        system->setInitialState              (new RandomUniform(
+                                                    system,
+                                                    numberOfDimensions,
+                                                    numberOfParticles,
+                                                    characteristicLength));
+        system->setWaveFunction              (new Correlated(
+                                                    system,
+                                                    alpha,  // The only variational parameter which is varied
+                                                    beta, // gamma = beta = 2.82843
+                                                    bosonDiameter));
+        system->setEquilibrationFraction     (equilibration);
+        system->setStepLength                (stepLength);
+        system->setNumberOfMetropolisSteps   (numberOfSteps/nProcs);
+        system->setImportanceSampling        (importanceSampling, timeStep);
+        system->runMetropolisSteps           ();
+        vector<double> energySamples = system->getSampler()->getEnergySamples();
+        #pragma omp critial
+        tempEnergies.push_back(energySamples);
+    } // End parallel
+
+    for(int i = 0; i < nProcs; i++){
+        allEnergies.insert(allEnergies.end(),
+            tempEnergies[i].begin(),
+            tempEnergies[i].end());
+    }
+
+    writeFileEnergy(allEnergies, numberOfDimensions, numberOfParticles, numberOfSteps,
+        "correlated_bruteforce/energies_alpha_" + to_string(alpha).substr(0, 5));
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
 void correlated_brute_force(int numberOfParticles) {
@@ -122,7 +202,7 @@ void correlated_brute_force(int numberOfParticles) {
         system->runMetropolisSteps           ();
         vector<double> energySamples = system->getSampler()->getEnergySamples();
         writeFileEnergy(energySamples, numberOfDimensions, numberOfParticles, numberOfSteps,
-             "correlated_bruteforce/alpha_" + to_string(alpha).substr(0, 5));
+             "correlated_bruteforce/energies_alpha_" + to_string(alpha).substr(0, 5));
         // cout << "alpha = " << alpha << " completed.\n";
     } // End parallel
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
