@@ -1,20 +1,20 @@
+import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
-import sys
-from blocking import block
+# from blocking import block
 from analysis import DataAnalysisClass, timeFunction
 
 
 plt.style.use('ggplot')
-
 DATA_DIR = "./Data/"
 dim = sys.argv[1]
 particles = sys.argv[2]
 log2Steps = int(sys.argv[3])
+
 
 def sphericalVMC(dim, particles):
     df_ana = pd.read_csv(DATA_DIR + f"vmc_{dim}d_{particles}p_ana.csv")
@@ -49,20 +49,40 @@ def blocking(dim, particles, log2Steps):
 
 
 def plot_correlated(log2Steps):
+    """
+    Reads three data files of energy samples for 10, 50 and 100 particles.
+    All files should be binary files of double precision (double / np.float64),
+    and they should have filenames
+        ./Data/correlated_bruteforce/alpha_XXX_Xp_2powXXsteps.bin
+                                            ^  ^       ^
+    E.g. alpha_200_50p_2pow20steps.bin
+    where alpha=0.200, 50 particles and 2**20 steps (samples).
+
+    Params:
+        log2steps : int, e.g. 20 for 2**20 = 1048576.
+    Returns:
+        None : but saves plot as a .png file AND saves a backup of the array
+               with all Emean and Estd, obtained by blocking.
+
+    """
     DATA_DIR = "./Data/correlated_bruteforce/alpha_"
     alphas = np.arange(0.2, 0.8, 0.1)
-    ALLDATA = np.zeros((7,2,3))
+    ALLDATA = np.zeros((7,2,3)) # Shape of array (7 alphas, 2=[Emean, Estd], 3 particle-numbers)
 
+    # Loop over particle numbers
     for j,p in enumerate([10, 50, 100]):
         Emean = np.zeros(alphas.shape)
         Estd = np.zeros(alphas.shape)
 
+        # Perform blocking on all alphas
         for i,alpha in enumerate(alphas):
             alpha_str = f"{alpha:1.3f}"
-            filename = DATA_DIR + alpha_str + f"_{dim}d_{p}p_2pow{log2Steps}steps.bin"
-            size = 2**17
+            filename = alpha_str + f"_{dim}d_{p}p_2pow{log2Steps}steps.bin"
+            size = 2**20
             print(f"Blocking for alpha={alpha:1.1f}", end=", ")
-            DataAnalysis = DataAnalysisClass(filename, size)
+            DataAnalysis = DataAnalysisClass(DATA_DIR + filename, size)
+            # Perform the blocking, NOTE: this takes around 30 seconds EACH time,
+            # if we use 2**20 samples, so 10-11 minutes in total.
             DataAnalysis.blocking()
             Emean[i] = DataAnalysis.blockingAvg
             Estd[i] = DataAnalysis.blockingStd
@@ -76,9 +96,8 @@ def plot_correlated(log2Steps):
     plt.xlabel(r"$\alpha$")
     plt.ylabel(r"$\frac{\langle E\rangle}{N}$", rotation=0)
     plt.legend()
-    np.savez("blocking_correlated.npz", ALLDATA)
-    # plt.savefig(f"./Figures/correlated_{particles}p_2pow{log2Steps}.png")
-    plt.savefig(f"./Figures/correlated_with_blocking.png")
+    np.savez("./Data/backup/blocking_correlated_bruteforce.npz", ALLDATA) # Save a backup of the array
+    plt.savefig(f"./Figures/correlated_with_blocking.png") # Save the figure
     return None
 
 

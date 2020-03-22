@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iomanip>
 #include <chrono>
 #include <omp.h>
-
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "WaveFunctions/correlated.h"
@@ -20,31 +20,23 @@
 #include "Misc/wfsampler.h"
 #include "Misc/writefile.h"
 
-#include "Math/random.h"
-
 using namespace std;
 
 /*
-TODO: (updated 16.03)
-    - Finish implementing elliptic HO class
-    - Finish implementing correlated WF:
-        - evaluation of the WF(done)
-        - implement gradiet and local energy
-        - implement 2nd derivative
     - Implement gradient descent for correlated WF
-    - Implement better particle initialization for correlated WF(done)
     - Implement oneBody density
 */
 
 // Run VMC for spherical HO trap
 // void run_bruteforce_vmc(double alpha_min, double alpha_max, double alpha_step);
-// void run_gradient_descent(int nAlphas, double alpha0, double gamma);
 // void run_single_vmc(double alpha, int numberOfSteps);
-void run_correlated(int numberOfSteps, int numberOfParticles);
+
+// Correlated = Interacting Bosons. Two approaches for finding optimal alpha:
+void correlated_brute_force(int numberOfParticles);
+void correlated_gradient_descent(int numberOfParticles, double alpha);
 
 int main(int argc, char** argv) {
     // NOTE: number of Metropolis steps must be a 2^N for blocking resampling to run
-
     if (argc < 2) {
         cout << "Usage: \n\t./vmc <number_of_particles>" << endl;
         cout << "Example: \n\t./vmc 100" << endl;
@@ -55,11 +47,14 @@ int main(int argc, char** argv) {
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
-    run_correlated(pow(2, 20), nParticles);
+    // correlated_brute_force(nParticles);
+
+    for (double alpha=0.2; alpha<0.9; alpha+= 0.1) correlated_gradient_descent(nParticles, alpha);
+
     return 0;
 }
 
-void run_correlated(int numberOfSteps, int numberOfParticles) {
+void correlated_brute_force(int numberOfParticles) {
     /* This case is done for only:
      *      3 Dimensions,
      *      Metropolis sampling rule (and not importance sampling)
@@ -77,6 +72,7 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
     std::vector<std::vector<double>> tempEnergies;
     std::vector<double> allEnergies;
     // Tweakable parameters
+    int numberOfSteps              = int (pow(2, 20)); // Metropolis steps
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
     double alphaMin                = 0.2;
@@ -126,102 +122,92 @@ void run_correlated(int numberOfSteps, int numberOfParticles) {
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
-void run_gradient_descent(int nAlphas, double alpha0, double gamma){
-
-    int numberOfDimensions         = 3;         // Dimensions
-    int numberOfParticles          = 10;        // Particales in system
-    int numberOfSteps              = (int) 1e4; // Monte Carlo cycles
-    double omega                   = 1.0;       // Oscillator frequency.
-    double stepLength              = 1.0;       // Metropolis: step length
-    double timeStep                = 0.01;      // Metropolis-Hastings: time step
-    double h                       = 0.001;     // Double derivative step length
-    double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
-    double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
-    bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
-
-    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);
-
-    vector <double> alphaVec;
-    vector<double> energyVec;
-    vector<double> energy2Vec;
-    vector<double> varianceVec;
-    vector<double> acceptRatioVec;
-
-
-    int maxIter = 100;
-    double tol = 1e-7;
-
-    double alphaNew = alpha0;
-    double alphaOld = 0;
-    int iter = 1;
-
+void correlated_gradient_descent(int numberOfParticles, double alpha) {
+    /* This case is done for only:
+     *      3 Dimensions,
+     *      Metropolis sampling rule (and not importance sampling)
+     *      Analytic double derivative (numerical algorithm is slower by ~ 3 times)
+     * This is the gradiet descent method for finding the optimal variational parameter
+     * which is only alpha.
+     */
+    // Fixed parameters (should not be changed)
+    int numberOfDimensions         = 3;          // Dimensions
+    double gamma                   = 2.82843;    // omega_z / omega_ho.
+    double beta                    = gamma;
+    double characteristicLength    = 2.5;        // Side length of box to initialize particles within
+    double bosonDiameter           = 0.00433;    // Fixed as in refs.
+    int numVarParameters           = 2;
+    double cost;
+    // Tweakable parameters
+    int numberOfSteps              = int (pow(2, 17)); // Metropolis steps per alpha
+    double stepLength              = 0.1;        // Metropolis: step length
+    double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
+    double tol                     = 1e-7;
+    // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
+    double learningRate            = 0.001;
+    int iter                       = 0;
+    int maxIter                    = 15;
+    std::vector<double> alphaVec;
+    // Inital print
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
+        equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    while (abs(alphaNew - alphaOld) > tol && iter < maxIter){
-
+    do {
+        alphaVec.push_back(alpha);     // Save alpha
+        // Please note that system by default uses
+        // * Analytic double derivative
+        // * Standard Metropolis sampling
         System* system = new System();
-        system->setSampler                  (new WfSampler(system));
-        system->setHamiltonian              (new HarmonicOscillator(system, omega));
-        system->setWaveFunction             (new SimpleGaussian(system, alphaNew));
-        system->setInitialState             (new RandomUniform(system,
+        system->setNumberOfParticles         (numberOfParticles);
+        system->setNumberOfDimensions        (numberOfDimensions);
+        system->setSampler                   (new WfSampler(system));
+        system->setHamiltonian               (new EllipticHarmonicOscillator(
+                                                    system,
+                                                    gamma,
+                                                    bosonDiameter));
+        system->setInitialState              (new RandomUniform(
+                                                    system,
                                                     numberOfDimensions,
                                                     numberOfParticles,
                                                     characteristicLength));
+        system->setWaveFunction              (new Correlated(
+                                                    system,
+                                                    alpha,  // The only variational parameter which is varied
+                                                    beta,   // gamma = beta = 2.82843
+                                                    bosonDiameter));
         system->setEquilibrationFraction     (equilibration);
         system->setStepLength                (stepLength);
         system->setNumberOfMetropolisSteps   (numberOfSteps);
-        system->setImportanceSampling        (importanceSampling, timeStep);
-        system->setNumericalDoubleDerivative (numericalDoubleDerviative, h);
         system->runMetropolisSteps           ();
-        Sampler* system_sampler = system->getSampler();
 
-
-        // save observables
-        alphaVec.push_back(alphaNew);
-        energyVec.push_back(system_sampler->getEnergy());
-        energy2Vec.push_back(system_sampler->getEnergy2());
-        varianceVec.push_back(system_sampler->getVariance());
-        acceptRatioVec.push_back(system_sampler->getAcceptRatio());
-
-
-        // get cost
-        double cost = system->getWaveFunction()->evaluateCostFunction();
-
-        alphaOld = alphaNew;
-
-        // compute new alpha with GD
-        alphaNew -= gamma*cost;
-
-        iter++;
-
-    }
+        // Get cost
+        cost = system->getWaveFunction()->evaluateCostFunction();
+        alpha -= learningRate*cost;           // Compute new alpha with GD
+        cout << "Iteration " << ++iter << ", alpha = ";
+        cout << fixed << setprecision(12) << alpha;
+        cout << ", cost = " << cost << endl;
+    } while (abs(alpha - alphaVec[iter-1]) > tol && iter < maxIter);
+    // Print timing results
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
-    writeFileOneVariational(numberOfDimensions, numberOfParticles, numberOfSteps,
-      int (equilibration*numberOfSteps), numericalDoubleDerviative,
-      alphaVec, energyVec, energy2Vec,
-      varianceVec, acceptRatioVec);
-
-    if (iter < maxIter){
-        cout << " * Converged in " << iter << " steps" << endl;
+    if (iter < maxIter) {
+        cout << "Done. Converged in " << iter << " steps" << endl;
+    } else {
+        cout << "Done. Did not converge within tol = " << tol << " in "  << maxIter << " steps" << endl;
     }
-    else{
-        cout << " * Did not converge within tol=" << tol << " in "  << maxIter << " steps" << endl;
-    }
-
-
+    writeFileAlpha(alphaVec, numberOfParticles, numberOfSteps);
 }
 
 void run_single_vmc(double alpha, int numberOfSteps) {
     int numberOfDimensions         = 3;         // Dimensions
-    int numberOfParticles          = 100;        // Particales in system
+    int numberOfParticles          = 100;       // Particles in system
     double omega                   = 1.0;       // Oscillator frequency.
     double stepLength              = 1.0;       // Metropolis: step length
     double timeStep                = 0.01;      // Metropolis-Hastings: time step
     double h                       = 0.001;     // Double derivative step length
     double equilibration           = 0.1;       // Amount of the total steps used for equilibration.
     double characteristicLength    = 1.0;       // a_0: natural length scale of the system
-    bool importanceSampling        = true;     // Otherwise: normal Metropolis sampling
+    bool importanceSampling        = true;      // Otherwise: normal Metropolis sampling
     bool numericalDoubleDerviative = false;     // Otherwise: use analytical expression for 2nd derivative
 
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps, equilibration, 1);

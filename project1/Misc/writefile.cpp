@@ -13,6 +13,18 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
     cout << " * Results written to " << filename << endl;
 }
 
+void writeFileAlpha(std::vector<double>& alphaVec, int numPart, int metroSteps) {
+    std::string filename = "./Data/correlated_gd/alpha_";
+    filename.append(to_string(alphaVec[0]).substr(0,3) + "_");
+    filename.append(to_string(numPart) + "p_");
+    filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
+    ofstream outfile;
+    outfile.open(filename, ios::out | ios::binary | ios::trunc);
+    outfile.write(reinterpret_cast<const char*> (alphaVec.data()), alphaVec.size()*sizeof(double));
+    outfile.close();
+    cout << "Results written to " << filename << endl;
+}
+
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,

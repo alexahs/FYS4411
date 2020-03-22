@@ -17,4 +17,6 @@ void printFinal(int, double);
 
 void writeFileEnergy(vector<double>&, int, int, int, string);
 
+void writeFileAlpha(std::vector<double>& alphaVec, int numPart, int metroSteps);
+
 void writeParticles(vector<class Particle*>, string);

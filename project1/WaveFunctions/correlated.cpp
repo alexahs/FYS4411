@@ -134,7 +134,11 @@ double Correlated::computeSingleInteractingPart(Particle* p1, Particle* p2) {
 }
 
 double Correlated::evaluateCostFunction() {
-    return 0;
+    double term1 = m_system->getSampler()->getExpectWfDerivTimesLocalE();
+    double term2 = m_system->getSampler()->getExpectWfDerivExpectLocalE();
+    double cost = 2*(term1/term2 - 1);
+    cost *= term2;
+    return cost;
 }
 
 std::vector<double> Correlated::computeQuantumForce(class Particle* particle) {
@@ -143,7 +147,38 @@ std::vector<double> Correlated::computeQuantumForce(class Particle* particle) {
 }
 
 double Correlated::evaluateDerivative(std::vector<class Particle*> particles) {
-    return 0;
+    // double deriv;
+    // double alpha = m_parameters.at(0);
+    // double beta  = m_parameters.at(1);
+    // double a     = m_bosonDiameter;
+    //
+    // for (int k=0; k<particles.size(); k++) {
+    //     std::vector<double> rk = particles[k]->getPosition();
+    //     double rjk, uPrimeOverR, uDoublePrime, laplacian;
+    //     double xk2   = rk[0] * rk[0];
+    //     double yk2   = rk[1] * rk[1];
+    //     double zk2   = rk[2] * rk[2];
+    //     std::vector<double> derivNablaPhi(3, -4), gradCorrelation(3, 0), rj(3, 0);
+    //     derivNablaPhi[0] *= xk2;
+    //     derivNablaPhi[1] *= yk2;
+    //     derivNablaPhi[2] *= beta * zk2;
+    //     deriv = 8*alpha*(xk2 + yk2 + beta*beta*zk2);
+    //     deriv -= 2*(2 + beta);
+    //     for (int j=0; j<m_system->getNumberOfParticles(); j++) {
+    //         rjk = computeSingleDistance(particles[k], particles[j]);
+    //         rj = particles[j]->getPosition();
+    //         if (j == k && rjk > a) {
+    //             uPrimeOverR = a / (rjk * rjk * (rjk - a));
+    //             gradCorrelation[0] += uPrimeOverR * (rk[0] - rj[0]);
+    //             gradCorrelation[1] += uPrimeOverR * (rk[1] - rj[1]);
+    //             gradCorrelation[2] += uPrimeOverR * (rk[2] - rj[2]);
+    //         }
+    //     }
+    //     // Derivative of the Second term of the laplacian
+    //     deriv += dotProduct(derivNablaPhi, gradCorrelation);
+    // }
+    // return -0.5 * deriv;
+    return - m_system->getSumRiSquared();
 }
 
 double Correlated::dotProduct(std::vector<double> v1, std::vector<double> v2) {
