@@ -186,7 +186,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha) {
         system->runMetropolisSteps           ();
 
         // Get cost
-        learningRate /= 1 + decay*counter
+        learningRate /= 1 + decay*counter;
         counter++;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
