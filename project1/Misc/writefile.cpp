@@ -15,7 +15,7 @@ void writeFileEnergy(std::vector<double>& energySamples, int numDim, int numPart
 
 void writeFileAlpha(std::vector<double>& alphaVec, int numPart, int metroSteps) {
     std::string filename = "./Data/correlated_gd/alpha_";
-    filename.append(to_string(alphaVec[0]).substr(0,3) + "_");
+    filename.append(to_string(alphaVec[0]).substr(0,5) + "_");
     filename.append(to_string(numPart) + "p_");
     filename.append("2pow" + to_string(int(log2(metroSteps))) + "steps.bin");
     ofstream outfile;
