@@ -152,7 +152,7 @@ void correlated_gradient_descent(int numberOfParticles, double alpha, double lea
     int numberOfSteps              = int (pow(2, 17)); // Metropolis steps per alpha
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
-    double tol                     = 1e-7;
+    double tol                     = 1e-6;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
     // double learningRate            = 0.1;
     int iter                       = 0;
