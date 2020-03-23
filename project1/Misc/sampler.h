@@ -1,6 +1,7 @@
 #pragma once
 #include <iomanip>
 #include <vector>
+#include <string>
 
 class Sampler {
 public:
@@ -9,6 +10,8 @@ public:
     virtual void sample(bool acceptedStep);
     virtual void computeAverages();
     // void printOutputToTerminal();
+    void setOneBodyDensity(double min, double max, int numberOfBins);
+    void finishOneBodyDensity(std::string filename);
     double getEnergy()                      { return m_energy; }
     double getEnergy2()                     { return m_energy2; }
     double getVariance()                    { return m_variance; }
@@ -34,5 +37,10 @@ protected:
     double m_expectWfDerivExpectLocalE = 0;     //  <wf^(-1)*dWf/d(params)>*<localEnergy>
     double m_cumulativeWfDerivative = 0;
     double m_cumulativeWfDerivTimesLocalE = 0;
+    double **m_bins = nullptr;
+    int m_numberOfBins = 0;
+    double m_min = 0;
+    double m_max = 0;
+    double m_binWidth = 0;
     std::vector <double> m_vecEnergySamples;
 };

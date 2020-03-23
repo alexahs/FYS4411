@@ -25,6 +25,20 @@ void writeFileAlpha(std::vector<double>& alphaVec, int numPart, int metroSteps) 
     cout << "Results written to " << filename << endl;
 }
 
+void writeOneBodyDensity(double** bins, int numberOfBins, string filename) {
+    std::string fullfilename = "./Data/onebodydensity/" + filename + ".csv";
+    ofstream outfile;
+    outfile.open(fullfilename, ios::out | ios::binary | ios::trunc);
+    outfile << "x,y,z" << endl;
+    for (int i=0; i<numberOfBins; i++) {
+        outfile << bins[0][i] << ",";
+        outfile << bins[1][i] << ",";
+        outfile << bins[2][i] << endl;
+    }
+    outfile.close();
+    cout << "Results written to " << filename << endl;
+}
+
 void writeFileOneVariational(int numDim, int numPart, int metroSteps, int equilSteps,
     bool numericalDoubleDerviative,
     vector<double> alpha, vector<double> energy, vector<double> energy2,

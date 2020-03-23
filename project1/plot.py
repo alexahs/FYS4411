@@ -7,6 +7,8 @@ import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
 # from blocking import block
 from analysis import DataAnalysisClass, timeFunction
+import matplotlib as mpl
+mpl.rcParams.update({'font.size': 18})
 
 
 plt.style.use('ggplot')
@@ -151,12 +153,40 @@ def animate_3D(particles):
     plt.show()
     # ani.save("/Data/particles.gif", writer="imagemagick", fps=30)
 
+def plot_onebody():
+    max = 4.0
+    DIR = "./Data/onebodydensity/"
+    fns = ["Jastrow.csv", "NoJastrow.csv"]
+    labs = ["Correlation", "Without correlation"]
+    fmts = ["--",":"]
+    for fn, label, fmt in zip(fns, labs, fmts):
+        df = pd.read_csv(DIR + fn)
+        px,py,pz = df["x"].values, df["y"].values, df["z"].values
+        bins = px.shape[0]
+        num = int (bins/2)
+        pr = np.zeros(num)
+        r = np.linspace(0, max, num)
+        total = 0
+        for i in range(num):
+            bin = px[i] + px[-1 - i] # Add from both sides of the origin
+            bin += py[i] + py[-1 - i] # Add from both sides of the origin
+            # bin += pz[i] + pz[-1 - i]
+            total += bin # Scale factor so that integral sums up to 1
+            pr[-i-1] = bin
+        pr /= total
+        plt.plot(r, pr, fmt, label=label)
+
+    plt.legend()
+    plt.xlabel(r"$|r|$")
+    plt.ylabel(r"$p(r)$", rotation=0)
+    plt.show()
 
 # sphericalVMC(dim, particles)
 # blocking(dim, particles, log2Steps)
-plot_correlated(log2Steps)
+# plot_correlated(log2Steps)
 # plotInitialState()
 # animate_3D(particles)
+plot_onebody()
 
 
 # Histogram of RNGs, just a test to verify that they're uniform and in range (0.0, 1.0)

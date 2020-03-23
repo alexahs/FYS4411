@@ -67,7 +67,7 @@ bool System::metropolisStep() {
     }
 }
 
-bool System::importanceStep(){
+bool System::importanceStep() {
     /* Perform one step according to Metropolis-Hastings algorithm
     * Returns
     * true, if step is accepted

@@ -33,34 +33,24 @@ using namespace std;
 
 // Correlated = Interacting Bosons. Two approaches for finding optimal alpha:
 void correlated_brute_force(int numberOfParticles);
-void correlated_gradient_descent(int numberOfParticles, double alpha, double learningRate, double decayRate);
+void correlated_gradient_descent(int numberOfParticles, double alpha);
+void correlated_one_body_density(int numberOfParticles);
 
 int main(int argc, char** argv) {
     // NOTE: number of Metropolis steps must be a 2^N for blocking resampling to run
-    if (argc < 4) {
-        cout << "Usage: \n\t./vmc <number_of_particles> <learning rate> <decay rate>" << endl;
-        cout << "Example: \n\t./vmc 100 0.001 0.01" << endl;
+    if (argc < 2) {
+        cout << "Usage: \n\t./vmc <number_of_particles>" << endl;
+        cout << "Example: \n\t./vmc 100" << endl;
         return 1;
     }
     int nParticles = atoi(argv[1]);
-    double learningRate = atof(argv[2]);
-    double decayRate = atof(argv[3]);
     // Control which analysis to perform:
     // run_bruteforce_vmc(0.1, 0.9, 0.05);
     // run_gradient_descent(500, 0.2, 0.001);
     // run_single_vmc(0.5, pow(2, 18));
     // correlated_brute_force(nParticles);
-    vector<double> alphas;
-    for(double alpha = 0.2; alpha < 0.9; alpha+=0.1){
-        cout << alpha << endl;
-        alphas.push_back(alpha);
-    }
-
-    #pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < alphas.size(); i++){
-        correlated_gradient_descent(nParticles, alphas[i], learningRate, decayRate);
-
-    }
+    // for (double alpha=0.2; alpha<0.9; alpha+= 0.1) correlated_gradient_descent(nParticles, alpha);
+    correlated_one_body_density(nParticles);
     return 0;
 }
 
@@ -132,7 +122,7 @@ void correlated_brute_force(int numberOfParticles) {
     printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
-void correlated_gradient_descent(int numberOfParticles, double alpha, double learningRate, double decayRate) {
+void correlated_gradient_descent(int numberOfParticles, double alpha) {
     /* This case is done for only:
      *      3 Dimensions,
      *      Metropolis sampling rule (and not importance sampling)
@@ -152,18 +142,16 @@ void correlated_gradient_descent(int numberOfParticles, double alpha, double lea
     int numberOfSteps              = int (pow(2, 17)); // Metropolis steps per alpha
     double stepLength              = 0.1;        // Metropolis: step length
     double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
-    double tol                     = 1e-6;
+    double tol                     = 1e-7;
     // double alpha                   = 0.5;        // Initial Alpha, educated guess based on brute-force method
-    // double learningRate            = 0.1;
+    double learningRate            = 0.001;
     int iter                       = 0;
-    int maxIter                    = 50;
+    int maxIter                    = 15;
     std::vector<double> alphaVec;
     // Inital print
     printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
         equilibration, numVarParameters);
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-
-    // double decay = 0.01;
     do {
         alphaVec.push_back(alpha);     // Save alpha
         // Please note that system by default uses
@@ -193,12 +181,10 @@ void correlated_gradient_descent(int numberOfParticles, double alpha, double lea
         system->runMetropolisSteps           ();
 
         // Get cost
-        learningRate /= 1 + decayRate*iter;
         cost = system->getWaveFunction()->evaluateCostFunction();
         alpha -= learningRate*cost;           // Compute new alpha with GD
         cout << "Iteration " << ++iter << ", alpha = ";
         cout << fixed << setprecision(12) << alpha;
-        cout << ", learning Rate = " << learningRate;
         cout << ", cost = " << cost << endl;
     } while (abs(alpha - alphaVec[iter-1]) > tol && iter < maxIter);
     // Print timing results
@@ -210,6 +196,54 @@ void correlated_gradient_descent(int numberOfParticles, double alpha, double lea
         cout << "Done. Did not converge within tol = " << tol << " in "  << maxIter << " steps" << endl;
     }
     writeFileAlpha(alphaVec, numberOfParticles, numberOfSteps);
+}
+
+void correlated_one_body_density(int numberOfParticles) {
+    /* This case is done for only:
+     *      3 Dimensions,
+     *      Metropolis sampling rule (and not importance sampling)
+     *      Analytic double derivative (numerical algorithm is slower by ~ 3 times)
+     * This is the brute-force method for finding the optimal variational parameter
+     * which is only alpha.
+     */
+    int numberOfDimensions         = 3;          // Dimensions
+    double gamma                   = 2.82843;    // omega_z / omega_ho.
+    double beta                    = gamma;
+    double characteristicLength    = 2.5;        // Side length of box to initialize particles within
+    double min                     = -4.0;
+    double max                     = 4.0;
+    int numberOfBins               = 100;
+    double bosonDiameter           = 0.00433;    // Fixed as in refs.
+    int numVarParameters           = 2;
+    int numberOfSteps              = int (pow(2, 20)); // Metropolis steps
+    double stepLength              = 0.1;        // Metropolis: step length
+    double equilibration           = 0.1;        // Amount of the total steps used for equilibration.
+    double alpha                   = 0.474;
+    string filename                = "Spherical";
+    // Inital print
+    printInitalSystemInfo(numberOfDimensions, numberOfParticles, numberOfSteps,
+        equilibration, numVarParameters);
+    // Main loop: brute-force over alphas
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    System* system = new System();
+    system->setNumberOfParticles         (numberOfParticles);
+    system->setNumberOfDimensions        (numberOfDimensions);
+    Sampler* sampler = new Sampler(system);
+    sampler->setOneBodyDensity           (min, max, numberOfBins);
+    system->setSampler                   (sampler);
+    system->setHamiltonian               (new EllipticHarmonicOscillator(
+                                                system, gamma, bosonDiameter));
+    system->setInitialState              (new RandomUniform(system, numberOfDimensions,
+                                                numberOfParticles, characteristicLength));
+    // system->setWaveFunction              (new Correlated(system, alpha, beta, bosonDiameter));
+    system->setWaveFunction              (new SimpleGaussian(system, alpha));
+    system->setEquilibrationFraction     (equilibration);
+    system->setStepLength                (stepLength);
+    system->setNumberOfMetropolisSteps   (numberOfSteps);
+    system->runMetropolisSteps           ();
+    sampler->finishOneBodyDensity(filename);
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    printFinal(1, chrono::duration_cast<chrono::milliseconds>(end - begin).count());
 }
 
 void run_single_vmc(double alpha, int numberOfSteps) {
