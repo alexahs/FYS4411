@@ -59,7 +59,6 @@ int main(int argc, char** argv) {
         correlated_single_alpha(vec_particles[i], alpha_opt);
     }
 
-
     return 0;
 }
 
@@ -121,7 +120,7 @@ void correlated_single_alpha(int numberOfParticles, double alpha) {
                                                     bosonDiameter));
         system->setEquilibrationFraction     (equilibration);
         system->setStepLength                (stepLength);
-        system->setNumberOfMetropolisSteps   (numberOfSteps/nProcs);
+        system->setNumberOfMetropolisSteps   (stepsPerProc);
         system->setImportanceSampling        (importanceSampling, timeStep);
         system->runMetropolisSteps           ();
         vector<double> energySamples = system->getSampler()->getEnergySamples();

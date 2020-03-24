@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys, os
 from blocking import block
+from analysis import *
 import seaborn as sns
 plt.style.use('ggplot')
 
@@ -18,7 +19,20 @@ if not os.path.exists(FIGURE_DIR):
     os.makedirs(FIGURE_DIR)
 
 
+def blocking_bootstrap():
+    inDir = "./Data/correlated_bruteforce/"
 
+    particles = [10, 50, 100]
+    size = int(2**21)
+
+    for p in particles:
+        print(f"====== {p} particles ======")
+        fname = inDir + f"energies_alpha_0.474_3d_{p}p_2pow21steps.bin"
+        DataAnalysis = DataAnalysisClass(fname, size)
+        DataAnalysis.runAllAnalyses()
+        DataAnalysis.printOutput()
+
+blocking_bootstrap()
 
 def plotGD():
     dataDir = "./Data/correlated_gd/"
@@ -545,7 +559,7 @@ def blocking():
 
     outfile.close()
 
-blocking()
+# blocking()
 
 def bruteForceResults():
     dims = [1, 2, 3]
