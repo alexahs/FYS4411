@@ -20,14 +20,14 @@ if not os.path.exists(FIGURE_DIR):
 
 
 def blocking_bootstrap():
-    inDir = "./Data/correlated_bruteforce/"
+    inDir = RAW_DATA_DIR + "brute_importance_with_energies/"
 
-    particles = [10, 50, 100]
+    alphas = [2, 3, 4, 5, 6, 7, 8, 9]#1e-1
     size = int(2**21)
 
-    for p in particles:
-        print(f"====== {p} particles ======")
-        fname = inDir + f"energies_alpha_0.474_3d_{p}p_2pow21steps.bin"
+    for alpha in alphas:
+        print(f"====== alpha = {alpha} ======")
+        fname = inDir + f"vmc_energysamples_3d_100p_{alpha}alpha_-1dt_2pow21steps.bin"
         DataAnalysis = DataAnalysisClass(fname, size)
         DataAnalysis.runAllAnalyses()
         DataAnalysis.printOutput()
