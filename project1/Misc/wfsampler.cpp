@@ -38,7 +38,7 @@ void WfSampler::sample(bool acceptedStep) {
     double wfDeriv = m_system->getWaveFunction()->
                             evaluateDerivative(m_system->getParticles());
 
-
+    // Sample quantities needed in gradient descent
     m_cumulativeEnergy  += localEnergy;
     m_cumulativeEnergy2 += localEnergy*localEnergy;
     m_cumulativeWfDerivative += wfDeriv;
