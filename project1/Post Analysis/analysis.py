@@ -22,7 +22,9 @@ def timeFunction(f):
         time2 = time.time()
         print(f"Function Took: \t {time2-time1:0.3f} s")
         return ret
+
     return wrap
+
 
 class DataAnalysisClass:
     # General Init functions
@@ -36,6 +38,7 @@ class DataAnalysisClass:
 
     def loadData(self, size=0):
         self.data = np.fromfile(self.inputFileName, dtype=np.float64, count=size)
+        # Alternative read methods:
         # if size != 0:
         #     with open(self.inputFileName) as inputFile:
         #         self.data = np.zeros(size)
@@ -59,16 +62,19 @@ class DataAnalysisClass:
     # Standard Autocorrelation
     @timeFunction
     def autocorrelation(self):
-        self.acf = np.zeros(len(self.data)/2)
-        for k in range(0, len(self.data)/2):
-            self.acf[k] = np.corrcoef(np.array([self.data[0:len(self.data)-k], \
-                                            self.data[k:len(self.data)]]))[0,1]
+        self.acf = np.zeros(len(self.data) / 2)
+        for k in range(0, len(self.data) / 2):
+            self.acf[k] = np.corrcoef(
+                np.array(
+                    [self.data[0 : len(self.data) - k], self.data[k : len(self.data)]]
+                )
+            )[0, 1]
 
     # Bootstrap
     @timeFunction
-    def bootstrap(self, nBoots = 1000):
+    def bootstrap(self, nBoots=1000):
         bootVec = np.zeros(nBoots)
-        for k in range(0,nBoots):
+        for k in range(0, nBoots):
             bootVec[k] = np.average(np.random.choice(self.data, len(self.data)))
         self.bootAvg = np.average(bootVec)
         self.bootVar = np.var(bootVec)
@@ -78,15 +84,17 @@ class DataAnalysisClass:
     @timeFunction
     def jackknife(self):
         jackknVec = np.zeros(len(self.data))
-        for k in range(0,len(self.data)):
+        for k in range(0, len(self.data)):
             jackknVec[k] = np.average(np.delete(self.data, k))
-        self.jackknAvg = self.avg - (len(self.data) - 1) * (np.average(jackknVec) - self.avg)
+        self.jackknAvg = self.avg - (len(self.data) - 1) * (
+            np.average(jackknVec) - self.avg
+        )
         self.jackknVar = float(len(self.data) - 1) * np.var(jackknVec)
         self.jackknStd = np.sqrt(self.jackknVar)
 
     # Blocking
     @timeFunction
-    def blocking(self, blockSizeMax = 500):
+    def blocking(self, blockSizeMax=500):
         blockSizeMin = 1
 
         self.blockSizes = []
@@ -94,8 +102,8 @@ class DataAnalysisClass:
         self.varVec = []
 
         for i in range(blockSizeMin, blockSizeMax):
-            if(len(self.data) % i != 0):
-                pass#continue
+            if len(self.data) % i != 0:
+                pass  # continue
             blockSize = i
             meanTempVec = []
             varTempVec = []
@@ -106,15 +114,14 @@ class DataAnalysisClass:
                 meanTempVec.append(np.average(self.data[startPoint:endPoint]))
                 startPoint = endPoint
                 endPoint += blockSize
-            mean, var = np.average(meanTempVec), np.var(meanTempVec)/len(meanTempVec)
+            mean, var = np.average(meanTempVec), np.var(meanTempVec) / len(meanTempVec)
             self.meanVec.append(mean)
             self.varVec.append(var)
             self.blockSizes.append(blockSize)
 
         self.blockingAvg = np.average(self.meanVec[-200:])
-        self.blockingVar = (np.average(self.varVec[-200:]))
+        self.blockingVar = np.average(self.varVec[-200:])
         self.blockingStd = np.sqrt(self.blockingVar)
-
 
     # Plot of Data, Autocorrelation Function and Histogram
     def plotAll(self):
@@ -134,16 +141,26 @@ class DataAnalysisClass:
     # Plot the Dataset, Mean and Std
     def plotData(self):
         # Far away plot
-        font = {'fontname':'serif'}
-        plt.plot(range(0, len(self.data)), self.data, 'r-', linewidth=1)
-        plt.plot([0, len(self.data)], [self.avg, self.avg], 'b-', linewidth=1)
-        plt.plot([0, len(self.data)], [self.avg + self.std, self.avg + self.std], 'g--', linewidth=1)
-        plt.plot([0, len(self.data)], [self.avg - self.std, self.avg - self.std], 'g--', linewidth=1)
-        plt.ylim(self.avg - 5*self.std, self.avg + 5*self.std)
-        plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
+        font = {"fontname": "serif"}
+        plt.plot(range(0, len(self.data)), self.data, "r-", linewidth=1)
+        plt.plot([0, len(self.data)], [self.avg, self.avg], "b-", linewidth=1)
+        plt.plot(
+            [0, len(self.data)],
+            [self.avg + self.std, self.avg + self.std],
+            "g--",
+            linewidth=1,
+        )
+        plt.plot(
+            [0, len(self.data)],
+            [self.avg - self.std, self.avg - self.std],
+            "g--",
+            linewidth=1,
+        )
+        plt.ylim(self.avg - 5 * self.std, self.avg + 5 * self.std)
+        plt.gca().yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
         plt.xlim(0, len(self.data))
-        plt.ylabel(self.outName.title() + ' Monte Carlo Evolution', **font)
-        plt.xlabel('MonteCarlo History', **font)
+        plt.ylabel(self.outName.title() + " Monte Carlo Evolution", **font)
+        plt.xlabel("MonteCarlo History", **font)
         plt.title(self.outName.title(), **font)
         plt.savefig(self.outName + "/data.eps")
         plt.savefig(self.outName + "/data.png")
@@ -152,42 +169,54 @@ class DataAnalysisClass:
     # Plot Histogram of Dataset and Gaussian around it
     def plotHistogram(self):
         binNumber = 50
-        font = {'fontname':'serif'}
-        count, bins, ignore = plt.hist(self.data, bins=np.linspace(self.avg - 5*self.std, self.avg + 5*self.std, binNumber))
-        plt.plot([self.avg, self.avg], [0,np.max(count)+10], 'b-', linewidth=1)
-        plt.ylim(0,np.max(count)+10)
-        plt.ylabel(self.outName.title() + ' Histogram', **font)
-        plt.xlabel(self.outName.title() , **font)
-        plt.title('Counts', **font)
+        font = {"fontname": "serif"}
+        count, bins, ignore = plt.hist(
+            self.data,
+            bins=np.linspace(
+                self.avg - 5 * self.std, self.avg + 5 * self.std, binNumber
+            ),
+        )
+        plt.plot([self.avg, self.avg], [0, np.max(count) + 10], "b-", linewidth=1)
+        plt.ylim(0, np.max(count) + 10)
+        plt.ylabel(self.outName.title() + " Histogram", **font)
+        plt.xlabel(self.outName.title(), **font)
+        plt.title("Counts", **font)
 
-        #gaussian
+        # gaussian
         norm = 0
-        for i in range(0,len(bins)-1):
-            norm += (bins[i+1]-bins[i])*count[i]
-        plt.plot(bins,  norm/(self.std * np.sqrt(2 * np.pi)) * np.exp( - (bins - self.avg)**2 / (2 * self.std**2) ), linewidth=1, color='r')
+        for i in range(0, len(bins) - 1):
+            norm += (bins[i + 1] - bins[i]) * count[i]
+        plt.plot(
+            bins,
+            norm
+            / (self.std * np.sqrt(2 * np.pi))
+            * np.exp(-((bins - self.avg) ** 2) / (2 * self.std ** 2)),
+            linewidth=1,
+            color="r",
+        )
         plt.savefig(self.outName + "/hist.eps")
         plt.savefig(self.outName + "/hist.png")
         plt.clf()
 
     # Plot the Autocorrelation Function
     def plotAutocorrelation(self):
-        font = {'fontname':'serif'}
-        plt.plot(range(1, len(self.data)/2), self.acf[1:], 'r-')
+        font = {"fontname": "serif"}
+        plt.plot(range(1, len(self.data) / 2), self.acf[1:], "r-")
         plt.ylim(-1, 1)
-        plt.xlim(0, len(self.data)/2)
-        plt.ylabel('Autocorrelation Function', **font)
-        plt.xlabel('Lag', **font)
-        plt.title('Autocorrelation', **font)
+        plt.xlim(0, len(self.data) / 2)
+        plt.ylabel("Autocorrelation Function", **font)
+        plt.xlabel("Lag", **font)
+        plt.title("Autocorrelation", **font)
         plt.savefig(self.outName + "/autocorrelation.eps")
         plt.savefig(self.outName + "/autocorrelation.png")
         plt.clf()
 
     def plotBlocking(self):
-        font = {'fontname':'serif'}
-        plt.plot(self.blockSizes, self.varVec, 'r-')
-        plt.ylabel('Variance', **font)
-        plt.xlabel('Block Size', **font)
-        plt.title('Blocking', **font)
+        font = {"fontname": "serif"}
+        plt.plot(self.blockSizes, self.varVec, "r-")
+        plt.ylabel("Variance", **font)
+        plt.xlabel("Block Size", **font)
+        plt.title("Blocking", **font)
         plt.savefig(self.outName + "/blocking.eps")
         plt.savefig(self.outName + "/blocking.png")
         plt.clf()
