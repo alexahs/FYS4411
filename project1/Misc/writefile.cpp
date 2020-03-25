@@ -76,20 +76,6 @@ void printInitalSystemInfo(int numberOfDimensions, int numberOfParticles,
     cout << " * Number of Metropolis steps run : " << numberOfSteps << endl;
     cout << " * Number of equilibration steps  : " << int(numberOfSteps*equilibration) << endl;
     cout << " * Number of parameters : " << numberOfParameters << endl << endl;
-    //
-    // int numOfColumns = 4;
-    // for (int i=1; i<=numberOfParameters; i++) {
-    //     cout << " Parameter " << i << " |";
-    //     numOfColumns ++;
-    // }
-    // cout << " Energy     ";
-    // cout << "| Energy^2   ";
-    // cout << "| Variance   ";
-    // cout << "| AcceptRatio" << endl << " ";
-    // for (int i=1; i<numOfColumns; i++) {
-    //     cout << "------------+";
-    // }
-    // cout << "------------" << endl << " ";
 }
 
 void printFinal(int numberOfParameters, double elapsedTime) {

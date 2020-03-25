@@ -7,9 +7,9 @@ import seaborn as sns
 
 plt.style.use("ggplot")
 
-RAW_DATA_DIR = "../Data/temp_results/"
-FORMATTED_DATA = "../Data/formatted/"
-FIGURE_DIR = "../Figures/"
+RAW_DATA_DIR = "./Data/temp_results/"
+FORMATTED_DATA = "./Data/formatted/"
+FIGURE_DIR = "./Figures/"
 
 
 if not os.path.exists(FORMATTED_DATA):
@@ -20,7 +20,7 @@ if not os.path.exists(FIGURE_DIR):
 
 
 def plotGD():
-    dataDir = "../Data/correlated_gd/"
+    dataDir = "./Data/correlated_gd/"
 
     n_alpha0 = 8
 

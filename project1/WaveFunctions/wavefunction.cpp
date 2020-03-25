@@ -8,14 +8,11 @@ WaveFunction::WaveFunction(System* system) {
 
 double WaveFunction::computeDoubleDerivative(std::vector<class Particle*> particles)
 {
-   /* Implemented by
-    * using the three point formula with a step length.
-    * NOTE: the virtual function evaluate must be defined, thus this function
-    * only makes sense for an inherited subclass, where evaluate is defined.
-
-    Example (1 dimension):
-        doubleDerivative = (u_i+1 - 2u_i + u_i-1) / h^2
-
+   /* Implemented by using the three point formula with a step length.
+    *
+    * Example (1 dimension):
+    *    doubleDerivative = (u_i+1 - 2u_i + u_i-1) / h^2
+    *
     * Params: particles
     * Returns: doubleDerivative / waveFunc
     */

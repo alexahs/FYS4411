@@ -8,6 +8,9 @@
 
 using namespace std;
 
+/* Just a bunch of functions that will write the desired data into
+their respective folders */
+
 void writeFileOneVariational(int, int, int, int, bool, vector<double>,
      vector<double>, vector<double>, vector<double>, vector<double>);
 

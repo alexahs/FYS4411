@@ -68,16 +68,6 @@ void Sampler::sample(bool acceptedStep) {
     }
 }
 
-// void Sampler::printOutputToTerminal() {
-//     int p = m_system->getWaveFunction()->getNumberOfParameters();
-//     std::vector<double> pa = m_system->getWaveFunction()->getParameters();
-//     for (int i=0; i<p; i++) { cout << setw(12) << pa.at(i) << "|"; }
-//     cout << setw(12) << setprecision(6) << m_energy << "|";
-//     cout << setw(12) << setprecision(6) << m_energy2 << "|";
-//     cout << setw(12) << setprecision(6) << m_variance << "|";
-//     cout << setw(12) << setprecision(6) << m_acceptRatio << "\n ";
-// }
-
 void Sampler::computeAverages() {
     int nMetropolisSteps = m_system->getNumberOfMetropolisSteps();
     m_energy = m_cumulativeEnergy / nMetropolisSteps;

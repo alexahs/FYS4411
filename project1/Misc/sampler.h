@@ -4,12 +4,17 @@
 #include <string>
 
 class Sampler {
+    /* This class is meant to keep track of the desired statistics or similar
+     * which we might want to record when doing the Monte Carlo cycles.
+     * NOTE: for each MC cycle, sample() is called. The rest of this class
+     * is specialized to record and compute values, during and at the end of
+     * the Monte Carlo integration.
+     */
 public:
     Sampler(class System* system);
     virtual void setNumberOfMetropolisSteps(int steps);
     virtual void sample(bool acceptedStep);
     virtual void computeAverages();
-    // void printOutputToTerminal();
     void setOneBodyDensity(double min, double max, int numberOfBins);
     void finishOneBodyDensity(std::string filename);
     double getEnergy()                      { return m_energy; }

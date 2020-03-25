@@ -14,10 +14,6 @@ using std::endl;
 
 EllipticHarmonicOscillator::EllipticHarmonicOscillator(System* system, double gamma,
         double bosonDiameter) : Hamiltonian(system) {
-    /*
-    remember to use the scaled version of omega in this potential
-    gamma = omega_z/omega_ho
-    */
     assert(gamma > 0);
     m_gamma2  = gamma * gamma;
     m_bosonDiameter = bosonDiameter;
@@ -25,6 +21,10 @@ EllipticHarmonicOscillator::EllipticHarmonicOscillator(System* system, double ga
 
 double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 {
+    /* We compute the kinetic energy by using the analytic expression, that
+     * is a part of the wave function class. The potential energy is
+     * included here.
+     */
     double localEnergy=0, rkj, potential=0;
     std::vector<double> rk(3, 0);
     std::vector<double> rj(3, 0);
@@ -50,10 +50,4 @@ double EllipticHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> par
         }
     }
     return localEnergy;
-}
-
-
-double EllipticHarmonicOscillator::computeLocalEnergyDerivative(std::vector<class Particle*> particles)
-{
-    return 1;
 }

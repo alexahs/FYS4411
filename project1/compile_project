@@ -2,6 +2,7 @@
 
 # Create build-directory
 mkdir Build
+mkdir Data
 
 # Move into the build-directory
 cd Build

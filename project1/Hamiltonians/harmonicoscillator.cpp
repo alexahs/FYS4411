@@ -17,14 +17,12 @@ HarmonicOscillator::HarmonicOscillator(System* system, double omega) :
 
 double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
 {
-    /* Here, you need to compute the kinetic and potential energies. Note that
-     * when using numerical differentiation, the computation of the kinetic
-     * energy becomes the same for all Hamiltonians, and thus the code for
-     * doing this should be moved up to the super-class, Hamiltonian.
-     *
-     * You may access the wave function currently used through the
-     * getWaveFunction method in the m_system object in the super-class, i.e.
-     * m_system->getWaveFunction()...
+    /* We have two options in this case. When the wavefunction is defined
+     * it takes the variable 'numericalDoubleDerivative', if that variable
+     * is true,
+     *      Use the three point formula to compute the Laplacian
+     * else (default),
+     *      Use the analytic expressino for the laplacian.
      */
     double r2 = m_system->getSumRiSquared();
     double potentialEnergy = 0.5*r2*m_omega*m_omega;
@@ -37,15 +35,4 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles)
     double kineticEnergy = - 0.5*secondDerivative;
 
     return kineticEnergy + potentialEnergy;
-}
-
-
-double HarmonicOscillator::computeLocalEnergyDerivative(std::vector<class Particle*> particles)
-{
-    double sumRi2 = m_system->getSumRiSquared();
-    double alpha = m_system->getWaveFunction()->getParameters().at(0);
-    int N =  m_system->getNumberOfParticles();
-    int dims = m_system->getNumberOfDimensions();
-
-    return N*dims - 4*alpha*sumRi2;
 }

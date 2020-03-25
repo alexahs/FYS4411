@@ -2,6 +2,10 @@
 #include <vector>
 
 class Particle {
+    /* Particle class is how one single particle is defined.
+     * We have the opportunity to easilty move it by 'adjustPosition()', or 
+     * call the position vector by 'getPosition()'
+     */
 public:
     Particle();
     void setPosition(const std::vector<double> &position);
