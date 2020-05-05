@@ -63,6 +63,7 @@ double NeuralQuantumState::evaluate(){
     for(int i = 0; i < m_nVisible; i++){
         psi1 += (m_inputLayer[i]-m_inputBias[i])*(m_inputLayer[i]-m_inputBias[i]);
     }
+    psi1 = exp(-1/(2*m_sigma2)*psi1);
 
     for(int j = 0; j < m_nHidden; j++){
         double term1 = 0;
@@ -74,8 +75,7 @@ double NeuralQuantumState::evaluate(){
         psi2 *= 1 + exp(term1);
     }
 
-    double wf = exp(-1/(2*m_sigma2)*psi1)*psi2;
-    return wf;
+    return psi1*psi2;
 }
 
 double NeuralQuantumState::computeNabla2(){
