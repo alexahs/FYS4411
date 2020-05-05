@@ -15,6 +15,7 @@ int main(){
     int nHidden = 10;
     double sigma = 1;
     double omega = 1;
+    bool interaction = false;
 
     int nMCcycles = 1000; //number of montecarlo cycles
     int nOptimizeIters = 100; //max iters in optimization
@@ -25,7 +26,7 @@ int main(){
     long seed = 1337;
 
 
-    Hamiltonian hamiltonian(omega);
+    Hamiltonian hamiltonian(omega, nParticles, nDims, interaction);
     NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed);
     Optimizer optimizer(eta, whichOptimizer);
     Sampler sampler(nMCcycles,

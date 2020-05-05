@@ -11,6 +11,8 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     //
     m_nVisible = (int) nParticles*nDims;
     m_nHidden = nHidden;
+    m_nParticles = nParticles;
+    m_nDims = nDims;
     m_sigma = sigma;
     m_sigma2 = sigma*sigma;
     m_sigma4 = m_sigma2*m_sigma2;
@@ -82,6 +84,7 @@ double NeuralQuantumState::evaluate(){
 
 std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
     // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
+    // equations (115) and (116) in lecture notes
 
     int m = nodeNumber;
 
@@ -89,13 +92,12 @@ std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nod
     double ddx = 0;
 
     for(int n = 0; n < m_nHidden; n++){
-        double Q = 0;
         double term1 = 0;
         for(int i = 0; n < m_nVisible; i++){
             term1 += m_inputLayer[i]*m_weights[i][n];
         }
 
-        Q = exp(m_hiddenBias[n] + term1/m_sigma2);
+        double Q = exp(m_hiddenBias[n] + term1/m_sigma2);
 
         dx += m_weights[m][n]/(Q+1);
         ddx += m_weights[m][n]*Q/((Q+1)*(Q+1));
@@ -111,6 +113,23 @@ std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nod
 
     return derivatives;
 }
+
+
+double NeuralQuantumState::computeDistance(int p, int q){
+    //compute the distance between two particles p and q
+    double distance2 = 0;
+    int pIdx = p*m_nDims;
+    int qIdx = q*m_nDims;
+    for(int d = 0; d < m_nDims; d++){
+        double distance = 0;
+        distance += m_inputLayer[pIdx + d] - m_inputLayer[qIdx + d];
+        distance2 += distance*distance;
+    }
+
+    return sqrt(distance2);
+
+}
+
 
 
 std::vector<double> NeuralQuantumState::computeQuantumForce(){
