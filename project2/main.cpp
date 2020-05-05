@@ -1,4 +1,4 @@
-#include <iosteam>
+#include <iostream>
 #include <vector>
 #include <iomanip>
 
@@ -19,17 +19,21 @@ int main(){
     int nMCcycles = 1000;
     int nOptimizeIters = 100;
     int samplingRule = 1; //1 - standard, 2 - metropolis, 3- gibbs
+    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
+    double eta = 0.001; //learning rate
+    double tolerance = 1e-6; 
 
 
-    hamiltonian = Hamiltonian(omega);
-    nqs = NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma);
-    optimizer = Optimizer(); //implement
-    sampler = Sampler(nMCcycles,
+    Hamiltonian hamiltonian(omega);
+    NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma);
+    Optimizer optimizer(eta, whichOptimizer);
+    Sampler sampler(nMCcycles,
                       nOptimizeIters,
                       samplingRule,
-                      &hamiltonian,
-                      &nqs,
-                      &optimizer);
+                      tolerance,
+                      hamiltonian,
+                      nqs,
+                      optimizer);
     //
     sampler.runOptimization();
 

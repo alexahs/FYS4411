@@ -21,10 +21,10 @@ std::vector<double> Hamiltonian::computeCostGradient(){
 
     //a bit unsure about this function, might have to call it
     //seperately for each gradient component, since the shapes mismatch
-    grad1 = 1;
-    grad2 = 1;
-    grad3 = 1;
-    std::vector<double> gradients = {grad1, grad2, grad3}
+    double grad1 = 1;
+    double grad2 = 1;
+    double grad3 = 1;
+    std::vector<double> gradients = {grad1, grad2, grad3};
     return gradients;
 }
 

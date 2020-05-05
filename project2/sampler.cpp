@@ -7,11 +7,11 @@
 Sampler::Sampler(int nMCcycles,
                  int nOptimizeIters,
                  int samplingRule,
-                 double tol,
-                 Hamiltonian *hamiltonian,
-                 NeuralQuantumState *nqs,
-                 Optimizer *optimizer)
-{
+                 double tolerance,
+                 Hamiltonian &hamiltonian,
+                 NeuralQuantumState &nqs,
+                 Optimizer &optimizer) :
+    m_hamiltonian(hamiltonian), m_nqs(nqs), m_optimizer(optimizer) {
     m_nMCcycles = nMCcycles;
     m_nOptimizeIters = nOptimizeIters;
     m_samplingRule = samplingRule;
@@ -38,6 +38,7 @@ void Sampler::runSampling(){
 
      take averages of cumulative sums (save to member variables possibly)
     */
+    int a = 1;
 
 }
 
@@ -51,4 +52,5 @@ void Sampler::runOptimization(){
     *     if "global" minimum reached:
     *         break
     */
+    int a = 1;
 }

@@ -12,7 +12,7 @@ class Sampler{
 */
 private:
     int m_nMCcycles;
-    int nOptimizeIters;
+    int m_nOptimizeIters;
     int m_samplingRule;
     double m_tolerance;
 
@@ -26,12 +26,12 @@ public:
             double tolerance,
             Hamiltonian &hamiltonian,
             NeuralQuantumState &nqs,
-            Optimizer &optimizer); //1 - standard metropolis, 2 - importance, 3 - gibbs
+            Optimizer &optimizer);
 
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
 
-    Hamiltonian *m_hamiltonian = nullptr;
-    NeuralQuantumState *m_nqs = nullptr;
-    Optimizer *m_optimizer = nullptr;
+    Hamiltonian m_hamiltonian;
+    NeuralQuantumState m_nqs;
+    Optimizer &m_optimizer;
 };

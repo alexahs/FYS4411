@@ -5,7 +5,7 @@
 class NeuralQuantumState {
 private:
 
-    void initialize(int nParticles, int nDims, int nHidden, double sigma);
+    void initialize();
     void initializeWeights();
     void initializePositions();
     int m_nHidden;
@@ -26,4 +26,4 @@ public:
     std::vector<std::vector<double>> m_weights;
 
 
-}
+};

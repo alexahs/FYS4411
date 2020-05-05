@@ -14,4 +14,4 @@ public:
     //gradients wrt variational parameters (weights / biases)
     std::vector<double> computeCostGradient();
     double evaluateCost();
-}
+};
