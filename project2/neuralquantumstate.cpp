@@ -16,14 +16,22 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     m_sigma = sigma;
     m_sigma2 = sigma*sigma;
     m_sigma4 = m_sigma2*m_sigma2;
-    m_inputLayer.reserve(m_nVisible);
-    m_hiddenLayer.reserve(m_nHidden);
-    m_inputBias.reserve(m_nVisible);
-    m_hiddenBias.reserve(m_nHidden);
-    m_weights.reserve(m_nVisible);
+    m_inputLayer.resize(m_nVisible);
+    m_hiddenLayer.resize(m_nHidden);
+    m_inputBias.resize(m_nVisible);
+    m_hiddenBias.resize(m_nHidden);
+    m_weights.resize(m_nVisible);
     for(int i = 0; i < m_nVisible; i++){
-        m_weights[i].reserve(m_nHidden);
+        m_weights[i].resize(m_nHidden);
     }
+
+    m_grads.dInputBias.resize(m_nVisible);
+    m_grads.dHiddenBias.resize(nHidden);
+    m_grads.dWeights.resize(m_nVisible);
+    for(int i = 0; i < m_nVisible; i++){
+        m_grads.dWeights[i].resize(nHidden);
+    }
+
     initializeWeights();
     initializePositions();
 }
@@ -81,6 +89,22 @@ double NeuralQuantumState::evaluate(){
     return psi1*psi2;
 }
 
+std::vector<double> NeuralQuantumState::computeQfactor(){
+    //computes the exponential factor used many times throughout the program
+    // exp(b_n - sum(x_i*w_ij)), as seen in equation (102) in notes
+    std::vector<double> Qfactor(m_nHidden);
+    for(int n = 0; n < m_nHidden; n++){
+        double term1 = 0;
+        for(int i = 0; i < m_nVisible; i++){
+            term1 += m_inputLayer[i]*m_weights[i][n];
+        }
+
+        Qfactor[n] = exp(m_hiddenBias[n] + term1/m_sigma2);
+    }
+
+    return Qfactor;
+}
+
 
 std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
     // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
@@ -91,16 +115,11 @@ std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nod
     double dx = 0;
     double ddx = 0;
 
+    std::vector<double> Q = computeQfactor();
+
     for(int n = 0; n < m_nHidden; n++){
-        double term1 = 0;
-        for(int i = 0; n < m_nVisible; i++){
-            term1 += m_inputLayer[i]*m_weights[i][n];
-        }
-
-        double Q = exp(m_hiddenBias[n] + term1/m_sigma2);
-
-        dx += m_weights[m][n]/(Q+1);
-        ddx += m_weights[m][n]*Q/((Q+1)*(Q+1));
+        dx += m_weights[m][n]/(Q[n]+1);
+        ddx += m_weights[m][n]*Q[n]/((Q[n]+1)*(Q[n]+1));
     }
 
     dx /= m_sigma2;
@@ -129,6 +148,32 @@ double NeuralQuantumState::computeDistance(int p, int q){
     return sqrt(distance2);
 
 }
+
+
+void NeuralQuantumState::computeCostGradient(){
+    //gradients wrt variational parameters (weights / biases)
+    //equations 101, 102 and 103 in lecture notes
+    std::vector<double> Q = computeQfactor();
+
+    //derivative wrt. input bias
+    for(int m = 0; m < m_nVisible; m++){
+        m_grads.dInputBias[m] = (m_inputLayer[m] -m_inputBias[m])/m_sigma2;
+    }
+
+    //derivative wrt. hidden bias
+    for(int n = 0; n < m_nHidden; n++){
+        m_grads.dHiddenBias[n] = 1/(Q[n] + 1);
+    }
+
+    //derivative wrt weights
+    for(int m = 0; m < m_nVisible; m++){
+        for(int n = 0; n < m_nHidden; n++){
+            m_grads.dWeights[m][n] = m_inputLayer[m]/(Q[n] + 1)/m_sigma2;
+        }
+    }
+
+}
+
 
 
 

@@ -7,6 +7,8 @@ Hamiltonian::Hamiltonian(double omega, int nParticles, int nDims, bool interacti
     m_nParticles = nParticles;
     m_nDims = nDims;
     m_interaction = interaction;
+
+
 }
 
 double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
@@ -41,19 +43,6 @@ double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
 }
 
 
-
-std::vector<double> Hamiltonian::computeCostGradient(){
-    //gradients wrt variational parameters (weights / biases)
-    //equations 105, 106 and 107 in lecture notes
-
-    //a bit unsure about this function, might have to call it
-    //seperately for each gradient component, since the shapes mismatch
-    double grad1 = 1;
-    double grad2 = 1;
-    double grad3 = 1;
-    std::vector<double> gradients = {grad1, grad2, grad3};
-    return gradients;
-}
 
 
 double Hamiltonian::evaluateCost(){

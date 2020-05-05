@@ -7,8 +7,13 @@
 #include "sampler.h"
 #include "Math/random.h"
 
+using std::vector;
+using std::cout;
+using std::endl;
+
 
 int main(){
+
 
     int nParticles = 2;
     int nDims = 2;
@@ -39,5 +44,5 @@ int main(){
     //
     sampler.runOptimization();
 
-    return 1;
+    return 0;
 }

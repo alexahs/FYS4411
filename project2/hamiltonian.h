@@ -14,8 +14,5 @@ private:
 public:
     Hamiltonian(double omega, int nParticles, int nDims, bool interaction);
     double computeLocalEnergy(NeuralQuantumState &nqs);
-    double computeInteractionTerm(std::vector<double> nodes);
-    //gradients wrt variational parameters (weights / biases)
-    std::vector<double> computeCostGradient();
     double evaluateCost();
 };
