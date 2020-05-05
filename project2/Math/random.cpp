@@ -42,4 +42,3 @@ double Random::nextDouble()
     if((temp=AM*iy) > RNMX) return RNMX;
     else return temp;
 }
-
