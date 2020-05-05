@@ -11,12 +11,13 @@ private:
     int m_nVisible;
     double m_sigma;
     double m_sigma2;
+    double m_sigma4;
 
 public:
     NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed);
 
     double evaluate(); //evaluate the wavefunction
-    double computeNabla2();
+    std::vector<double> computeFirstAndSecondDerivatives(int nodeNumber);
     std::vector<double> computeQuantumForce();
 
     std::vector<double> m_inputLayer;

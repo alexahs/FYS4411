@@ -13,6 +13,7 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     m_nHidden = nHidden;
     m_sigma = sigma;
     m_sigma2 = sigma*sigma;
+    m_sigma4 = m_sigma2*m_sigma2;
     m_inputLayer.reserve(m_nVisible);
     m_hiddenLayer.reserve(m_nHidden);
     m_inputBias.reserve(m_nVisible);
@@ -78,10 +79,39 @@ double NeuralQuantumState::evaluate(){
     return psi1*psi2;
 }
 
-double NeuralQuantumState::computeNabla2(){
-    double gradient = 1;
-    return gradient;
+
+std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
+    // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
+
+    int m = nodeNumber;
+
+    double dx = 0;
+    double ddx = 0;
+
+    for(int n = 0; n < m_nHidden; n++){
+        double Q = 0;
+        double term1 = 0;
+        for(int i = 0; n < m_nVisible; i++){
+            term1 += m_inputLayer[i]*m_weights[i][n];
+        }
+
+        Q = exp(m_hiddenBias[n] + term1/m_sigma2);
+
+        dx += m_weights[m][n]/(Q+1);
+        ddx += m_weights[m][n]*Q/((Q+1)*(Q+1));
+    }
+
+    dx /= m_sigma2;
+    ddx /= m_sigma4;
+
+    dx += -1/m_sigma2*(m_inputLayer[m] - m_inputBias[m]);
+    ddx += -1/m_sigma2;
+
+    std::vector<double> derivatives = {dx, ddx};
+
+    return derivatives;
 }
+
 
 std::vector<double> NeuralQuantumState::computeQuantumForce(){
     std::vector<double> qForce = {1, 2, 3};

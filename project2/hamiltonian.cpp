@@ -8,10 +8,12 @@ Hamiltonian::Hamiltonian(double omega){
 
 double Hamiltonian::computeLocalEnergy(){
     // equation 114 in lecture notes
-    // nabla^2 is implemented in NeuralQuantumState class
-    double kinetic = 1;
-    double potential = 1;
-    return kinetic + potential;
+
+
+
+
+
+    return 1.0;
 }
 
 
