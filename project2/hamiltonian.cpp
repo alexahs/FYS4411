@@ -37,7 +37,7 @@ double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
         localEnergy += 1/distances;
     }
 
-    return 1.0;
+    return localEnergy;
 }
 
 
