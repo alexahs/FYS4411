@@ -64,6 +64,10 @@ void NeuralQuantumState::initializePositions(){
 
 }
 
+void NeuralQuantumState::adjustPosition(int node, double change){
+
+}
+
 
 double NeuralQuantumState::evaluate(){
     //evaluate the wavefunction

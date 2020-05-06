@@ -16,8 +16,27 @@ private:
     int m_samplingRule;
     double m_tolerance;
 
+    int m_acceptedSteps = 0;
+    double m_acceptRatio = 0;
+    double m_energy = 0;
+    double m_energy2 = 0;
+    double m_variance = 0;
+    double m_wfOld = 0;
+
+    int m_nDims;
+    int m_nParticles;
+    int m_nHidden;
+    int m_nInput;
+
+    double m_localEnergyOld = 0;
+    s_dPsi m_dPsiOld;
+    s_dPsi m_dPsiFinal;
+
+
+
     //loop over mc cycles and sample energies etc
     void runSampling();
+    bool metropolisStep(int particleNumber);
 
 public:
     Sampler(int nMCcycles,

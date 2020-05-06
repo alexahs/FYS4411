@@ -2,22 +2,21 @@
 #include <vector>
 
 
-Hamiltonian::Hamiltonian(double omega, int nParticles, int nDims, bool interaction){
+Hamiltonian::Hamiltonian(double omega, bool interaction, NeuralQuantumState &nqs){
     m_omega = omega;
-    m_nParticles = nParticles;
-    m_nDims = nDims;
     m_interaction = interaction;
-
+    m_nParticles = nqs.getNumberOfParticles();
+    m_nDims = nqs.getNumberOfDims();
+    m_nInput = nqs.getNumberOfInputs();
 
 }
 
 double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
     // equation 114 in lecture notes
 
-    int nNodes = m_nParticles*m_nDims;
     double localEnergy = 0;
 
-    for(int m = 0; m < nNodes; m++){
+    for(int m = 0; m < m_nInput; m++){
         std::vector<double> derivatives = nqs.computeFirstAndSecondDerivatives(m);
         double dx = derivatives[0];
         double ddx = derivatives[1];

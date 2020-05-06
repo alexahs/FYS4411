@@ -2,6 +2,7 @@
 #include "hamiltonian.h"
 #include "neuralquantumstate.h"
 #include "optimizer.h"
+#include "random.h"
 
 
 Sampler::Sampler(int nMCcycles,
@@ -19,6 +20,47 @@ Sampler::Sampler(int nMCcycles,
     m_hamiltonian = hamiltonian;
     m_nqs = nqs;
     m_optimizer = optimizer;
+
+    m_nDims = nqs.getNumberOfDims();
+    m_nParticles = nqs.getNumberOfParticles();
+    m_nHidden = nqs.getNumberOfHidden();
+    m_nInput = nqs.getNumberOfInputs();
+
+    // m_dPsiOld.dInputBias.resize(m_nInput);
+    // m_dPsiOld.dHiddenBias.resize(m_nHidden);
+    // m_dPsiOld.dWeights.resize(m_nInput);
+    // for(int i = 0; i < m_nInput; i++){
+    //     m_dPsiOld.dWeights[i].resize(m_nHidden);
+    // }
+}
+
+bool Sampler::metropolisStep(int particleNumber){
+    std::vector<double> positionOld = m_nqs.m_inputLayer;
+    int idxStart = particleNumber*m_nDims;
+    int idxStop = idxStart + m_nDims;
+
+    std::vector<double> proposedStep;
+    for(int node = idxStart; node < idxStop; node++){
+        double step = Random::nextDouble() - 0.5;
+        proposedStep.push_back(step);
+        m_nqs.adjustPosition(node, step);
+    }
+
+    double wfNew = m_nqs.evaluate();
+    double ratio = wfNew*wfNew/(m_wfOld*m_wfOld);
+
+    if(Random::nextDouble() <= ratio){
+        m_wfOld = wfNew;
+        return true;
+    }
+    else{
+        int i = 0;
+        for(int node = idxStart; node < idxStop; node++){
+            m_nqs.adjustPosition(node, - proposedStep[i]);
+            i++;
+        }
+        return false;
+    }
 }
 
 
@@ -38,7 +80,48 @@ void Sampler::runSampling(){
 
      take averages of cumulative sums (save to member variables possibly)
     */
-    int a = 1;
+
+    m_dPsiOld = m_nqs.m_grads;
+
+    m_wfOld = m_nqs.evaluate();
+    m_localEnergyOld = m_hamiltonian.computeLocalEnergy(m_nqs);
+    double localEnergy = 0;
+    s_dPsi dPsi;
+
+    for(int cycle = 0; cycle < m_nMCcycles; cycle++){
+        for(int particle = 0; particle < m_nParticles; particle++){
+            if(metropolisStep(particle)) {
+                m_acceptedSteps++;
+                localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
+                m_localEnergyOld = localEnergy;
+                dPsi = m_nqs.computeCostGradient();
+                m_dPsiOld = dPsi;
+            }
+            else{
+                localEnergy = m_localEnergyOld;
+                dPsi = m_dPsiOld;
+
+            }
+        }
+
+        m_energy += localEnergy;
+        m_energy2 += localEnergy*localEnergy;
+
+        for(int i = 0; i < m_nInput; i++){
+            m_dPsiFinal.dInputBias[i] += dPsi.dInputBias[i];
+            for(int j = 0; j < m_nHidden; j++){
+                m_dPsiFinal.dWeights[i][j] += dPsi.dWeights[i][j];
+            }
+        }
+
+        for(int i = 0; i < m_nHidden; i++){
+            m_dPsiFinal.dHiddenBias[i] += dPsi.dHiddenBias[i];
+        }
+
+    }// end MC cycles
+
+    //divide energy etc by number of cycles here
+
 
 }
 

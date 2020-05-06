@@ -31,8 +31,8 @@ int main(){
     long seed = 1337;
 
 
-    Hamiltonian hamiltonian(omega, nParticles, nDims, interaction);
-    NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed);
+    NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed); //must be initialized first
+    Hamiltonian hamiltonian(omega, interaction, nqs);
     Optimizer optimizer(eta, whichOptimizer);
     Sampler sampler(nMCcycles,
                     nOptimizeIters,

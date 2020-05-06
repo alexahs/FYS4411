@@ -7,19 +7,20 @@ struct s_dPsi {
     std::vector<std::vector<double>> dWeights;
 };
 
+
+
 class NeuralQuantumState {
 private:
 
     void initializeWeights();
     void initializePositions();
-    int m_nHidden;
-    int m_nVisible;
-    int m_nParticles;
-    int m_nDims;
+    int m_nHidden = 0;
+    int m_nVisible = 0;
+    int m_nParticles = 0;
+    int m_nDims = 0;
     double m_sigma;
     double m_sigma2;
     double m_sigma4;
-    s_dPsi m_grads;
 
 public:
     NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed);
@@ -30,12 +31,19 @@ public:
     std::vector<double> computeQuantumForce();
     std::vector<double> computeQfactor();
     s_dPsi computeCostGradient();
+    void adjustPosition(int node, double change); //adjust position of a single particle q
 
     std::vector<double> m_inputLayer;
     std::vector<double> m_hiddenLayer;
     std::vector<double> m_inputBias;
     std::vector<double> m_hiddenBias;
     std::vector<std::vector<double>> m_weights; //shape [m_nVisible, m_nHidden]
+    s_dPsi m_grads;
+
+    int getNumberOfParticles() {return m_nParticles;}
+    int getNumberOfDims()      {return m_nDims;}
+    int getNumberOfInputs()    {return m_nVisible;}
+    int getNumberOfHidden()    {return m_nHidden;}
 
 
 };
