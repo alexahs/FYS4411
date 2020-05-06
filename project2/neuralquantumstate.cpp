@@ -150,7 +150,7 @@ double NeuralQuantumState::computeDistance(int p, int q){
 }
 
 
-void NeuralQuantumState::computeCostGradient(){
+s_dPsi NeuralQuantumState::computeCostGradient(){
     //gradients wrt variational parameters (weights / biases)
     //equations 101, 102 and 103 in lecture notes
     std::vector<double> Q = computeQfactor();
@@ -171,6 +171,8 @@ void NeuralQuantumState::computeCostGradient(){
             m_grads.dWeights[m][n] = m_inputLayer[m]/(Q[n] + 1)/m_sigma2;
         }
     }
+
+    return m_grads;
 
 }
 
