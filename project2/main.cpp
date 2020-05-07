@@ -15,15 +15,15 @@ using std::endl;
 int main(){
 
 
-    int nParticles = 2;
+    int nParticles = 10;
     int nDims = 2;
-    int nHidden = 5;
+    int nHidden = 10;
     double sigma = 1;
     double omega = 1;
     bool interaction = false;
 
     int nMCcycles = 1000; //number of montecarlo cycles
-    int nOptimizeIters = 100; //max iters in optimization
+    int nOptimizeIters = 1000; //max iters in optimization
     int samplingRule = 1; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double eta = 0.001; //learning rate
@@ -33,10 +33,11 @@ int main(){
 
     NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed); //must be initialized first
     Hamiltonian hamiltonian(omega, interaction, nqs);
-    Optimizer optimizer(eta, whichOptimizer, nOptimizeIters);
+    Optimizer optimizer(eta, whichOptimizer);
     Sampler sampler(nMCcycles,
                     samplingRule,
                     tolerance,
+                    nOptimizeIters,
                     hamiltonian,
                     nqs,
                     optimizer);

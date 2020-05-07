@@ -1,7 +1,9 @@
 #include "neuralquantumstate.h"
 #include "Math/random.h"
+#include "netparams.h"
 #include <iostream>
 #include <cmath>
+#include <Eigen/Dense>
 
 using std::cout;
 using std::endl;
@@ -17,24 +19,8 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     m_sigma = sigma;
     m_sigma2 = sigma*sigma;
     m_sigma4 = m_sigma2*m_sigma2;
-    m_inputLayer.resize(m_nVisible);
-    m_hiddenLayer.resize(m_nHidden);
-    m_inputBias.resize(m_nVisible);
-    m_hiddenBias.resize(m_nHidden);
-    m_weights.resize(m_nVisible);
-    for(int i = 0; i < m_nVisible; i++){
-        m_weights[i].resize(m_nHidden);
-    }
-
-    m_grads.dInputBias.resize(m_nVisible);
-    m_grads.dHiddenBias.resize(nHidden);
-    m_grads.dWeights.resize(m_nVisible);
-    for(int i = 0; i < m_nVisible; i++){
-        m_grads.dWeights[i].resize(nHidden);
-    }
-
+    net = NetParams(m_nInput, m_nHidden);
     initialize();
-    m_params.print();
 }
 
 
@@ -42,72 +28,70 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
 void NeuralQuantumState::initialize(){
     //randomly initialize weights or something
 
-    m_params = NetParams(m_nInput, m_nHidden);
-
     double sigma_init = 0.01;
     for(int i = 0; i < m_nVisible; i++){
-        m_params.inputBias[i] = Random::nextGaussian(0, sigma_init);
-        m_params.inputLayer[i] = Random::nextDouble() - 0.5;
+        net.inputBias(i) = Random::nextGaussian(0, sigma_init);
+        net.inputLayer(i) = Random::nextDouble() - 0.5;
         for(int j = 0; j < m_nHidden; j++){
-            m_params.weights[i][j] = Random::nextGaussian(0, sigma_init);
+            net.weights(i, j) = Random::nextGaussian(0, sigma_init);
 
         }
     }
 
     for(int i = 0; i < m_nHidden; i++){
-        m_params.hiddenBias[i] = Random::nextGaussian(0, sigma_init);
+        net.hiddenBias(i) = Random::nextGaussian(0, sigma_init);
     }
 
 }
 
 
 void NeuralQuantumState::adjustPosition(int node, double change){
-
+    net.inputLayer(node) += change;
 }
 
 
 double NeuralQuantumState::evaluate(){
     //evaluate the wavefunction
     //could probably use some matrix magic to speed up computations here..
-
     double psi1 = 0;
     double psi2 = 1;
     for(int i = 0; i < m_nVisible; i++){
-        psi1 += (m_inputLayer[i]-m_inputBias[i])*(m_inputLayer[i]-m_inputBias[i]);
+        psi1 +=  (net.inputLayer(i)-net.inputBias(i))*(net.inputLayer(i)-net.inputBias(i));
     }
     psi1 = exp(-1/(2*m_sigma2)*psi1);
+
 
     for(int j = 0; j < m_nHidden; j++){
         double term1 = 0;
         for(int i = 0; i < m_nVisible; i++){
-            term1 += m_inputLayer[i]*m_weights[i][j];
+            term1 += net.inputLayer(i)*net.weights(i,j);
         }
         term1 /= m_sigma2;
-        term1 += m_inputBias[j];
+        term1 += net.hiddenBias(j);
         psi2 *= 1 + exp(term1);
     }
 
     return psi1*psi2;
 }
 
-std::vector<double> NeuralQuantumState::computeQfactor(){
+Eigen::VectorXd NeuralQuantumState::computeQfactor(){
     //computes the exponential factor used many times throughout the program
     // exp(b_n - sum(x_i*w_ij)), as seen in equation (102) in notes
-    std::vector<double> Qfactor(m_nHidden);
+    Eigen::VectorXd Qfactor(m_nHidden);
     for(int n = 0; n < m_nHidden; n++){
         double term1 = 0;
         for(int i = 0; i < m_nVisible; i++){
-            term1 += m_inputLayer[i]*m_weights[i][n];
+            term1 += net.inputLayer(i)*net.weights(i,n);
         }
 
-        Qfactor[n] = exp(m_hiddenBias[n] + term1/m_sigma2);
+        Qfactor(n) = exp(net.hiddenBias(n) + term1/m_sigma2);
     }
 
     return Qfactor;
 }
 
 
-std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
+Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
     // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
     // equations (115) and (116) in lecture notes
 
@@ -115,21 +99,22 @@ std::vector<double> NeuralQuantumState::computeFirstAndSecondDerivatives(int nod
 
     double dx = 0;
     double ddx = 0;
-
-    std::vector<double> Q = computeQfactor();
+    Eigen::VectorXd Q = computeQfactor();
 
     for(int n = 0; n < m_nHidden; n++){
-        dx += m_weights[m][n]/(Q[n]+1);
-        ddx += m_weights[m][n]*Q[n]/((Q[n]+1)*(Q[n]+1));
+        dx += net.weights(m,n)/(Q(n)+1);
+        ddx += net.weights(m,n)*Q(n)/((Q(n)+1)*(Q(n)+1));
     }
 
     dx /= m_sigma2;
     ddx /= m_sigma4;
 
-    dx += -1/m_sigma2*(m_inputLayer[m] - m_inputBias[m]);
+    dx += -1/m_sigma2*(net.inputLayer(m) - net.inputBias(m));
     ddx += -1/m_sigma2;
 
-    std::vector<double> derivatives = {dx, ddx};
+    Eigen::VectorXd derivatives(2);
+    derivatives(0) = dx;
+    derivatives(1) = ddx;
 
     return derivatives;
 }
@@ -142,7 +127,7 @@ double NeuralQuantumState::computeDistance(int p, int q){
     int qIdx = q*m_nDims;
     for(int d = 0; d < m_nDims; d++){
         double distance = 0;
-        distance += m_inputLayer[pIdx + d] - m_inputLayer[qIdx + d];
+        distance += net.inputLayer(pIdx + d) - net.inputLayer(qIdx + d);
         distance2 += distance*distance;
     }
 
@@ -151,36 +136,37 @@ double NeuralQuantumState::computeDistance(int p, int q){
 }
 
 
-s_dPsi NeuralQuantumState::computeCostGradient(){
+void NeuralQuantumState::computeCostGradient(){
     //gradients wrt variational parameters (weights / biases)
     //equations 101, 102 and 103 in lecture notes
-    std::vector<double> Q = computeQfactor();
+    Eigen::VectorXd Q = computeQfactor();
 
     //derivative wrt. input bias
-    for(int m = 0; m < m_nVisible; m++){
-        m_grads.dInputBias[m] = (m_inputLayer[m] -m_inputBias[m])/m_sigma2;
-    }
+    // for(int m = 0; m < m_nVisible; m++){
+        //     net.dInputBias[m] = (net.inputLayer[m] -net.inputBias[m])/m_sigma2;
+        // }
+    net.dInputBias = net.inputLayer - net.inputBias;
+    net.dInputBias /= m_sigma2;
+
 
     //derivative wrt. hidden bias
     for(int n = 0; n < m_nHidden; n++){
-        m_grads.dHiddenBias[n] = 1/(Q[n] + 1);
+        net.dHiddenBias(n) = 1/(Q(n) + 1);
     }
 
     //derivative wrt weights
     for(int m = 0; m < m_nVisible; m++){
         for(int n = 0; n < m_nHidden; n++){
-            m_grads.dWeights[m][n] = m_inputLayer[m]/(Q[n] + 1)/m_sigma2;
+            net.dWeights(m,n) = net.inputLayer(m)/(Q(n) + 1)/m_sigma2;
         }
     }
-
-    return m_grads;
 
 }
 
 
 
 
-std::vector<double> NeuralQuantumState::computeQuantumForce(){
-    std::vector<double> qForce = {1, 2, 3};
+Eigen::VectorXd NeuralQuantumState::computeQuantumForce(){
+    Eigen::VectorXd qForce(3);
     return qForce;
 }

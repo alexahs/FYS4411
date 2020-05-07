@@ -2,6 +2,7 @@
 #include "hamiltonian.h"
 #include "neuralquantumstate.h"
 #include "optimizer.h"
+#include "netparams.h"
 
 class Sampler{
 /*
@@ -14,6 +15,7 @@ private:
     int m_nMCcycles;
     int m_samplingRule;
     double m_tolerance;
+    int m_nOptimizeIters;
 
     int m_acceptedSteps = 0;
     double m_acceptRatio = 0;
@@ -27,9 +29,11 @@ private:
     int m_nHidden;
     int m_nInput;
 
+
     double m_localEnergyOld = 0;
-    s_dPsi m_dPsiOld;
-    s_dPsi m_dPsiFinal;
+
+    NetParams m_finalGradients;
+    NetParams m_netOld;
 
 
 
@@ -41,6 +45,7 @@ public:
     Sampler(int nMCcycles,
             int samplingRule,
             double tolerance,
+            int nOptimizeIters,
             Hamiltonian &hamiltonian,
             NeuralQuantumState &nqs,
             Optimizer &optimizer);
@@ -50,5 +55,5 @@ public:
 
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
-    Optimizer &m_optimizer;
+    Optimizer m_optimizer;
 };

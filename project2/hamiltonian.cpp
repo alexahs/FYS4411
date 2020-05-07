@@ -17,13 +17,14 @@ double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
     double localEnergy = 0;
 
     for(int m = 0; m < m_nInput; m++){
-        std::vector<double> derivatives = nqs.computeFirstAndSecondDerivatives(m);
+        Eigen::VectorXd derivatives = nqs.computeFirstAndSecondDerivatives(m);
         double dx = derivatives[0];
         double ddx = derivatives[1];
-        double x2 = nqs.m_inputLayer[m]*nqs.m_inputLayer[m];
+        double xSquared = nqs.net.inputLayer(m)*nqs.net.inputLayer(m);
 
-        localEnergy += -1*dx*dx - ddx + m_omega*m_omega*x2;
+        localEnergy += -1*dx*dx - ddx + m_omega*m_omega*xSquared;
     }
+
 
     localEnergy *= 0.5;
 

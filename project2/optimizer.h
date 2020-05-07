@@ -5,12 +5,11 @@
 class Optimizer {
 private:
     double m_eta;
-    int m_whichMethod;
-    int m_nOptimizeIters;
+    int m_whichOptimizer;
 
 public:
-    Optimizer(double eta, int whichMethod, int nOptimizeIters);
+    Optimizer(double eta, int whichOptimizer);
 
 
-    void optimize();
+    void optimize(NeuralQuantumState &nqs);
 };
