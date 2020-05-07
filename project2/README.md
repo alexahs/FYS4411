@@ -12,7 +12,7 @@ energy instantly. With a bigger spread of initial positions, the energy goes neg
 optimizer has a hard time optimizing the parameters.
 
 ## TODO:
-* Test the code to be sure that it is running correctly
+* Test the code to be sure that it is running correctly (test functions?)
 * Implement importance sampling
 * Implement a better optimizer (only have standard gradient descent so far)
 * Implement Gibbs sampling
