@@ -14,8 +14,7 @@ using std::endl;
 
 int main(){
 
-
-    int nParticles = 5;
+    int nParticles = 2;
     int nDims = 2;
     int nHidden = 10;
     double sigma = 1;
@@ -26,7 +25,7 @@ int main(){
     int nOptimizeIters = 100; //max iters in optimization
     int samplingRule = 1; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
-    double eta = 0.0001; //learning rate
+    double eta = 0.001; //learning rate
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337;
 

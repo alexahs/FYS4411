@@ -32,7 +32,7 @@ Sampler::Sampler(int nMCcycles,
     m_nHidden = nqs.getNumberOfHidden();
     m_nInput = nqs.getNumberOfInputs();
 
-
+    //store gradient vector in one long 1d vec
     m_dPsi.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
     m_dPsiTimesE.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
 
