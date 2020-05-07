@@ -33,9 +33,8 @@ int main(){
 
     NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed); //must be initialized first
     Hamiltonian hamiltonian(omega, interaction, nqs);
-    Optimizer optimizer(eta, whichOptimizer);
+    Optimizer optimizer(eta, whichOptimizer, nOptimizeIters);
     Sampler sampler(nMCcycles,
-                    nOptimizeIters,
                     samplingRule,
                     tolerance,
                     hamiltonian,

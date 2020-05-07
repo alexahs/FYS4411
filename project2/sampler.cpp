@@ -6,7 +6,6 @@
 
 
 Sampler::Sampler(int nMCcycles,
-                 int nOptimizeIters,
                  int samplingRule,
                  double tolerance,
                  Hamiltonian &hamiltonian,
@@ -14,7 +13,6 @@ Sampler::Sampler(int nMCcycles,
                  Optimizer &optimizer) :
     m_hamiltonian(hamiltonian), m_nqs(nqs), m_optimizer(optimizer) {
     m_nMCcycles = nMCcycles;
-    m_nOptimizeIters = nOptimizeIters;
     m_samplingRule = samplingRule;
     m_tolerance = tolerance;
     m_hamiltonian = hamiltonian;
@@ -26,12 +24,6 @@ Sampler::Sampler(int nMCcycles,
     m_nHidden = nqs.getNumberOfHidden();
     m_nInput = nqs.getNumberOfInputs();
 
-    // m_dPsiOld.dInputBias.resize(m_nInput);
-    // m_dPsiOld.dHiddenBias.resize(m_nHidden);
-    // m_dPsiOld.dWeights.resize(m_nInput);
-    // for(int i = 0; i < m_nInput; i++){
-    //     m_dPsiOld.dWeights[i].resize(m_nHidden);
-    // }
 }
 
 bool Sampler::metropolisStep(int particleNumber){
@@ -120,7 +112,19 @@ void Sampler::runSampling(){
 
     }// end MC cycles
 
-    //divide energy etc by number of cycles here
+    m_energy /= m_nMCcycles;
+    m_energy2 /= m_nMCcycles;
+
+    for(int i = 0; i < m_nInput; i++){
+        m_dPsiFinal.dInputBias[i] /= m_nMCcycles;
+        for(int j = 0; j < m_nHidden; j++){
+            m_dPsiFinal.dWeights[i][j] /= m_nMCcycles;
+        }
+    }
+
+    for(int i = 0; i < m_nHidden; i++){
+        m_dPsiFinal.dHiddenBias[i] /= m_nMCcycles;
+    }
 
 
 }

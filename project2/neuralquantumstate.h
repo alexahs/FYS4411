@@ -7,6 +7,18 @@ struct s_dPsi {
     std::vector<std::vector<double>> dWeights;
 };
 
+// struct NetworkParams {
+//     using std::vector;
+//
+//     vector<double> inputLayer;
+//     vector<double> hiddenLayer;
+//     vector<vector<double>> weights;
+//
+//     vector<double> dInputLayer;
+//     vector<double> dHiddenLayer;
+//     vector<vector<double>> dWeights;
+// }
+
 
 
 class NeuralQuantumState {

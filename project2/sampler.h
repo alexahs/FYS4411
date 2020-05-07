@@ -12,7 +12,6 @@ class Sampler{
 */
 private:
     int m_nMCcycles;
-    int m_nOptimizeIters;
     int m_samplingRule;
     double m_tolerance;
 
@@ -40,7 +39,6 @@ private:
 
 public:
     Sampler(int nMCcycles,
-            int nOptimizeIters,
             int samplingRule,
             double tolerance,
             Hamiltonian &hamiltonian,
