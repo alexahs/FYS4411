@@ -14,7 +14,6 @@ Optimizer::Optimizer(double eta, int whichOptimizer){
 void Optimizer::optimize(NeuralQuantumState &nqs){
     //gradient denscent
     if (m_whichOptimizer == 1) {
-        std::cout << "GRADIENT DESCENT" << std::endl;
         nqs.net.inputBias -= m_eta*nqs.net.dInputBias;
         nqs.net.hiddenBias -= m_eta*nqs.net.dHiddenBias;
         nqs.net.weights -= m_eta*nqs.net.dWeights;

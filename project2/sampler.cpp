@@ -149,32 +149,7 @@ void Sampler::runOptimization(){
         runSampling();
         m_optimizer.optimize(m_nqs);
     }
-    // std::cout << "GOT THIS FAR" << std::endl;
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
-    // runSampling();
-    // m_optimizer.optimize(m_nqs);
 
-
-    // int i = 0;
-    // while (i < m_nOptimizeIters){
-    //     std::cout << "GOT THIS FAR" << std::endl;
-    //     runSampling();
-    //     m_optimizer.optimize(m_nqs);
-    //     i++;
-    // }
 
 
 
