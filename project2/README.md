@@ -5,7 +5,7 @@ Compile by running the shell script `compile_project.`, creates an executable `r
 
 
 
-##Progress
+## Progress
 Main parts of the program are implemented, but it is most likely full of bugs...
 With small enough initialized positions and no interaction, it produces the analytical
 energy instantly. With a bigger spread of initial positions, the energy goes negative, and the
