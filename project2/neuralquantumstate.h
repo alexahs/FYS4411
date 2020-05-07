@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <netparams.h>
 
 struct s_dPsi {
     std::vector<double> dInputBias;
@@ -7,27 +8,14 @@ struct s_dPsi {
     std::vector<std::vector<double>> dWeights;
 };
 
-// struct NetworkParams {
-//     using std::vector;
-//
-//     vector<double> inputLayer;
-//     vector<double> hiddenLayer;
-//     vector<vector<double>> weights;
-//
-//     vector<double> dInputLayer;
-//     vector<double> dHiddenLayer;
-//     vector<vector<double>> dWeights;
-// }
-
-
 
 class NeuralQuantumState {
 private:
 
-    void initializeWeights();
-    void initializePositions();
+    void initialize();
     int m_nHidden = 0;
     int m_nVisible = 0;
+    int m_nInput = 0;
     int m_nParticles = 0;
     int m_nDims = 0;
     double m_sigma;
@@ -44,6 +32,10 @@ public:
     std::vector<double> computeQfactor();
     s_dPsi computeCostGradient();
     void adjustPosition(int node, double change); //adjust position of a single particle q
+
+
+    NetParams m_params;
+
 
     std::vector<double> m_inputLayer;
     std::vector<double> m_hiddenLayer;

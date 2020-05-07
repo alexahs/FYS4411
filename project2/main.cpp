@@ -17,7 +17,7 @@ int main(){
 
     int nParticles = 2;
     int nDims = 2;
-    int nHidden = 10;
+    int nHidden = 5;
     double sigma = 1;
     double omega = 1;
     bool interaction = false;

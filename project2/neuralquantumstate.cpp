@@ -10,6 +10,7 @@ using std::endl;
 NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed){
     //
     m_nVisible = (int) nParticles*nDims;
+    m_nInput = (int) nParticles*nDims;
     m_nHidden = nHidden;
     m_nParticles = nParticles;
     m_nDims = nDims;
@@ -32,37 +33,33 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
         m_grads.dWeights[i].resize(nHidden);
     }
 
-    initializeWeights();
-    initializePositions();
+    initialize();
+    m_params.print();
 }
 
 
 
-void NeuralQuantumState::initializeWeights(){
+void NeuralQuantumState::initialize(){
     //randomly initialize weights or something
+
+    m_params = NetParams(m_nInput, m_nHidden);
+
     double sigma_init = 0.01;
     for(int i = 0; i < m_nVisible; i++){
-        m_inputBias[i] = Random::nextGaussian(0, sigma_init);
+        m_params.inputBias[i] = Random::nextGaussian(0, sigma_init);
+        m_params.inputLayer[i] = Random::nextDouble() - 0.5;
         for(int j = 0; j < m_nHidden; j++){
-            m_weights[i][j] = Random::nextGaussian(0, sigma_init);
+            m_params.weights[i][j] = Random::nextGaussian(0, sigma_init);
 
         }
     }
 
     for(int i = 0; i < m_nHidden; i++){
-        m_hiddenBias[i] = Random::nextGaussian(0, sigma_init);
+        m_params.hiddenBias[i] = Random::nextGaussian(0, sigma_init);
     }
 
 }
 
-void NeuralQuantumState::initializePositions(){
-    //initialize positions
-    for(int i = 0; i < m_nVisible; i++){
-        m_inputLayer[i] = Random::nextDouble() - 0.5;
-        cout << m_inputLayer[i] << endl;
-    }
-
-}
 
 void NeuralQuantumState::adjustPosition(int node, double change){
 
