@@ -23,6 +23,7 @@ Sampler::Sampler(int nMCcycles,
     m_hamiltonian = hamiltonian;
     m_nqs = nqs;
     m_optimizer = optimizer;
+    m_nOptimizeIters = nOptimizeIters;
 
     m_nDims = nqs.getNumberOfDims();
     m_nParticles = nqs.getNumberOfParticles();
@@ -142,8 +143,9 @@ void Sampler::runOptimization(){
     */
 
     // std::cout << "GOT THIS FAR" << std::endl;
+    // cout << m_nOptimizeIters << endl;
     for(int i = 0; i < m_nOptimizeIters; i++){
-        std::cout << "GOT THIS FAR" << std::endl;
+        // std::cout << "GOT THIS FAR" << std::endl;
         runSampling();
         m_optimizer.optimize(m_nqs);
     }
