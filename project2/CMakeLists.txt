@@ -1,4 +1,4 @@
-project(project_1_fys4411)
+project(project_2_fys4411)
 
 # Add directories containing header-files
 include_directories(
@@ -14,5 +14,5 @@ file(
 
 set (CMAKE_CXX_FLAGS "-O3 -fopenmp")
 
-# Create executable called "vmc"
-add_executable(vmc ${SOURCES})
+# Create executable called "rbm"
+add_executable(rbm ${SOURCES})
