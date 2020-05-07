@@ -29,11 +29,11 @@ private:
     int m_nHidden;
     int m_nInput;
 
+    Eigen::VectorXd m_dPsi;
+    Eigen::VectorXd m_dPsiTimesE;
+    Eigen::VectorXd m_costGradient;
 
-    double m_localEnergyOld = 0;
 
-    NetParams m_finalGradients;
-    NetParams m_netOld;
 
 
 
@@ -52,7 +52,8 @@ public:
 
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
-
+    void printInitalSystemInfo();
+    void printInfo();
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;

@@ -7,6 +7,8 @@
 
 using std::cout;
 using std::endl;
+using std::setw;
+using std::setprecision;
 
 
 Sampler::Sampler(int nMCcycles,
@@ -30,7 +32,9 @@ Sampler::Sampler(int nMCcycles,
     m_nHidden = nqs.getNumberOfHidden();
     m_nInput = nqs.getNumberOfInputs();
 
-    m_finalGradients = NetParams(m_nInput, m_nHidden);
+
+    m_dPsi.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
+    m_dPsiTimesE.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
 
 }
 
@@ -80,52 +84,41 @@ void Sampler::runSampling(){
      take averages of cumulative sums (save to member variables possibly)
     */
 
-    NetParams m_netOld = m_nqs.net;
-    m_nqs.computeCostGradient();
+    Eigen::VectorXd netGrads1d = m_nqs.computeCostGradient();
     m_wfOld = m_nqs.evaluate();
-    m_localEnergyOld = m_hamiltonian.computeLocalEnergy(m_nqs);
-    double localEnergy = 0;
+    double localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
 
     m_energy = 0;
     m_energy2 = 0;
-    m_finalGradients.dInputBias.fill(0);
-    m_finalGradients.dHiddenBias.fill(0);
-    m_finalGradients.dWeights.fill(0);
 
+    m_dPsi.fill(0);
+    m_dPsiTimesE.fill(0);
 
     for(int cycle = 0; cycle < m_nMCcycles; cycle++){
         for(int particle = 0; particle < m_nParticles; particle++){
             if(metropolisStep(particle)) {
                 m_acceptedSteps++;
                 localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
-                m_localEnergyOld = localEnergy;
-                m_nqs.computeCostGradient();
-            }
-            else{
-                localEnergy = m_localEnergyOld;
-                m_nqs.net = m_netOld;
-
+                netGrads1d = m_nqs.computeCostGradient();
             }
         }
 
         m_energy += localEnergy;
         m_energy2 += localEnergy*localEnergy;
+        m_dPsi += netGrads1d;
+        m_dPsiTimesE += netGrads1d*localEnergy;
 
-        m_finalGradients.dInputBias += m_nqs.net.dInputBias;
-        m_finalGradients.dHiddenBias += m_nqs.net.dHiddenBias;
-        m_finalGradients.dWeights += m_nqs.net.dWeights;
 
     }// end MC cycles
 
     m_energy /= m_nMCcycles;
     m_energy2 /= m_nMCcycles;
+    m_dPsi /= m_nMCcycles;
+    m_dPsiTimesE /= m_nMCcycles;
 
-    m_finalGradients.dInputBias /= m_nMCcycles;
-    m_finalGradients.dHiddenBias /= m_nMCcycles;
-    m_finalGradients.dWeights /= m_nMCcycles;
+    m_variance = m_energy2 - m_energy*m_energy;
+    m_costGradient = 2*(m_dPsiTimesE - m_energy*m_dPsi);
 
-    cout << "Energy:   " << m_energy << endl;
-    cout << "Energy^2: " << m_energy2 << endl;
 
 
 
@@ -133,26 +126,33 @@ void Sampler::runSampling(){
 
 void Sampler::runOptimization(){
     /*
-    * main flow:
-    * loop max gradient descent iters:
-    *     runSampling() to get energy and weight gradients
-    *     update weights by gradient descent (or something a bit more sophisticated)
-    *     save energy to file/memory
-    *     if "global" minimum reached:
-    *         break
+    Optimize weights and biases after each set of MC runs
     */
-
-    // std::cout << "GOT THIS FAR" << std::endl;
-    // cout << m_nOptimizeIters << endl;
+    printInitalSystemInfo();
     for(int i = 0; i < m_nOptimizeIters; i++){
-        // std::cout << "GOT THIS FAR" << std::endl;
         runSampling();
-        m_optimizer.optimize(m_nqs);
+        m_optimizer.optimize(m_nqs, m_costGradient, m_nInput, m_nHidden);
+
+        printInfo();
     }
 
+}
+
+void Sampler::printInfo(){
+    cout << setw(13) << setprecision(5) << m_energy;
+    cout << setw(14) << setprecision(5) << m_energy2;
+    cout << setw(16) << setprecision(5) << m_variance << endl;
+}
 
 
-
-
-
+void Sampler::printInitalSystemInfo(){
+    cout << endl;
+    cout << " -------- System info -------- " << endl;
+    cout << " * Number of dimensions        : " << m_nDims << endl;
+    cout << " * Number of particles         : " << m_nParticles << endl;
+    cout << " * Number of hidden layers     : " << m_nHidden << endl;
+    cout << " * Number of Metropolis steps  : " << m_nMCcycles << endl;
+    cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
+    cout << " * Number of parameters        : " << m_nHidden*m_nInput << endl << endl;
+    cout << "====== Energy ====== Energy2 ====== Variance ======" << endl << endl;
 }

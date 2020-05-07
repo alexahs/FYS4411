@@ -1,6 +1,7 @@
 #include "optimizer.h"
 #include "netparams.h"
 #include <vector>
+#include <Eigen/Dense>
 
 
 
@@ -11,12 +12,28 @@ Optimizer::Optimizer(double eta, int whichOptimizer){
 
 
 
-void Optimizer::optimize(NeuralQuantumState &nqs){
+void Optimizer::optimize(NeuralQuantumState &nqs, Eigen::VectorXd grads, int nInput, int nHidden){
     //gradient denscent
     if (m_whichOptimizer == 1) {
-        nqs.net.inputBias -= m_eta*nqs.net.dInputBias;
-        nqs.net.hiddenBias -= m_eta*nqs.net.dHiddenBias;
-        nqs.net.weights -= m_eta*nqs.net.dWeights;
+
+        for(int i = 0; i < nInput; i++){
+            nqs.net.inputBias(i) -= m_eta*grads(i);
+        }
+
+        int k = nInput;
+        for(int i = 0; i < nHidden; i++){
+            nqs.net.hiddenBias(i) -= m_eta*grads(k);
+            k++;
+        }
+
+        k = nInput + nHidden;
+        for(int i = 0; i < nInput; i++){
+            for(int j = 0; j < nHidden; j++){
+                nqs.net.weights(i, j) -= m_eta*grads(k);
+                k++;
+            }
+        }
+
 
     }
     if (m_whichOptimizer == 2){

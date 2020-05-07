@@ -30,7 +30,7 @@ public:
     Eigen::VectorXd computeFirstAndSecondDerivatives(int nodeNumber);
     Eigen::VectorXd computeQuantumForce();
     Eigen::VectorXd computeQfactor();
-    void computeCostGradient();
+    Eigen::VectorXd computeCostGradient();
     void adjustPosition(int node, double change); //adjust position of a single particle q
 
     NetParams net;
