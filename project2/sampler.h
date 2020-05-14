@@ -16,6 +16,7 @@ private:
     int m_samplingRule;
     double m_tolerance;
     int m_nOptimizeIters;
+    double m_stepLength;
 
     int m_acceptedSteps = 0;
     double m_acceptRatio = 0;
@@ -46,6 +47,7 @@ public:
             int samplingRule,
             double tolerance,
             int nOptimizeIters,
+            double stepLength,
             Hamiltonian &hamiltonian,
             NeuralQuantumState &nqs,
             Optimizer &optimizer);

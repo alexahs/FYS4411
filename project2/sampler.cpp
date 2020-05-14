@@ -15,6 +15,7 @@ Sampler::Sampler(int nMCcycles,
                  int samplingRule,
                  double tolerance,
                  int nOptimizeIters,
+                 double stepLength,
                  Hamiltonian &hamiltonian,
                  NeuralQuantumState &nqs,
                  Optimizer &optimizer) :
@@ -26,6 +27,7 @@ Sampler::Sampler(int nMCcycles,
     m_nqs = nqs;
     m_optimizer = optimizer;
     m_nOptimizeIters = nOptimizeIters;
+    m_stepLength = stepLength;
 
     m_nDims = nqs.getNumberOfDims();
     m_nParticles = nqs.getNumberOfParticles();
@@ -44,7 +46,7 @@ bool Sampler::metropolisStep(int particleNumber){
 
     std::vector<double> proposedStep;
     for(int node = idxStart; node < idxStop; node++){
-        double step = Random::nextDouble() - 0.5;
+        double step = m_stepLength*(Random::nextDouble() - 0.5);
         proposedStep.push_back(step);
         m_nqs.adjustPosition(node, step);
     }
@@ -151,7 +153,7 @@ void Sampler::printInitalSystemInfo(){
     cout << " * Number of dimensions        : " << m_nDims << endl;
     cout << " * Number of particles         : " << m_nParticles << endl;
     cout << " * Number of hidden layers     : " << m_nHidden << endl;
-    cout << " * Number of Metropolis steps  : " << m_nMCcycles << endl;
+    cout << " * Number of Metropolis steps  : " << "10^" << log10(m_nMCcycles) << endl;
     cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
     cout << " * Number of parameters        : " << m_nHidden*m_nInput << endl << endl;
     cout << "====== Energy ====== Energy2 ====== Variance ======" << endl << endl;

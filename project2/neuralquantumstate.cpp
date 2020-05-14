@@ -28,7 +28,7 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
 void NeuralQuantumState::initialize(){
     //randomly initialize weights or something
 
-    double sigma_init = 0.01;
+    double sigma_init = 0.1;
     for(int i = 0; i < m_nVisible; i++){
         net.inputBias(i) = Random::nextGaussian(0, sigma_init);
         net.inputLayer(i) = Random::nextDouble() - 0.5;
@@ -58,7 +58,7 @@ double NeuralQuantumState::evaluate(){
     for(int i = 0; i < m_nVisible; i++){
         psi1 +=  (net.inputLayer(i)-net.inputBias(i))*(net.inputLayer(i)-net.inputBias(i));
     }
-    psi1 = exp(-1/(2*m_sigma2)*psi1);
+    psi1 = exp(-psi1/(2*m_sigma2));
 
 
     for(int j = 0; j < m_nHidden; j++){
@@ -86,6 +86,7 @@ Eigen::VectorXd NeuralQuantumState::computeQfactor(){
 
         Qfactor(n) = exp(net.hiddenBias(n) + term1/m_sigma2);
     }
+
 
     return Qfactor;
 }
