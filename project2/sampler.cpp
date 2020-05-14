@@ -143,7 +143,8 @@ void Sampler::runOptimization(){
 void Sampler::printInfo(){
     cout << setw(13) << setprecision(5) << m_energy;
     cout << setw(14) << setprecision(5) << m_energy2;
-    cout << setw(16) << setprecision(5) << m_variance << endl;
+    cout << setw(16) << setprecision(5) << m_variance;
+    cout << setw(14) << setprecision(5) << m_costGradient.sum() << endl;
 }
 
 
@@ -156,5 +157,5 @@ void Sampler::printInitalSystemInfo(){
     cout << " * Number of Metropolis steps  : " << "10^" << log10(m_nMCcycles) << endl;
     cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
     cout << " * Number of parameters        : " << m_nHidden*m_nInput << endl << endl;
-    cout << "====== Energy ====== Energy2 ====== Variance ======" << endl << endl;
+    cout << "====== Energy ====== Energy2 ====== Variance ====== Cost ====== " << endl << endl;
 }

@@ -14,14 +14,14 @@ using std::endl;
 
 int main(){
 
-    int nParticles = 2;
-    int nDims = 3;
-    int nHidden = 10;
+    int nParticles = 1;
+    int nDims = 1;
+    int nHidden = 2;
     double sigma = 1;
     double omega = 1;
     bool interaction = false;
 
-    int nMCcycles = 1e5; //number of montecarlo cycles
+    int nMCcycles = 1e4; //number of montecarlo cycles
     int nOptimizeIters = 100; //max iters in optimization
     double stepLength = 0.1;
     int samplingRule = 1; //1 - standard, 2 - metropolis, 3- gibbs
