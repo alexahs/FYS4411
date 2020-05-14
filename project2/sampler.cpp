@@ -16,6 +16,7 @@ Sampler::Sampler(int nMCcycles,
                  double tolerance,
                  int nOptimizeIters,
                  double stepLength,
+                 double timeStep,
                  Hamiltonian &hamiltonian,
                  NeuralQuantumState &nqs,
                  Optimizer &optimizer) :
@@ -28,6 +29,8 @@ Sampler::Sampler(int nMCcycles,
     m_optimizer = optimizer;
     m_nOptimizeIters = nOptimizeIters;
     m_stepLength = stepLength;
+    m_timeStepDiffusion = timeStep*0.5;
+    m_sqrtTimeStep = sqrt(timeStep);
 
     m_nDims = nqs.getNumberOfDims();
     m_nParticles = nqs.getNumberOfParticles();
@@ -68,6 +71,89 @@ bool Sampler::metropolisStep(int particleNumber){
     }
 }
 
+bool Sampler::sample(int particleNumber){
+    if(m_samplingRule == 1){
+        return metropolisStep(particleNumber);
+    }
+    if(m_samplingRule == 2){
+        return importanceStep(particleNumber);
+    }
+    
+}
+
+bool Sampler::importanceStep(int particleNumber){
+    int idxStart = particleNumber*m_nDims;
+    int idxStop = idxStart + m_nDims;
+    int m = idxStart;
+    Eigen::VectorXd qForceOld(m_nDims);
+    Eigen::VectorXd qForceNew(m_nDims);
+    Eigen::VectorXd posOld(m_nDims);
+    Eigen::VectorXd posNew(m_nDims);
+    Eigen::VectorXd proposedStep(m_nDims);
+    double sigma2 = m_nqs.getSigma2();
+
+
+    //old quantities
+    Eigen::VectorXd Q = m_nqs.computeQfactor();
+    int k = 0;
+    for(int i = idxStart; i < idxStop; i++){
+        double sum = 0;
+        for(int n = 0; n < m_nHidden; n++){
+            sum += m_nqs.net.weights(m, n)/(Q(n) + 1);
+        }
+        qForceOld(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
+        posOld(k) = m_nqs.net.inputLayer(i);
+        //calculate new position
+        double step = qForceOld(k)*m_timeStepDiffusion + Random::nextGaussian(0, 1.0)*m_sqrtTimeStep;
+        proposedStep(k) = step;
+        m_nqs.adjustPosition(i, step);
+
+        qForceNew(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
+
+
+        k++;
+    }
+
+    //new quantities
+    double wfNew = m_nqs.evaluate();
+    Q = m_nqs.computeQfactor();
+    k = 0;
+    for(int i = idxStart; i < idxStop; i++){
+        double sum = 0;
+        for(int n = 0; n < m_nHidden; n++){
+            sum += m_nqs.net.weights(m, n)/(Q(n) + 1);
+        }
+        qForceNew(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
+        posNew(k) = m_nqs.net.inputLayer(i);
+        k++;
+    }
+
+    //compute greens function
+    double greensRatio = 0;
+    for(int i = 0; i < m_nDims; i++){
+        double term1 = posOld(i) - posNew(i) - m_timeStepDiffusion*qForceNew(i);
+        double term2 = posNew(i) - posOld(i) - m_timeStepDiffusion*qForceOld(i);
+        greensRatio += term2*term2 - term1*term1;
+    }
+
+    greensRatio /= 4*m_timeStepDiffusion;
+    greensRatio = exp(greensRatio);
+    double probabilityRatio = greensRatio*wfNew*wfNew/(m_wfOld*m_wfOld);
+
+    if(Random::nextDouble() <= probabilityRatio){
+        m_wfOld = wfNew;
+        return true;
+    }
+    else{
+        int i = 0;
+        for(int node = idxStart; node < idxStop; node++){
+            m_nqs.adjustPosition(node, - proposedStep(i));
+            i++;
+        }
+        return false;
+    }
+}
+
 
 void Sampler::runSampling(){
     /*
@@ -96,9 +182,18 @@ void Sampler::runSampling(){
     m_dPsi.fill(0);
     m_dPsiTimesE.fill(0);
 
+    for(int equil = 0; equil < (int) 0.1*m_nMCcycles; equil++){
+        for(int particle = 0; particle < m_nParticles; particle++){
+            int rndParticle = Random::nextInt(m_nParticles);
+            bool equilibrationSteps = sample(rndParticle);
+        }
+    }
+
     for(int cycle = 0; cycle < m_nMCcycles; cycle++){
         for(int particle = 0; particle < m_nParticles; particle++){
-            if(metropolisStep(particle)) {
+            int rndParticle = Random::nextInt(m_nParticles);
+            bool stepAccepted = sample(rndParticle);
+            if(stepAccepted) {
                 m_acceptedSteps++;
                 localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
                 netGrads1d = m_nqs.computeCostGradient();
@@ -138,7 +233,10 @@ void Sampler::runOptimization(){
         printInfo();
     }
 
+    // printFinalSystemInfo();
+
 }
+
 
 void Sampler::printInfo(){
     cout << setw(13) << setprecision(5) << m_energy;

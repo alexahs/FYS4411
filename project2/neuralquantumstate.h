@@ -2,11 +2,6 @@
 #include <vector>
 #include <netparams.h>
 
-struct s_dPsi {
-    std::vector<double> dInputBias;
-    std::vector<double> dHiddenBias;
-    std::vector<std::vector<double>> dWeights;
-};
 
 
 class NeuralQuantumState {
@@ -28,7 +23,6 @@ public:
     double evaluate(); //evaluate the wavefunction
     double computeDistance(int p, int q); //distance between two particles p and q
     Eigen::VectorXd computeFirstAndSecondDerivatives(int nodeNumber);
-    Eigen::VectorXd computeQuantumForce();
     Eigen::VectorXd computeQfactor();
     Eigen::VectorXd computeCostGradient();
     void adjustPosition(int node, double change); //adjust position of a single particle q
@@ -40,6 +34,7 @@ public:
     int getNumberOfDims()      {return m_nDims;}
     int getNumberOfInputs()    {return m_nVisible;}
     int getNumberOfHidden()    {return m_nHidden;}
+    double getSigma2()         {return m_sigma2;}
 
 
 };

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <cassert>
 
 #include "hamiltonian.h"
 #include "neuralquantumstate.h"
@@ -20,13 +21,16 @@ int main(){
     double sigma = 1;
     double omega = 1;
     bool interaction = false;
+    if(interaction) {assert(nParticles > 1);}
+
 
     int nMCcycles = 1e4; //number of montecarlo cycles
     int nOptimizeIters = 100; //max iters in optimization
-    double stepLength = 0.1;
-    int samplingRule = 1; //1 - standard, 2 - metropolis, 3- gibbs
+    double stepLength = 0.1; //for standard metropolis stampling
+    double timeStep = 0.1; //for importance sampling
+    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
-    double eta = 0.001; //learning rate
+    double eta = 0.01; //learning rate
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337;
 
@@ -39,6 +43,7 @@ int main(){
                     tolerance,
                     nOptimizeIters,
                     stepLength,
+                    timeStep,
                     hamiltonian,
                     nqs,
                     optimizer);

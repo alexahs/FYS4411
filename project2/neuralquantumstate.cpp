@@ -27,16 +27,18 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
 
 void NeuralQuantumState::initialize(){
     //randomly initialize weights or something
-
-    double sigma_init = 0.1;
+    // Random::setSeed(100);
+    double sigma_init = 0.001;
     for(int i = 0; i < m_nVisible; i++){
         net.inputBias(i) = Random::nextGaussian(0, sigma_init);
         net.inputLayer(i) = Random::nextDouble() - 0.5;
+        // std::cout << net.inputBias(i) << std::endl;
         for(int j = 0; j < m_nHidden; j++){
             net.weights(i, j) = Random::nextGaussian(0, sigma_init);
 
         }
     }
+    // exit(1);
 
     for(int i = 0; i < m_nHidden; i++){
         net.hiddenBias(i) = Random::nextGaussian(0, sigma_init);
@@ -173,7 +175,7 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
 
 
 
-Eigen::VectorXd NeuralQuantumState::computeQuantumForce(){
-    Eigen::VectorXd qForce(3);
-    return qForce;
-}
+
+
+
+//

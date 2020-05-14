@@ -17,6 +17,8 @@ private:
     double m_tolerance;
     int m_nOptimizeIters;
     double m_stepLength;
+    double m_timeStepDiffusion;
+    double m_sqrtTimeStep;
 
     int m_acceptedSteps = 0;
     double m_acceptRatio = 0;
@@ -40,7 +42,9 @@ private:
 
     //loop over mc cycles and sample energies etc
     void runSampling();
+    bool sample(int particleNumber);
     bool metropolisStep(int particleNumber);
+    bool importanceStep(int particleNumber);
 
 public:
     Sampler(int nMCcycles,
@@ -48,6 +52,7 @@ public:
             double tolerance,
             int nOptimizeIters,
             double stepLength,
+            double timeStep,
             Hamiltonian &hamiltonian,
             NeuralQuantumState &nqs,
             Optimizer &optimizer);
