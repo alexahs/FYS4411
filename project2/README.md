@@ -6,13 +6,15 @@ Compile by running `./compile_project`, creates the executable `rbm`.
 
 
 ## Progress
-Main parts of the program are implemented, but it is most likely full of bugs...
-With small enough initialized positions and no interaction, it produces the analytical
-energy instantly. With a bigger spread of initial positions, the energy goes negative, and the
-optimizer has a hard time optimizing the parameters.
+Main parts of the program are implemented, not thoroughly tested, but produces somewhat correct results.
+One problem is that with sigma != 1 in the wavefunction, the results are very off.  
+Still using a naive optimizer, not sure how well it is working, since the randomly initialized weights
+seem to produce results which are already close to the energy minimum.
+
+
 
 ## TODO:
-* Test the code to be sure that it is running correctly (test functions?)
-* Implement importance sampling
+* Test the code to be sure that it is running correctly.
 * Implement a better optimizer (only have standard gradient descent so far)
 * Implement Gibbs sampling
+* Parallelization
