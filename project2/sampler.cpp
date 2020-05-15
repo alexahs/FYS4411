@@ -99,7 +99,7 @@ bool Sampler::importanceStep(int particleNumber){
     for(int i = idxStart; i < idxStop; i++){
         double sum = 0;
         for(int n = 0; n < m_nHidden; n++){
-            sum += m_nqs.net.weights(m, n)/(Q(n) + 1);
+            sum += m_nqs.net.weights(m, n)/(exp(-Q(n)) + 1);
         }
         qForceOld(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
         posOld(k) = m_nqs.net.inputLayer(i);
@@ -121,7 +121,7 @@ bool Sampler::importanceStep(int particleNumber){
     for(int i = idxStart; i < idxStop; i++){
         double sum = 0;
         for(int n = 0; n < m_nHidden; n++){
-            sum += m_nqs.net.weights(m, n)/(Q(n) + 1);
+            sum += m_nqs.net.weights(m, n)/(exp(-Q(n)) + 1);
         }
         qForceNew(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
         posNew(k) = m_nqs.net.inputLayer(i);
@@ -178,6 +178,7 @@ void Sampler::runSampling(){
 
     m_energy = 0;
     m_energy2 = 0;
+    m_acceptedSteps = 0;
 
     m_dPsi.fill(0);
     m_dPsiTimesE.fill(0);
@@ -239,10 +240,11 @@ void Sampler::runOptimization(){
 
 
 void Sampler::printInfo(){
-    cout << setw(13) << setprecision(5) << m_energy;
-    cout << setw(14) << setprecision(5) << m_energy2;
-    cout << setw(16) << setprecision(5) << m_variance;
-    cout << setw(14) << setprecision(5) << m_costGradient.sum() << endl;
+    cout << setw(13) << setprecision(6) << m_energy;
+    cout << setw(14) << setprecision(6) << m_energy2;
+    cout << setw(16) << setprecision(6) << m_variance;
+    cout << setw(14) << setprecision(6) << m_costGradient.sum();
+    cout << setw(14) << setprecision(15) << m_acceptedSteps/m_nMCcycles << endl;
 }
 
 
@@ -255,5 +257,6 @@ void Sampler::printInitalSystemInfo(){
     cout << " * Number of Metropolis steps  : " << "10^" << log10(m_nMCcycles) << endl;
     cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
     cout << " * Number of parameters        : " << m_nHidden*m_nInput + m_nHidden + m_nInput << endl << endl;
-    cout << "====== Energy ====== Energy2 ====== Variance ====== Cost ====== " << endl << endl;
+    cout << "====== Energy ====== Energy2 ====== Variance ====== Cost ====== ";
+    cout << "Accept ratio =====" << endl << endl;
 }
