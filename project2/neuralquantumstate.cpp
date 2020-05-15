@@ -63,6 +63,15 @@ double NeuralQuantumState::evaluate(){
     psi1 = exp(-psi1/(2*m_sigma2));
 
 
+
+    //////
+    Eigen::VectorXd Q = net.hiddenBias + (((1.0/m_sigma2)*net.inputLayer).transpose()*net.weights).transpose();
+    for(int j = 0; j<m_nHidden; j++){
+        psi2 *= (1 + exp(Q(j)));
+    }
+    //////
+
+    /*
     for(int j = 0; j < m_nHidden; j++){
         double term1 = 0;
         for(int i = 0; i < m_nVisible; i++){
@@ -72,13 +81,16 @@ double NeuralQuantumState::evaluate(){
         term1 += net.hiddenBias(j);
         psi2 *= 1 + exp(term1);
     }
+    */
 
     return psi1*psi2;
 }
 
 Eigen::VectorXd NeuralQuantumState::computeQfactor(){
     //computes the exponential factor used many times throughout the program
-    // exp(b_n - sum(x_i*w_ij)), as seen in equation (102) in notes
+    // exp(b_j - sum(x_i*w_ij)), as seen in equation (102) in notes
+
+    /*
     Eigen::VectorXd Qfactor(m_nHidden);
     for(int n = 0; n < m_nHidden; n++){
         double term1 = 0;
@@ -88,7 +100,12 @@ Eigen::VectorXd NeuralQuantumState::computeQfactor(){
 
         Qfactor(n) = exp(net.hiddenBias(n) + term1/m_sigma2);
     }
+    */
 
+    Eigen::VectorXd Qfactor = net.hiddenBias + (((1.0/m_sigma2)*net.inputLayer).transpose()*net.weights).transpose();
+    for(int j = 0; j<m_nHidden; j++){
+        Qfactor(j) = exp(Qfactor(j));
+    }
 
     return Qfactor;
 }

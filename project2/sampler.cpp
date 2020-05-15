@@ -78,7 +78,7 @@ bool Sampler::sample(int particleNumber){
     if(m_samplingRule == 2){
         return importanceStep(particleNumber);
     }
-    
+
 }
 
 bool Sampler::importanceStep(int particleNumber){
@@ -251,9 +251,9 @@ void Sampler::printInitalSystemInfo(){
     cout << " -------- System info -------- " << endl;
     cout << " * Number of dimensions        : " << m_nDims << endl;
     cout << " * Number of particles         : " << m_nParticles << endl;
-    cout << " * Number of hidden layers     : " << m_nHidden << endl;
+    cout << " * Number of hidden nodes      : " << m_nHidden << endl;
     cout << " * Number of Metropolis steps  : " << "10^" << log10(m_nMCcycles) << endl;
     cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
-    cout << " * Number of parameters        : " << m_nHidden*m_nInput << endl << endl;
+    cout << " * Number of parameters        : " << m_nHidden*m_nInput + m_nHidden + m_nInput << endl << endl;
     cout << "====== Energy ====== Energy2 ====== Variance ====== Cost ====== " << endl << endl;
 }
