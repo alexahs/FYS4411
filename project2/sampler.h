@@ -60,7 +60,7 @@ public:
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
     void printInitalSystemInfo();
-    void printInfo();
+    void printInfo(int step);
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;

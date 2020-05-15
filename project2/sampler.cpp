@@ -231,7 +231,8 @@ void Sampler::runOptimization(){
         runSampling();
         m_optimizer.optimize(m_nqs, m_costGradient, m_nInput, m_nHidden);
 
-        printInfo();
+        printInfo(i);
+
     }
 
     // printFinalSystemInfo();
@@ -239,12 +240,13 @@ void Sampler::runOptimization(){
 }
 
 
-void Sampler::printInfo(){
-    cout << setw(13) << setprecision(6) << m_energy;
-    cout << setw(14) << setprecision(6) << m_energy2;
-    cout << setw(16) << setprecision(6) << m_variance;
-    cout << setw(14) << setprecision(6) << m_costGradient.sum();
-    cout << setw(14) << setprecision(15) << m_acceptedSteps/m_nMCcycles << endl;
+void Sampler::printInfo(int step){
+    cout << setw(10) << step;
+    cout << setw(15) << setprecision(6) << m_energy;
+    cout << setw(15) << setprecision(6) << m_energy2;
+    cout << setw(15) << setprecision(6) << m_variance;
+    cout << setw(15) << setprecision(6) << m_costGradient.sum();
+    cout << setw(10) << setprecision(15) << m_acceptedSteps/m_nMCcycles << endl;
 }
 
 
@@ -257,6 +259,6 @@ void Sampler::printInitalSystemInfo(){
     cout << " * Number of Metropolis steps  : " << "10^" << log10(m_nMCcycles) << endl;
     cout << " * Number of optimization steps: " << m_nOptimizeIters << endl;
     cout << " * Number of parameters        : " << m_nHidden*m_nInput + m_nHidden + m_nInput << endl << endl;
-    cout << "====== Energy ====== Energy2 ====== Variance ====== Cost ====== ";
+    cout << "===== Step ====== Energy ====== Energy2 ====== Variance ====== Cost ====== ";
     cout << "Accept ratio =====" << endl << endl;
 }
