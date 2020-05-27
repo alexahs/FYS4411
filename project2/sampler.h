@@ -3,6 +3,8 @@
 #include "neuralquantumstate.h"
 #include "optimizer.h"
 #include "netparams.h"
+#include <fstream>
+
 
 class Sampler{
 /*
@@ -36,6 +38,11 @@ private:
     Eigen::VectorXd m_dPsiTimesE;
     Eigen::VectorXd m_costGradient;
 
+    Eigen::VectorXd m_energyVals;
+    Eigen::VectorXd m_energy2Vals;
+    Eigen::VectorXd m_varianceVals;
+    Eigen::VectorXd m_acceptRatioVals;
+
 
 
 
@@ -45,6 +52,11 @@ private:
     bool sample(int particleNumber);
     bool metropolisStep(int particleNumber);
     bool importanceStep(int particleNumber);
+
+    void printInitalSystemInfo();
+    void printInfo(int step);
+    void printFinalInfo();
+    void writeFileCumulativeResults();
 
 public:
     Sampler(int nMCcycles,
@@ -59,8 +71,7 @@ public:
 
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
-    void printInitalSystemInfo();
-    void printInfo(int step);
+    void runDataCollection(int nMCcycles);
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;

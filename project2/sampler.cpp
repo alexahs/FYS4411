@@ -41,6 +41,11 @@ Sampler::Sampler(int nMCcycles,
     m_dPsi.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
     m_dPsiTimesE.resize(m_nInput + m_nHidden + m_nInput*m_nHidden);
 
+    m_energyVals.resize(m_nOptimizeIters);
+    m_energy2Vals.resize(m_nOptimizeIters);
+    m_varianceVals.resize(m_nOptimizeIters);
+    m_acceptRatioVals.resize(m_nOptimizeIters);
+
 }
 
 bool Sampler::metropolisStep(int particleNumber){
@@ -220,6 +225,7 @@ void Sampler::runSampling(){
 
 
 
+
 }
 
 void Sampler::runOptimization(){
@@ -227,16 +233,49 @@ void Sampler::runOptimization(){
     Optimize weights and biases after each set of MC runs
     */
     printInitalSystemInfo();
-    for(int i = 0; i < m_nOptimizeIters; i++){
+    for(int step = 0; step < m_nOptimizeIters; step++){
         runSampling();
+        // cout << m_nqs.net.hiddenLayer << endl;
+        // exit(1);
         m_optimizer.optimize(m_nqs, m_costGradient, m_nInput, m_nHidden);
 
-        printInfo(i);
+        m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
+
+        m_energyVals(step) = m_energy;
+        m_energy2Vals(step) = m_energy2;
+        m_varianceVals(step) = m_variance;
+        m_acceptRatioVals(step) = m_acceptRatio;
+
+        printInfo(step);
 
     }
+    writeFileCumulativeResults();
 
     // printFinalSystemInfo();
 
+}
+
+void Sampler::runDataCollection(int nMCcycles){
+    /*
+    final big run with optimized weights
+    */
+    m_nMCcycles = nMCcycles;
+    runSampling();
+    m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
+    printFinalInfo();
+
+
+}
+
+void Sampler::printFinalInfo(){
+    cout << endl;
+    cout << "------- Final values with optimized parameters -------" << endl;
+    cout << "===== Cycles ====== Energy ====== Energy2 ====== Variance ===== Accept ratio =====" << endl << endl;
+    cout << setw(10) << "2^" << log2(m_nMCcycles);
+    cout << setw(15) << setprecision(6) << m_energy;
+    cout << setw(15) << setprecision(6) << m_energy2;
+    cout << setw(15) << setprecision(6) << m_variance;
+    cout << setw(15) << setprecision(6) << m_acceptRatio << endl;
 }
 
 
@@ -246,7 +285,7 @@ void Sampler::printInfo(int step){
     cout << setw(15) << setprecision(6) << m_energy2;
     cout << setw(15) << setprecision(6) << m_variance;
     cout << setw(15) << setprecision(6) << m_costGradient.sum();
-    cout << setw(10) << setprecision(15) << m_acceptedSteps/m_nMCcycles << endl;
+    cout << setw(15) << setprecision(6) << m_acceptRatio << endl;
 }
 
 
@@ -257,9 +296,39 @@ void Sampler::printInitalSystemInfo(){
     cout << " * Number of particles          : " << m_nParticles << endl;
     cout << " * Number of hidden nodes       : " << m_nHidden << endl;
     cout << " * Number of hidden node density: " << m_nHidden/m_nInput << endl;
-    cout << " * Number of Metropolis steps   : " << "10^" << log10(m_nMCcycles) << endl;
+    cout << " * Number of Metropolis steps   : " << "2^" << log2(m_nMCcycles) << endl;
     cout << " * Number of optimization steps : " << m_nOptimizeIters << endl;
     cout << " * Number of parameters         : " << m_nHidden*m_nInput + m_nHidden + m_nInput << endl << endl;
     cout << "===== Step ====== Energy ====== Energy2 ====== Variance ====== Cost ====== ";
     cout << "Accept ratio =====" << endl << endl;
+}
+
+
+void Sampler::writeFileCumulativeResults(){
+    /*
+    writes results from optimizing
+    */
+
+    std::string filename = "./Data/rbm_cumulative_results_";
+    filename.append(std::to_string(m_nParticles) + "p_");
+    filename.append(std::to_string(m_nDims) + "d_");
+    filename.append(std::to_string(m_nHidden) + "h_");
+    filename.append(std::to_string(m_nMCcycles) + "cycles.csv");
+
+    std::ofstream outfile;
+    outfile.open(filename, std::ofstream::out | std::ofstream::trunc);
+    outfile << "Energy,Energy2,Variance,AcceptRatio" << endl;
+    for(int i = 0; i < m_nOptimizeIters; i++){
+        outfile << m_energyVals(i) << ",";
+        outfile << m_energy2Vals(i) << ",";
+        outfile << m_varianceVals(i) << ",";
+        outfile << m_acceptRatioVals(i) << "," << endl;
+    }
+
+    outfile.close();
+    cout << endl;
+    cout << " * Cumulative results written to " << filename << endl;
+
+
+
 }

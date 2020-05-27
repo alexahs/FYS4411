@@ -13,12 +13,13 @@ private:
     int m_nInput = 0;
     int m_nParticles = 0;
     int m_nDims = 0;
+    double m_sigma_init;
     double m_sigma;
     double m_sigma2;
     double m_sigma4;
 
 public:
-    NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed);
+    NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init);
 
     double evaluate(); //evaluate the wavefunction
     double computeDistance(int p, int q); //distance between two particles p and q
