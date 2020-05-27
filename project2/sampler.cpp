@@ -283,7 +283,8 @@ void Sampler::writeEnergySamples(){
     filename.append(std::to_string(m_nParticles) + "p_");
     filename.append(std::to_string(m_nDims) + "d_");
     filename.append(std::to_string(m_nHidden) + "h_");
-    filename.append(std::to_string(m_nMCcycles) + "cycles.bin");
+    filename.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
 
     std::ofstream outfile;
     outfile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
