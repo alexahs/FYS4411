@@ -8,40 +8,43 @@ data_path = project_path.parents[0] / 'Data'
 def read_optimization():
     '''
         Reads files with names of formats:
-            'rbm_cumulative_results_Pp_Dd_Hh_Ocycles_Eeta.csv'
+            'rbm_cumulative_results_Pp_Dd_Hh_Ccycles_Eeta.csv'
 
         Where:
             'P' is the number of particles
             'D' is the number of dimensions
             'H' is the number of hidden units
-            'O' is the number of optimization cycles
-            'C' is the number of cycles
+            'C' is the number of optimization cycles
             'E' is the learning rate
     '''
     all_files = list(data_path.glob(r'**/*'))
     base = r'.*rbm_cumulative_results_'
     ext = r'\.csv'
 
-    pattern_optimization_1 = \
+    pattern_1 = \
     base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
 
-    pattern_optimization_2 = \
+    pattern_2 = \
     base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
 
-    labels_csv = ['particle', 'dimensions', 'hidden_units',
-                  'cycles_optimization', 'learning_rate']
-    files = {}
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+              'learning_rate']
+    files = []
 
     for f in all_files:
-        f = re.findall(pattern_optimization_1, str(f))
-        if f:
-            files[f[0].__str__()] = {}
-            vals = re.findall(pattern_optimization_2, f[0])[0]
-            for k,v in zip(labels_csv, vals):
-                files[f[0].__str__()][k] = v
+        match = re.findall(pattern_1, str(f))
+        if match:
+            files.append({'path':f})
+            vals = re.findall(pattern_2, str(f))[0]
+            for k,v in zip(labels, vals):
+                files[-1][k] = v
+            data = []
+            with open(files[-1]['path'], 'r') as infile:
+                for line in infile.readlines():
+                    data.append(line.split(','))
+            print(data)
 
-    for i in files.items():
-        print(i)
+    return files
 
 def read_energy_samples():
     '''
@@ -52,7 +55,6 @@ def read_energy_samples():
             'P' is the number of particles
             'D' is the number of dimensions
             'H' is the number of hidden units
-            'O' is the number of optimization cycles
             'C' is the number of cycles
             'E' is the learning rate
     '''
@@ -60,28 +62,27 @@ def read_energy_samples():
     base = r'.*energy_samples_'
     ext = r'\.bin'
 
-    labels_csv = ['particle', 'dimensions', 'hidden_units',
-                  'cycles_optimization', 'learning_rate']
-    files = {}
+    pattern_1 = \
+    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
 
-    pattern_energies_1 = \
-    base + r'\d+p_\d+d_\d+h_\d+cycles' + ext
-
-    pattern_energies_2 = \
+    pattern_2 = \
     base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
 
-    labels_bin = ['particle', 'dimensions', 'hidden_units',
-                  'cycles']
-    for f in all_files:
-        f = re.findall(pattern_optimization_1, str(f))
-        if f:
-            files[f[0].__str__()] = {}
-            vals = re.findall(pattern_optimization_2, f[0])[0]
-            for k,v in zip(labels_csv, vals):
-                files[f[0].__str__()][k] = v
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+              'learning_rate']
 
-    for i in files.items():
-        print(i)
+    files = []
+
+    for f in all_files:
+        match = re.findall(pattern_1, str(f))
+        if match:
+            files.append({'path':f})
+            vals = re.findall(pattern_2, str(f))[0]
+            for k,v in zip(labels, vals):
+                files[-1][k] = v
+
+    return files
 
 if __name__ == '__main__':
     read_optimization()
+    read_energy_samples()

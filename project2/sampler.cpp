@@ -354,7 +354,7 @@ void Sampler::writeCumulativeResults(){
         outfile << m_energyVals(i) << ",";
         outfile << m_energy2Vals(i) << ",";
         outfile << m_varianceVals(i) << ",";
-        outfile << m_acceptRatioVals(i) << "," << endl;
+        outfile << m_acceptRatioVals(i) << endl;
     }
 
     outfile.close();
