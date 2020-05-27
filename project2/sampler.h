@@ -76,7 +76,12 @@ public:
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
     void runDataCollection(int nMCcycles);
+    void printGridSearchInfo(int i, int j);
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;
+
+
+
+    bool m_printOptimInfo = true;
 };

@@ -238,7 +238,8 @@ void Sampler::runOptimization(){
     /*
     Optimize weights and biases after each set of MC runs
     */
-    printInitalSystemInfo();
+    if(m_printOptimInfo){printInitalSystemInfo();}
+
     m_finalRun = false;
     for(int step = 0; step < m_nOptimizeIters; step++){
         runSampling();
@@ -252,8 +253,8 @@ void Sampler::runOptimization(){
         m_energy2Vals(step) = m_energy2;
         m_varianceVals(step) = m_variance;
         m_acceptRatioVals(step) = m_acceptRatio;
+        if(m_printOptimInfo){printInfo(step);}
 
-        printInfo(step);
 
     }
     writeCumulativeResults();
@@ -271,7 +272,7 @@ void Sampler::runDataCollection(int nMCcycles){
     m_energySamples.resize(m_nMCcycles);
     runSampling();
     m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
-    printFinalInfo();
+
     writeEnergySamples();
 
 
@@ -282,14 +283,14 @@ void Sampler::writeEnergySamples(){
     filename.append(std::to_string(m_nParticles) + "p_");
     filename.append(std::to_string(m_nDims) + "d_");
     filename.append(std::to_string(m_nHidden) + "h_");
-    filename.append(std::to_string(m_nMCcycles) + "cycles_");
-    filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
+    filename.append(std::to_string(m_nMCcycles) + "cycles.bin");
 
     std::ofstream outfile;
     outfile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
     outfile.write(reinterpret_cast<const char*> (m_energySamples.data()),m_energySamples.size()*sizeof(double));
     outfile.close();
-    cout << " * Results written to " << filename << endl;
+    if(m_printOptimInfo){cout << " * Results written to " << filename << endl;}
+
 }
 
 
@@ -356,7 +357,18 @@ void Sampler::writeCumulativeResults(){
     }
 
     outfile.close();
-    cout << endl;
-    cout << " * Cumulative results written to " << filename << endl;
+    if(m_printOptimInfo){cout << " * Cumulative results written to " << filename << endl;}
 
+}
+
+void Sampler::printGridSearchInfo(int i, int j){
+    if(i == 0 && j == 0){
+        cout << "===== Eta ===== nHidden ===== Energy ===== Energy2 ===== Variance ===== Accept ratio =====" << endl << endl;
+    }
+    cout << setw(8) << setprecision(6) << m_optimizer.getLearningRate();
+    cout << setw(15) << setprecision(6) << m_nHidden;
+    cout << setw(15) << setprecision(6) << m_energy;
+    cout << setw(15) << setprecision(6) << m_energy2;
+    cout << setw(15) << setprecision(6) << m_variance;
+    cout << setw(15) << setprecision(6) << m_acceptRatio << endl;
 }
