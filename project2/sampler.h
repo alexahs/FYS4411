@@ -43,6 +43,9 @@ private:
     Eigen::VectorXd m_varianceVals;
     Eigen::VectorXd m_acceptRatioVals;
 
+    bool m_finalRun = false;
+
+    Eigen::VectorXd m_energySamples;
 
 
 
@@ -56,7 +59,8 @@ private:
     void printInitalSystemInfo();
     void printInfo(int step);
     void printFinalInfo();
-    void writeFileCumulativeResults();
+    void writeCumulativeResults();
+    void writeEnergySamples();
 
 public:
     Sampler(int nMCcycles,

@@ -46,6 +46,8 @@ Sampler::Sampler(int nMCcycles,
     m_varianceVals.resize(m_nOptimizeIters);
     m_acceptRatioVals.resize(m_nOptimizeIters);
 
+
+
 }
 
 bool Sampler::metropolisStep(int particleNumber){
@@ -211,6 +213,10 @@ void Sampler::runSampling(){
         m_dPsi += netGrads1d;
         m_dPsiTimesE += netGrads1d*localEnergy;
 
+        if(m_finalRun){
+            m_energySamples(cycle) = localEnergy;
+        }
+
 
     }// end MC cycles
 
@@ -233,6 +239,7 @@ void Sampler::runOptimization(){
     Optimize weights and biases after each set of MC runs
     */
     printInitalSystemInfo();
+    m_finalRun = false;
     for(int step = 0; step < m_nOptimizeIters; step++){
         runSampling();
         // cout << m_nqs.net.hiddenLayer << endl;
@@ -249,7 +256,7 @@ void Sampler::runOptimization(){
         printInfo(step);
 
     }
-    writeFileCumulativeResults();
+    writeCumulativeResults();
 
     // printFinalSystemInfo();
 
@@ -260,12 +267,33 @@ void Sampler::runDataCollection(int nMCcycles){
     final big run with optimized weights
     */
     m_nMCcycles = nMCcycles;
+    m_finalRun = true;
+    m_energySamples.resize(m_nMCcycles);
     runSampling();
     m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
     printFinalInfo();
+    writeEnergySamples();
 
 
 }
+
+void Sampler::writeEnergySamples(){
+    std::string filename = "./Data/energy_samples_";
+    filename.append(std::to_string(m_nParticles) + "p_");
+    filename.append(std::to_string(m_nDims) + "d_");
+    filename.append(std::to_string(m_nHidden) + "h_");
+    filename.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
+
+    std::ofstream outfile;
+    outfile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+    outfile.write(reinterpret_cast<const char*> (m_energySamples.data()),m_energySamples.size()*sizeof(double));
+    outfile.close();
+    cout << " * Results written to " << filename << endl;
+}
+
+
+
 
 void Sampler::printFinalInfo(){
     cout << endl;
@@ -304,16 +332,18 @@ void Sampler::printInitalSystemInfo(){
 }
 
 
-void Sampler::writeFileCumulativeResults(){
+void Sampler::writeCumulativeResults(){
     /*
     writes results from optimizing
     */
 
+    // std::string dir = "./Data/results_" + std::to_string(m_optimizer.getLearningRate()) + "eta/";
     std::string filename = "./Data/rbm_cumulative_results_";
     filename.append(std::to_string(m_nParticles) + "p_");
     filename.append(std::to_string(m_nDims) + "d_");
     filename.append(std::to_string(m_nHidden) + "h_");
-    filename.append(std::to_string(m_nMCcycles) + "cycles.csv");
+    filename.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.csv");
 
     std::ofstream outfile;
     outfile.open(filename, std::ofstream::out | std::ofstream::trunc);
@@ -328,7 +358,5 @@ void Sampler::writeFileCumulativeResults(){
     outfile.close();
     cout << endl;
     cout << " * Cumulative results written to " << filename << endl;
-
-
 
 }
