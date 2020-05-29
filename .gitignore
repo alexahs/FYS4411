@@ -35,10 +35,10 @@ vmc
 
 # Data files
 *.dat
-#*.bin
+*.bin
 *.txt
 !CMakeLists.txt
-#*.csv
+*.csv
 *.npy
 
 
@@ -54,7 +54,7 @@ homework
 results
 Results
 data
-Data
+#Data
 figures
 Figures
 Literature
