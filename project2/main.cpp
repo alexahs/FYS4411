@@ -87,16 +87,22 @@ void runGridSearch1p1d(){
     long seed = 1337; //seed does nothing apparently
 
 
-    std::vector<double> etaVals {0.25, 0.1, 0.01, 0.001, 0.0001};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9};
+    // std::vector<double> etaVals {0.25, 0.1, 0.01, 0.001, 0.0001};
+    // std::vector<double> etaVals {0.2,0.1895,0.179,0.1684,0.1579,0.1474,0.1369,0.1264,0.1158,0.1053,0.0948,0.0843,0.0737,0.0632,0.0527};//,0.0422,0.0317,0.0211,0.0106,0.0001};
+    std::vector<double> etaVals {0.2000,0.1968,0.1937,0.1905,0.1873,0.1842,0.1810,0.1779,0.1747,0.1715,0.1684,0.1652,0.1620,0.1589,0.1557,0.1526,0.1494,0.1462,0.1431,0.1399,0.1367,0.1336,0.1304,0.1272,0.1241,0.1209,0.1178,0.1146,0.1114,0.1083,0.1051,0.1019,0.0988,0.0956,0.0924,0.0893,0.0861,0.0830,0.0798,0.0766,0.0735,0.0703,0.0671,0.0640,0.0608,0.0577,0.0545,0.0513,0.0482,0.0450};//,0.0422,0.0317,0.0211,0.0106,0.0001};
+    // std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9};
+    // std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
     double eta;
     int nHidden;
-    #pragma omp parallel for schedule(dynamic)
+    double counter = 0.0;
+    double tot_iter = etaVals.size()*hiddenVals.size();
+    std::cout << "LOADING 0%" << std::flush;
     for(int i = 0; i < etaVals.size(); i++){
+        #pragma omp parallel for
         for(int j = 0; j < hiddenVals.size(); j++){
             eta = etaVals[i];
             nHidden = hiddenVals[j];
-
 
             NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init); //must be initialized first
             Hamiltonian hamiltonian(omega, interaction, nqs);
@@ -114,9 +120,12 @@ void runGridSearch1p1d(){
             sampler.m_printOptimInfo = false;
             sampler.runOptimization();
             sampler.runDataCollection(nMCcycles*8);
-            sampler.printGridSearchInfo(i, j);
+            // sampler.printGridSearchInfo(i, j);
+            counter++;
+            std::cout << "\rLOADING " << round(100*counter/tot_iter) << "%" << std::flush;
 
         }
     }
+    std::cout << std::endl;
 
 }
