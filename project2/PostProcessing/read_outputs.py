@@ -37,13 +37,19 @@ def read_optimization():
             files.append({'path':f})
             vals = re.findall(pattern_2, str(f))[0]
             for k,v in zip(labels, vals):
-                files[-1][k] = v
-            data = []
-            with open(files[-1]['path'], 'r') as infile:
-                for line in infile.readlines():
-                    data.append(line.split(','))
-            print(data)
+                files[-1][k] = float(v)
 
+            data = []
+            with open(f, 'r') as infile:
+                for n,line in enumerate(infile.readlines()):
+                    if n == 0:
+                        columns = line.strip().split(',')
+                    else:
+                        data.append(line.strip().split(','))
+
+            data = np.array(data, dtype = np.float64).T
+            for k,v in zip(columns, data):
+                files[-1][k] = v
     return files
 
 def read_energy_samples():
@@ -79,10 +85,15 @@ def read_energy_samples():
             files.append({'path':f})
             vals = re.findall(pattern_2, str(f))[0]
             for k,v in zip(labels, vals):
-                files[-1][k] = v
+                files[-1][k] = float(v)
+
+            files[-1]['Energy'] = np.fromfile(f, dtype = np.float64)
 
     return files
 
 if __name__ == '__main__':
-    read_optimization()
-    read_energy_samples()
+    optimizations = read_optimization()
+    energies = read_energy_samples()
+
+    print(optimizations)
+    print(energies)
