@@ -1,6 +1,11 @@
 from analysis import dataAnalysisClass
 from multiprocessing import Pool
 import numpy as np
+import shutil
+import os
+import re
+
+import read_outputs
 
 def get_analyser_data(data, test):
     '''
@@ -124,3 +129,50 @@ def get_energy_grids(data, test = False):
         sorted_results[key]['LR'] = LR
         sorted_results[key]['HU'] = HU
     return sorted_results
+
+def save_energy_grids(sorted_results, savename):
+    '''
+        Saves the energy grids to file
+    '''
+    savename = f'../DataProcessed/{savename}'
+    if os.path.isdir(savename):
+        delete = input('Delete Previously Saved Data? (y/n)')
+        if delete == 'y':
+            shutil.rmtree(savename)
+        else:
+            exit()
+    os.mkdir(savename)
+    for key, value in sorted_results.items():
+        name = f'{savename}/arr_{key}_{{}}'
+        np.save(name.format('sample'), value['sample'])
+        np.save(name.format('blocking'), value['blocking'])
+        np.save(name.format('bootstrap'), value['bootstrap'])
+        np.save(name.format('LR'), value['LR'])
+        np.save(name.format('HU'), value['HU'])
+
+def load_energy_grids(savename):
+    '''
+        Loads the energy grids from file
+    '''
+    savename = f'../DataProcessed/{savename}'
+    files = os.listdir(savename)
+    sorted_results = {}
+    for f in files:
+        pattern = r'arr_(P\d+D\d+C\d+)_(.*)\.npy'
+        key1,key2  = re.findall(pattern, f)[0]
+        if key1 not in sorted_results.keys():
+            sorted_results[key1] = {}
+        sorted_results[key1][key2] = np.load(savename + '/' + f)
+    return sorted_results
+
+if __name__ == '__main__':
+    energies = read_outputs.read_energy_samples()
+    sorted_results = get_energy_grids(energies, test = True)
+    save_energy_grids(sorted_results, 'test')
+    loaded_results = load_energy_grids('test')
+    for i,j in zip(sorted_results.items(), loaded_results.items()):
+        assert np.array_equal(i[1]['sample'], j[1]['sample'])
+        assert np.array_equal(i[1]['blocking'], j[1]['blocking'])
+        assert np.array_equal(i[1]['bootstrap'], j[1]['bootstrap'])
+        assert np.array_equal(i[1]['LR'], j[1]['LR'])
+        assert np.array_equal(i[1]['HU'], j[1]['HU'])
