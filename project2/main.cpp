@@ -75,7 +75,7 @@ void runGridSearch1p1d(){
     bool interaction = false;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 12;
+    int nCyclesPow2 = 14;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 100; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling

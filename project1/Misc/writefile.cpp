@@ -78,6 +78,7 @@ void printInitalSystemInfo(int numberOfDimensions, int numberOfParticles,
     cout << " * Number of parameters : " << numberOfParameters << endl << endl;
 }
 
+
 void printFinal(int numberOfParameters, double elapsedTime) {
     int numOfColumns = 4 + numberOfParameters;
     for (int i=1; i<numOfColumns; i++) {
