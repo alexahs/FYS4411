@@ -136,11 +136,15 @@ def save_energy_grids(sorted_results, savename):
     '''
     savename = f'../DataProcessed/{savename}'
     if os.path.isdir(savename):
-        delete = input('Delete Previously Saved Data? (y/n)')
-        if delete == 'y':
-            shutil.rmtree(savename)
-        else:
-            exit()
+        while True:
+            delete = input('Delete Previously Saved Data? (y/n)')
+            if delete == 'y':
+                shutil.rmtree(savename)
+            elif delete == 'n':
+                exit()
+            else:
+                print('Invalid input: {delete}, try again.')
+
     os.mkdir(savename)
     for key, value in sorted_results.items():
         name = f'{savename}/arr_{key}_{{}}'
