@@ -2,6 +2,7 @@
 #include <vector>
 #include <iomanip>
 #include <cassert>
+#include <omp.h>
 
 #include "hamiltonian.h"
 #include "neuralquantumstate.h"
@@ -71,11 +72,15 @@ void runGridSearch1p1d(){
     int nDims = 1;
     double sigma = 1.0; //in nqs
     double omega = 1.0; //in hamiltonian
-    double sigma_init = 0.5; //initial spread of initial positions and weights
+    double sigma_init = 1.0; //initial spread of initial positions and weights
     bool interaction = false;
     if(interaction) {assert(nParticles > 1);}
 
+<<<<<<< HEAD
     int nCyclesPow2 = 14;
+=======
+    int nCyclesPow2 = 15;
+>>>>>>> bc5813aa771fc7f8638d33355218ef96deb378ef
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 100; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
@@ -86,10 +91,11 @@ void runGridSearch1p1d(){
     long seed = 1337; //seed does nothing apparently
 
 
-    std::vector<double> etaVals {0.5, 0.1, 0.01, 0.001, 0.0001};
-    std::vector<int> hiddenVals {2, 4, 6, 8, 10};
+    std::vector<double> etaVals {0.25, 0.1, 0.01, 0.001, 0.0001};
+    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9};
     double eta;
     int nHidden;
+    #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < etaVals.size(); i++){
         for(int j = 0; j < hiddenVals.size(); j++){
             eta = etaVals[i];
