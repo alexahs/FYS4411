@@ -15,6 +15,9 @@ using std::endl;
 
 void runGridSearch1p1d();
 void runSingle();
+void runGridSearch2();
+void runGridSearch3();
+void runGridSearch4();
 
 int main(){
     // runSingle();
