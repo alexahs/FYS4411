@@ -100,5 +100,5 @@ def plot_energies(grids, dimensions = 2, expected = None):
 if __name__ == '__main__':
     # optimizations = read_outputs.read_optimization()
     # energies = read_outputs.read_energy_samples()
-    grids = processing.load_energy_grids('run_1')
-    plot_energies(grids, 2, 0.5)
+    grids = processing.load_energy_grids('run_2')
+    plot_energies(grids, 2)#, 0.5)

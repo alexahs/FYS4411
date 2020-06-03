@@ -13,15 +13,15 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-void runGridSearch1p1d();
 void runSingle();
+void runGridSearch1();
 void runGridSearch2();
 void runGridSearch3();
 void runGridSearch4();
 
 int main(){
     // runSingle();
-    // runGridSearch1p1d();
+    runGridSearch1();
     runGridSearch2();
     runGridSearch3();
     runGridSearch4();
@@ -66,8 +66,7 @@ void runSingle(){
     sampler.runDataCollection(nMCcycles*8);
 }
 
-
-void runGridSearch1p1d(){
+void runGridSearch1(){
 
     int nParticles = 1;
     int nDims = 1;
