@@ -51,7 +51,7 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     Em = Z[idx[0],idx[1]]
                     Z = np.log(Z)
                 else:
-                    cutoffs = [0.49, 0.51]
+                    cutoffs = [0, 2]
                     Z[Z < cutoffs[0]] = cutoffs[0]
                     Z[Z > cutoffs[1]] = cutoffs[1]
                 plt.figure()
@@ -82,7 +82,7 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     Z = np.log(Z)
                     p3 = Z[idx[0],idx[1]]
                 else:
-                    cutoffs = [0.47, 0.53]
+                    cutoffs = [0, 2]
                     Z[Z < cutoffs[0]] = cutoffs[0]
                     Z[Z > cutoffs[1]] = cutoffs[1]
                 ax.plot_surface(value['LR'], value['HU'], Z, cmap = 'magma')
