@@ -32,7 +32,7 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 8;
+    int nCyclesPow2 = 18;
     int samplingRule = 2;   //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
 
