@@ -26,14 +26,23 @@ int main(){
     auto t0 = std::chrono::high_resolution_clock::now();
     runGridSearch1();
     auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt1 = (t1 - t0);
+    std::cout << "dt1 = " << dt1.count() << " s\n";
     runGridSearch2();
     auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt2 = (t2 - t1);
+    std::cout << "dt2 = " << dt2.count() << " s\n";
     runGridSearch3();
     auto t3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt3 = (t3 - t2);
+    std::cout << "dt3 = " << dt3.count() << " s\n";
     runGridSearch4();
     auto t4 = std::chrono::high_resolution_clock::now();
-  	double time_used = (stop - start).count();
-  	std::cout << "Time Elapsed = " << time_used << " s\n";
+  	std::chrono::duration<double> dt4 = (t4 - t3);
+    std::cout << "dt4 = " << dt4.count() << " s\n";
+    std::chrono::duration<double> dt5 = (t4 - t0);
+    std::cout << "dt_total = " << dt5.count() << " s\n";
+
     return 0;
 }
 
