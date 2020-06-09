@@ -9,7 +9,7 @@ using std::cout;
 using std::endl;
 
 
-NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init){
+NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init, int samplingRule){
     //
     m_nVisible = (int) nParticles*nDims;
     m_nInput = (int) nParticles*nDims;
@@ -21,6 +21,7 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     m_sigma2 = sigma*sigma;
     m_sigma4 = m_sigma2*m_sigma2;
     net = NetParams(m_nInput, m_nHidden);
+    if(samplingRule == 3){m_isGibbsSampling = true;}
     initialize();
 }
 
@@ -39,8 +40,6 @@ void NeuralQuantumState::initialize(){
 
         }
     }
-    cout << net.weights << endl;
-    exit(1);
 
     for(int i = 0; i < m_nHidden; i++){
         net.hiddenBias(i) = Random::nextGaussian(0, m_sigma_init);
@@ -131,6 +130,11 @@ Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNum
 
     double dx = (-(net.inputLayer(m) - net.inputBias(m)) + sum1)/m_sigma2;
     double ddx = -1/m_sigma2 + sum2/m_sigma4;
+    if(m_isGibbsSampling){
+        dx *= 0.5;
+        ddx *= 0.5;
+    }
+
 
     Eigen::VectorXd derivatives(2);
     derivatives(0) = dx;
@@ -191,6 +195,8 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
             k++;
         }
     }
+
+    if(m_isGibbsSampling){grads *= 0.5;}
 
     return grads;
 
