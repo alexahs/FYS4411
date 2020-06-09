@@ -29,11 +29,11 @@ def get_energy_data(data):
     means = get_analyser_data(data['Energy'], data['test'])
     vals = np.zeros(11, dtype = np.float64)
     vals[0]  = means['sample']['avg']
-    vals[1]  = means['sample']['var']
+    vals[1]  = means['sample']['std']
     vals[2]  = means['blocking']['avg']
-    vals[3]  = means['blocking']['var']
+    vals[3]  = means['blocking']['std']
     vals[4]  = means['bootstrap']['avg']
-    vals[5]  = means['bootstrap']['var']
+    vals[5]  = means['bootstrap']['std']
     vals[6]  = data['particle']
     vals[7]  = data['dimensions']
     vals[8]  = data['hidden_units']
@@ -86,6 +86,9 @@ def sort_energy_grids(results):
     energy_grid_sample = np.zeros((len(unique_HU), len(unique_LR)))
     energy_grid_blocking = np.zeros((len(unique_HU), len(unique_LR)))
     energy_grid_bootstrap = np.zeros((len(unique_HU), len(unique_LR)))
+    err_grid_sample = np.zeros((len(unique_HU), len(unique_LR)))
+    err_grid_blocking = np.zeros((len(unique_HU), len(unique_LR)))
+    err_grid_bootstrap = np.zeros((len(unique_HU), len(unique_LR)))
     msg2 = 'Multiple energies found for same conditions.'
     for i,(a,b) in enumerate(zip(LR, HU)):
         for j,(c,d) in enumerate(zip(a, b)):
@@ -95,10 +98,13 @@ def sort_energy_grids(results):
             assert len(idx) == 1, msg2
             idx = idx[0]
             energy_grid_sample[i,j] = results[idx].squeeze()[0]
+            err_grid_sample[i,j] = results[idx].squeeze()[1]
             energy_grid_blocking[i,j] = results[idx].squeeze()[2]
+            err_grid_blocking[i,j] = results[idx].squeeze()[3]
             energy_grid_bootstrap[i,j] = results[idx].squeeze()[4]
+            err_grid_bootstrap[i,j] = results[idx].squeeze()[5]
 
-    return energy_grid_sample, energy_grid_blocking, energy_grid_bootstrap, LR, HU
+    return energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, energy_grid_bootstrap, err_grid_bootstrap, LR, HU
 
 def get_energy_grids(data, test = False):
     '''
@@ -121,11 +127,14 @@ def get_energy_grids(data, test = False):
     for result in results:
         key = f'P{result[0][6]:.0f}D{result[0][7]:.0f}C{result[0][9]:.0f}'
         sorted_results[key] = {}
-        E_sample, E_blocking, E_bootstrap, LR, HU = \
+        energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, energy_grid_bootstrap, err_grid_bootstrap, LR, HU = \
         sort_energy_grids(np.array(result))
-        sorted_results[key]['sample'] = E_sample
-        sorted_results[key]['blocking'] = E_blocking
-        sorted_results[key]['bootstrap'] = E_bootstrap
+        sorted_results[key]['sample'] = energy_grid_sample
+        sorted_results[key]['sample_err'] = err_grid_sample
+        sorted_results[key]['blocking'] = energy_grid_blocking
+        sorted_results[key]['blocking_err'] = err_grid_blocking
+        sorted_results[key]['bootstrap'] = energy_grid_bootstrap
+        sorted_results[key]['bootstrap_err'] = err_grid_bootstrap
         sorted_results[key]['LR'] = LR
         sorted_results[key]['HU'] = HU
     return sorted_results
@@ -140,6 +149,7 @@ def save_energy_grids(sorted_results, savename):
             delete = input('Delete Previously Saved Data? (y/n)')
             if delete == 'y':
                 shutil.rmtree(savename)
+                break
             elif delete == 'n':
                 exit()
             else:
@@ -153,6 +163,10 @@ def save_energy_grids(sorted_results, savename):
         np.save(name.format('bootstrap'), value['bootstrap'])
         np.save(name.format('LR'), value['LR'])
         np.save(name.format('HU'), value['HU'])
+
+        np.save(name.format('sample_err'), value['sample_err'])
+        np.save(name.format('blocking_err'), value['blocking_err'])
+        np.save(name.format('bootstrap_err'), value['bootstrap_err'])
 
 def load_energy_grids(savename):
     '''
@@ -171,12 +185,15 @@ def load_energy_grids(savename):
 
 if __name__ == '__main__':
     energies = read_outputs.read_energy_samples()
-    sorted_results = get_energy_grids(energies, test = True)
-    save_energy_grids(sorted_results, 'test')
-    loaded_results = load_energy_grids('test')
+    sorted_results = get_energy_grids(energies, test = False)
+    save_energy_grids(sorted_results, 'run_2')
+    loaded_results = load_energy_grids('run_2')
     for i,j in zip(sorted_results.items(), loaded_results.items()):
         assert np.array_equal(i[1]['sample'], j[1]['sample'])
         assert np.array_equal(i[1]['blocking'], j[1]['blocking'])
         assert np.array_equal(i[1]['bootstrap'], j[1]['bootstrap'])
+        assert np.array_equal(i[1]['sample_err'], j[1]['sample_err'])
+        assert np.array_equal(i[1]['blocking_err'], j[1]['blocking_err'])
+        assert np.array_equal(i[1]['bootstrap_err'], j[1]['bootstrap_err'])
         assert np.array_equal(i[1]['LR'], j[1]['LR'])
         assert np.array_equal(i[1]['HU'], j[1]['HU'])

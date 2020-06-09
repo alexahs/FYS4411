@@ -1,7 +1,8 @@
 #include <iostream>
-#include <vector>
 #include <iomanip>
 #include <cassert>
+#include <vector>
+#include <chrono>
 #include <omp.h>
 
 #include "hamiltonian.h"
@@ -13,15 +14,59 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-void runGridSearch1p1d();
 void runSingle();
+void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
 
 int main(){
 
+    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
+    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
+    // std::vector<int> hiddenVals {1,2,3,4,5};
+    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int nCyclesPow2 = 15;
+    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
+    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
 
-    runSingle();
-    // runGridSearch1p1d();
+    while (true) {
+        std::cout << "Delete Previous Data? (y/n/q)" << std::endl;
+        char input;
+        std::cin >> input;
+        if (input == 'y' || input == 'Y') {
+          int output = system("rm -rf Data/*");
+          break;
+        } else if (input == 'q' || input == 'Q') {
+          exit(0);
+        } else if (input != 'n' && input != 'N') {
+          std::cout << "Invalid Input: " << input << std::endl;
+        } else {
+          break;
+        }
+    }
 
+    // runSingle();
+    // Execution of main part of program
+    auto t0 = std::chrono::high_resolution_clock::now();
+    runGridSearch1(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt1 = (t1 - t0);
+    std::cout << "dt1 = " << dt1.count() << " s\n";
+    runGridSearch2(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt2 = (t2 - t1);
+    std::cout << "dt2 = " << dt2.count() << " s\n";
+    runGridSearch3(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
+    auto t3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt3 = (t3 - t2);
+    std::cout << "dt3 = " << dt3.count() << " s\n";
+    runGridSearch4(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
+    auto t4 = std::chrono::high_resolution_clock::now();
+  	std::chrono::duration<double> dt4 = (t4 - t3);
+    std::cout << "dt4 = " << dt4.count() << " s\n";
+    std::chrono::duration<double> dt5 = (t4 - t0);
+    std::cout << "dt_total = " << dt5.count() << " s\n";
 
     return 0;
 }
@@ -47,7 +92,6 @@ void runSingle(){
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 694206661337; //seed does nothing apparently
 
-
     NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init); //must be initialized first
     Hamiltonian hamiltonian(omega, interaction, nqs);
     Optimizer optimizer(eta, whichOptimizer);
@@ -65,8 +109,112 @@ void runSingle(){
     sampler.runDataCollection(nMCcycles*8);
 }
 
+void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
-void runGridSearch1p1d(){
+    int nParticles = 2;
+    int nDims = 2;
+    double sigma = 1.0; //in nqs
+    double omega = 1.0; //in hamiltonian
+    double sigma_init = 0.001; //initial spread of initial positions and weights
+    bool interaction = false;
+    if(interaction) {assert(nParticles > 1);}
+
+    int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
+    int nOptimizeIters = 100; //max iters in optimization
+    double stepLength = 0.1; //for standard metropolis stampling
+    double timeStep = 0.45; //for importance sampling
+    double tolerance = 1e-6; //tolerance for convergence
+    long seed = 1337; //seed does nothing apparently
+
+    double eta;
+    int nHidden;
+    double counter = 0.0;
+    double tot_iter = etaVals.size()*hiddenVals.size();
+    std::cout << "LOADING 0%" << std::flush;
+    for(int i = 0; i < etaVals.size(); i++){
+        #pragma omp parallel for
+        for(int j = 0; j < hiddenVals.size(); j++){
+            eta = etaVals[i];
+            nHidden = hiddenVals[j];
+            NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init); //must be initialized first
+            Hamiltonian hamiltonian(omega, interaction, nqs);
+            Optimizer optimizer(eta, whichOptimizer);
+            Sampler sampler(nMCcycles,
+                            samplingRule,
+                            tolerance,
+                            nOptimizeIters,
+                            stepLength,
+                            timeStep,
+                            hamiltonian,
+                            nqs,
+                            optimizer);
+            //
+            sampler.m_printOptimInfo = false;
+            sampler.runOptimization();
+            sampler.runDataCollection(nMCcycles*8);
+            // sampler.printGridSearchInfo(i, j);
+            counter++;
+            std::cout << "\rLOADING " << round(100*counter/tot_iter) << "%" << std::flush;
+
+        }
+    }
+    std::cout << std::endl;
+}
+
+void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
+
+    int nParticles = 2;
+    int nDims = 1;
+    double sigma = 1.0; //in nqs
+    double omega = 1.0; //in hamiltonian
+    double sigma_init = 0.001; //initial spread of initial positions and weights
+    bool interaction = true;
+    if(interaction) {assert(nParticles > 1);}
+
+    int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
+    int nOptimizeIters = 200; //max iters in optimization
+    double stepLength = 0.1; //for standard metropolis stampling
+    double timeStep = 0.45; //for importance sampling
+    double tolerance = 1e-6; //tolerance for convergence
+    long seed = 1337; //seed does nothing apparently
+
+    double eta;
+    int nHidden;
+    double counter = 0.0;
+    double tot_iter = etaVals.size()*hiddenVals.size();
+    std::cout << "LOADING 0%" << std::flush;
+    for(int i = 0; i < etaVals.size(); i++){
+        #pragma omp parallel for
+        for(int j = 0; j < hiddenVals.size(); j++){
+            eta = etaVals[i];
+            nHidden = hiddenVals[j];
+
+            NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init); //must be initialized first
+            Hamiltonian hamiltonian(omega, interaction, nqs);
+            Optimizer optimizer(eta, whichOptimizer);
+            Sampler sampler(nMCcycles,
+                            samplingRule,
+                            tolerance,
+                            nOptimizeIters,
+                            stepLength,
+                            timeStep,
+                            hamiltonian,
+                            nqs,
+                            optimizer);
+            //
+            sampler.m_printOptimInfo = false;
+            sampler.runOptimization();
+            sampler.runDataCollection(nMCcycles*8);
+            // sampler.printGridSearchInfo(i, j);
+            counter++;
+            std::cout << "\rLOADING " << round(100*counter/tot_iter) << "%" << std::flush;
+
+        }
+    }
+    std::cout << std::endl;
+}
+
+void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
     int nParticles = 2;
     int nDims = 2;
@@ -76,23 +224,68 @@ void runGridSearch1p1d(){
     bool interaction = true;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 16;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
-    int nOptimizeIters = 100; //max iters in optimization
+    int nOptimizeIters = 200; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337; //seed does nothing apparently
 
 
-    std::vector<double> etaVals {0.25, 0.1, 0.01, 0.001, 0.0001};
-    // std::vector<double> etaVals {0.2,0.1895,0.179,0.1684,0.1579,0.1474,0.1369,0.1264,0.1158,0.1053,0.0948,0.0843,0.0737,0.0632,0.0527};//,0.0422,0.0317,0.0211,0.0106,0.0001};
-    // std::vector<double> etaVals {0.2000,0.1968,0.1937,0.1905,0.1873,0.1842,0.1810,0.1779,0.1747,0.1715,0.1684,0.1652,0.1620,0.1589,0.1557,0.1526,0.1494,0.1462,0.1431,0.1399,0.1367,0.1336,0.1304,0.1272,0.1241,0.1209,0.1178,0.1146,0.1114,0.1083,0.1051,0.1019,0.0988,0.0956,0.0924,0.0893,0.0861,0.0830,0.0798,0.0766,0.0735,0.0703,0.0671,0.0640,0.0608,0.0577,0.0545,0.0513,0.0482,0.0450};//,0.0422,0.0317,0.0211,0.0106,0.0001};
-    std::vector<int> hiddenVals {1,2,3,4};
-    // std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-    // std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
+    double eta;
+    int nHidden;
+    double counter = 0.0;
+    double tot_iter = etaVals.size()*hiddenVals.size();
+    std::cout << "LOADING 0%" << std::flush;
+    for(int i = 0; i < etaVals.size(); i++){
+        #pragma omp parallel for
+        for(int j = 0; j < hiddenVals.size(); j++){
+            eta = etaVals[i];
+            nHidden = hiddenVals[j];
+
+            NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init); //must be initialized first
+            Hamiltonian hamiltonian(omega, interaction, nqs);
+            Optimizer optimizer(eta, whichOptimizer);
+            Sampler sampler(nMCcycles,
+                            samplingRule,
+                            tolerance,
+                            nOptimizeIters,
+                            stepLength,
+                            timeStep,
+                            hamiltonian,
+                            nqs,
+                            optimizer);
+            //
+            sampler.m_printOptimInfo = false;
+            sampler.runOptimization();
+            sampler.runDataCollection(nMCcycles*8);
+            // sampler.printGridSearchInfo(i, j);
+            counter++;
+            std::cout << "\rLOADING " << round(100*counter/tot_iter) << "%" << std::flush;
+
+        }
+    }
+    std::cout << std::endl;
+
+}
+
+void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
+
+    int nParticles = 2;
+    int nDims = 3;
+    double sigma = 1.0; //in nqs
+    double omega = 1.0; //in hamiltonian
+    double sigma_init = 0.001; //initial spread of initial positions and weights
+    bool interaction = true;
+    if(interaction) {assert(nParticles > 1);}
+
+    int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
+    int nOptimizeIters = 200; //max iters in optimization
+    double stepLength = 0.1; //for standard metropolis stampling
+    double timeStep = 0.45; //for importance sampling
+    double tolerance = 1e-6; //tolerance for convergence
+    long seed = 1337; //seed does nothing apparently
+
     double eta;
     int nHidden;
     double counter = 0.0;

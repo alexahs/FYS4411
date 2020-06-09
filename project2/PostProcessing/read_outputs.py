@@ -78,6 +78,8 @@ def read_energy_samples():
               'learning_rate']
 
     files = []
+    defaults = np.zeros(10)
+    empty_arr = np.array([])
 
     for f in all_files:
         match = re.findall(pattern_1, str(f))
@@ -87,7 +89,11 @@ def read_energy_samples():
             for k,v in zip(labels, vals):
                 files[-1][k] = float(v)
 
-            files[-1]['Energy'] = np.fromfile(f, dtype = np.float64)
+            data = np.fromfile(f, dtype = np.float64)
+            data = data[np.isfinite(data)]
+            if np.array_equal(empty_arr, data):
+                data = defaults.copy()
+            files[-1]['Energy'] = data
 
     return files
 

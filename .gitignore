@@ -39,7 +39,7 @@ vmc
 *.txt
 !CMakeLists.txt
 *.csv
-*.npy
+#*.npy
 
 
 # Misc. files
