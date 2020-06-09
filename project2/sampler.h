@@ -47,6 +47,8 @@ private:
 
     Eigen::VectorXd m_energySamples;
 
+    Eigen::VectorXd m_uniform_real_distribution_H;
+
 
 
 
@@ -55,6 +57,8 @@ private:
     bool sample(int particleNumber);
     bool metropolisStep(int particleNumber);
     bool importanceStep(int particleNumber);
+    bool gibbsStep();
+    double sigmoid(double z);
 
     void printInitalSystemInfo();
     void printInfo(int step);

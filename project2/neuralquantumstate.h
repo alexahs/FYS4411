@@ -36,6 +36,7 @@ public:
     int getNumberOfInputs()    {return m_nVisible;}
     int getNumberOfHidden()    {return m_nHidden;}
     double getSigma2()         {return m_sigma2;}
+    double getSigma()         {return m_sigma;}
 
 
 };

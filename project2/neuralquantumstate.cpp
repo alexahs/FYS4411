@@ -39,7 +39,8 @@ void NeuralQuantumState::initialize(){
 
         }
     }
-    // exit(1);
+    cout << net.weights << endl;
+    exit(1);
 
     for(int i = 0; i < m_nHidden; i++){
         net.hiddenBias(i) = Random::nextGaussian(0, m_sigma_init);
@@ -194,10 +195,6 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
     return grads;
 
 }
-
-
-
-
 
 
 

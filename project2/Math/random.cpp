@@ -3,7 +3,7 @@
 
 long     Random::iy = 0;
 long     Random::iv[NTAB];
-long     Random::seed = -1;
+long     Random::seed = -2;
 void Random::setSeed(long seed) {
     Random::seed = seed;
 }

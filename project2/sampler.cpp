@@ -46,7 +46,30 @@ Sampler::Sampler(int nMCcycles,
     m_varianceVals.resize(m_nOptimizeIters);
     m_acceptRatioVals.resize(m_nOptimizeIters);
 
+    // if(m_samplingRule == 3){
+    //     for(int i = 0; i < m_nInput; i++){
+    //         m_uniform_real_distribution_H(i) = Random::nextDouble();
+    //     }
+    // }
 
+
+
+}
+
+bool Sampler::sample(int particleNumber){
+    if(m_samplingRule == 1){
+        return metropolisStep(particleNumber);
+    }
+    if(m_samplingRule == 2){
+        return importanceStep(particleNumber);
+    }
+    if(m_samplingRule == 3){
+        return gibbsStep();
+    }
+    else{
+        cout << "Invalild sampling rule. " << endl;
+        exit(1);
+    }
 
 }
 
@@ -78,15 +101,6 @@ bool Sampler::metropolisStep(int particleNumber){
     }
 }
 
-bool Sampler::sample(int particleNumber){
-    if(m_samplingRule == 1){
-        return metropolisStep(particleNumber);
-    }
-    if(m_samplingRule == 2){
-        return importanceStep(particleNumber);
-    }
-
-}
 
 bool Sampler::importanceStep(int particleNumber){
     int idxStart = particleNumber*m_nDims;
@@ -162,6 +176,28 @@ bool Sampler::importanceStep(int particleNumber){
 }
 
 
+bool Sampler::gibbsStep(){
+
+    for(int j = 0; j < m_nHidden; j++){
+         double z = m_nqs.net.hiddenBias(j) + m_nqs.net.inputLayer.dot(m_nqs.net.weights.col(j))/m_nqs.getSigma2();
+         m_nqs.net.hiddenLayer(j) = Random::nextDouble() < sigmoid(z);
+    }
+
+    for(int i = 0; i < m_nInput; i++){
+        double meanPos = m_nqs.net.inputBias(i) + m_nqs.net.weights.row(i)*m_nqs.net.hiddenLayer;
+        double posDistribution = Random::nextGaussian(meanPos, m_nqs.getSigma());
+        m_nqs.net.inputLayer(i) = posDistribution;
+    }
+
+    return true;
+}
+
+
+double Sampler::sigmoid(double z){
+    return 1.0/(1 + exp(-z));
+}
+
+
 void Sampler::runSampling(){
     /*
     * pretty much the same as in project 1, main flow:
@@ -198,15 +234,15 @@ void Sampler::runSampling(){
     }
 
     for(int cycle = 0; cycle < m_nMCcycles; cycle++){
-        for(int particle = 0; particle < m_nParticles; particle++){
-            int rndParticle = Random::nextInt(m_nParticles);
-            bool stepAccepted = sample(rndParticle);
-            if(stepAccepted) {
-                m_acceptedSteps++;
-                localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
-                netGrads1d = m_nqs.computeCostGradient();
-            }
+        // for(int particle = 0; particle < m_nParticles; particle++){
+        int rndParticle = Random::nextInt(m_nParticles);
+        bool stepAccepted = sample(rndParticle);
+        if(stepAccepted) {
+            m_acceptedSteps++;
+            localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
+            netGrads1d = m_nqs.computeCostGradient();
         }
+        // }
 
         m_energy += localEnergy;
         m_energy2 += localEnergy*localEnergy;
@@ -247,7 +283,7 @@ void Sampler::runOptimization(){
         // exit(1);
         m_optimizer.optimize(m_nqs, m_costGradient, m_nInput, m_nHidden);
 
-        m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
+        m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles;
 
         m_energyVals(step) = m_energy;
         m_energy2Vals(step) = m_energy2;
