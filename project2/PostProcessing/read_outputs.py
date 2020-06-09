@@ -91,6 +91,7 @@ def read_energy_samples():
 
             data = np.fromfile(f, dtype = np.float64)
             data = data[np.isfinite(data)]
+            data = data[data != 0]
             if np.array_equal(empty_arr, data):
                 data = defaults.copy()
             files[-1]['Energy'] = data
