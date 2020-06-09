@@ -89,7 +89,7 @@ class dataAnalysisClass:
 
     # Blocking
     @staticmethod
-    # @njit(cache = True)
+    @njit(cache = True)
     def blocking(data, blockSizeMax = 500):
         blockSizeMin = 1
 
@@ -111,8 +111,10 @@ class dataAnalysisClass:
                 endPoint += blockSize
             vectorized = np.array(meanTempVec)
             mean = np.mean(vectorized)
-            print(len(meanTempVec))
-            var = np.var(vectorized)/len(meanTempVec)
+            if len(meanTempVec) == 0:
+                var = -1E3
+            else:
+                var = np.var(vectorized)/len(meanTempVec)
             meanVec.append(mean)
             varVec.append(var)
             blockSizes.append(blockSize)
