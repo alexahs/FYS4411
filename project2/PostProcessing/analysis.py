@@ -110,14 +110,11 @@ class dataAnalysisClass:
                 startPoint = endPoint
                 endPoint += blockSize
             vectorized = np.array(meanTempVec)
-            if len(meanTempVec) == 0:
-                var = -1E-3
-                mean = -1E-3
-            else:
+            if len(meanTempVec) != 0:
                 mean = np.mean(vectorized)
                 var = np.var(vectorized)/len(meanTempVec)
-            meanVec.append(mean)
-            varVec.append(var)
+                meanVec.append(mean)
+                varVec.append(var)
             blockSizes.append(blockSize)
 
         arr_varVec = np.array(varVec[-200:])
