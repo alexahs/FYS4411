@@ -79,12 +79,14 @@ public:
 
     //loop over gradient descent steps, calling runSampling each iteration
     void runOptimization();
-    void runDataCollection(int nMCcycles);
+    void runDataCollection(int nMCcycles, bool saveToFile = true);
     void printGridSearchInfo(int i, int j);
     bool isGibbsSampling();
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;
+
+    double getMeanEnergy(){return m_energy;}
 
 
 

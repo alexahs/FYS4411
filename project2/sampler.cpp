@@ -302,7 +302,7 @@ void Sampler::runOptimization(){
 
 }
 
-void Sampler::runDataCollection(int nMCcycles){
+void Sampler::runDataCollection(int nMCcycles, bool saveToFile){
     /*
     final big run with optimized weights
     */
@@ -312,8 +312,9 @@ void Sampler::runDataCollection(int nMCcycles){
     runSampling();
     m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
 
-    writeEnergySamples();
-
+    if (saveToFile) {
+      writeEnergySamples();
+    }
 
 }
 

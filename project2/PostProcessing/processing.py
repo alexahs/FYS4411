@@ -186,6 +186,8 @@ def load_energy_grids(savename):
 if __name__ == '__main__':
     energies = read_outputs.read_energy_samples()
     sorted_results = get_energy_grids(energies, test = False)
+    if not os.path.exists('../DataProcessed/'):
+        os.mkdir('../DataProcessed/')
     save_energy_grids(sorted_results, 'run_2')
     loaded_results = load_energy_grids('run_2')
     for i,j in zip(sorted_results.items(), loaded_results.items()):
