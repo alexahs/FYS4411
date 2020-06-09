@@ -29,6 +29,7 @@ class dataAnalysisClass:
         self.var = np.var(data)
         self.std = np.std(data)
         self.data = data
+        self.samplingErrors()
 
     def loadData(self, size=0):
         if size != 0:
@@ -72,6 +73,9 @@ class dataAnalysisClass:
         for k in prange(0, nBoots):
             bootVec[k] = np.mean(np.random.choice(data, len(data)))
         return np.mean(bootVec), np.var(bootVec), np.std(bootVec)
+
+    def samplingErrors(self):
+        self.std /= np.sqrt(len(self.data))
 
     # Jackknife
     @timeFunction
