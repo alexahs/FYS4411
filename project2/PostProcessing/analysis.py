@@ -111,6 +111,7 @@ class dataAnalysisClass:
                 endPoint += blockSize
             vectorized = np.array(meanTempVec)
             mean = np.mean(vectorized)
+            print(len(meanTempVec))
             var = np.var(vectorized)/len(meanTempVec)
             meanVec.append(mean)
             varVec.append(var)
