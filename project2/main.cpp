@@ -26,7 +26,7 @@ int main(){
     std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
     // std::vector<int> hiddenVals {1,2,3,4,5};
     std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-    int nCyclesPow2 = 16;
+    int nCyclesPow2 = 15;
     int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
 
