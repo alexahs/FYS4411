@@ -51,11 +51,11 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     Em = Z[idx[0],idx[1]]
                     Z = np.log(Z)
                 else:
-                    cutoffs = [0.49, 0.51]
+                    cutoffs = [0, 4]
                     Z[Z < cutoffs[0]] = cutoffs[0]
                     Z[Z > cutoffs[1]] = cutoffs[1]
                 plt.figure()
-                plt.contourf(value['LR'], value['HU'], Z, 400, cmap='magma')
+                plt.pcolormesh(value['LR'], value['HU'], Z, cmap='magma')
                 plt.xlabel('Learning Rate $\eta$')
                 plt.ylabel('Number of Nodes $H$')
                 cbar = plt.colorbar()
@@ -67,6 +67,7 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     cbar.set_label(msg2)
                 else:
                     cbar.set_label(f'Mean {mean_type.capitalize()} Energy')
+                print(Z)
             plt.show()
         elif dimensions == 3:
             for mean_type in means:
@@ -82,7 +83,7 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     Z = np.log(Z)
                     p3 = Z[idx[0],idx[1]]
                 else:
-                    cutoffs = [0.47, 0.53]
+                    cutoffs = [0, 2]
                     Z[Z < cutoffs[0]] = cutoffs[0]
                     Z[Z > cutoffs[1]] = cutoffs[1]
                 ax.plot_surface(value['LR'], value['HU'], Z, cmap = 'magma')
@@ -97,8 +98,50 @@ def plot_energies(grids, dimensions = 2, expected = None):
                     ax.set_zlabel(f'Mean {mean_type.capitalize()} Energy')
             plt.show()
 
+def plot_err(grids, dimensions = 2):
+    '''
+        Plots energies using energy data from processing.py
+
+        If dimensions is 2, makes a 2D contour plot
+        If dimensions is 3, makes a 3D surface plot
+
+        Expected should be the expected energy value (float)
+    '''
+    msg = '$\Delta E={:g}$ at $\eta={:g}$, $H={:g}$'
+    for key, value in grids.items():
+        means = ['sample_err', 'bootstrap_err', 'blocking_err']
+        if dimensions == 2:
+            for mean_type in means:
+                Z = value[mean_type]
+                cutoffs = [0, 4]
+                Z[Z < cutoffs[0]] = cutoffs[0]
+                Z[Z > cutoffs[1]] = cutoffs[1]
+                plt.figure()
+                plt.pcolormesh(value['LR'], value['HU'], Z, cmap='magma')
+                plt.xlabel('Learning Rate $\eta$')
+                plt.ylabel('Number of Nodes $H$')
+                cbar = plt.colorbar()
+                plt.axis(aspect='image')
+                cbar.set_label(f'Std. Error of {mean_type.capitalize()} Energy')
+                print(Z)
+            plt.show()
+        elif dimensions == 3:
+            for mean_type in means:
+                fig = plt.figure()
+                ax = plt.axes(projection='3d')
+                Z = value[mean_type]
+                cutoffs = [0, 2]
+                Z[Z < cutoffs[0]] = cutoffs[0]
+                Z[Z > cutoffs[1]] = cutoffs[1]
+                ax.plot_surface(value['LR'], value['HU'], Z, cmap = 'magma')
+                ax.set_xlabel('Learning Rate $\eta$')
+                ax.set_ylabel('Number of Nodes')
+                ax.set_zlabel(f'Std. Error of  {mean_type.capitalize()} Energy')
+            plt.show()
+
 if __name__ == '__main__':
     # optimizations = read_outputs.read_optimization()
     # energies = read_outputs.read_energy_samples()
-    grids = processing.load_energy_grids('run_1')
-    plot_energies(grids, 2, 0.5)
+    grids = processing.load_energy_grids('run_2')
+    plot_energies(grids, 2)#, 0.5)
+    plot_err(grids, 2)
