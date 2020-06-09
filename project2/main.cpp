@@ -14,7 +14,7 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer);
+double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer, double expected);
 void runSingle();
 void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals, double sigma);
 void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals, double sigma);
@@ -30,7 +30,6 @@ int main(){
     int nCyclesPow2 = 10;
     int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
-    double sigma = 0.8; // 0.7-1.3 might be good
 
     while (true) {
         std::cout << "Delete Previous Data? (y/n/q)" << std::endl;
@@ -48,7 +47,8 @@ int main(){
         }
     }
 
-    runSigmaGridSearch(nCyclesPow2, samplingRule, whichOptimizer);
+    double expected = 3;  // Expected value in sigma search
+    double sigma = runSigmaGridSearch(nCyclesPow2, samplingRule, whichOptimizer, expected);
     // runSingle();
     // Execution of main part of program
     // auto t0 = std::chrono::high_resolution_clock::now();
@@ -74,14 +74,23 @@ int main(){
     return 0;
 }
 
-double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer) {
+double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer, double expected) {
     int nParticles = 2;
     int nDims = 2;
     int nHidden = 2;
 
+    double sigma_min = 1.12;
+    double sigma_max = 1.16;
+    int N_sigmas = 1000;
+
+    double d_sigma = (sigma_max - sigma_min)/(N_sigmas-1);
+    double sigmas [N_sigmas] = {};
+    for (int i = 0; i < N_sigmas; i++) {
+      sigmas[i] = sigma_min + i*d_sigma;
+    }
+
     // SIZE IS HARDCODED!!!! CHECK THE LOOP TO BE SURE ALL IS CONSISTENT
-    double sigmas [20] = {0.700,0.732,0.763,0.795,0.826,0.858,0.889,0.921,0.953,0.984,1.016,1.047,1.079,1.111,1.142,1.174,1.205,1.237,1.268,1.300};
-    double meanEnergies [20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    double meanEnergies [N_sigmas] = { };
 
     double omega = 1.0; //in hamiltonian
     double sigma_init = 0.001; //initial spread of initial positions and weights
@@ -96,10 +105,12 @@ double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer)
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 694206661337; //seed does nothing apparently
 
-    #pragma omp for
-    for (int i = 0; i < 20; i++) {
-        double sigma = sigmas[i];
-        NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigma_init, samplingRule); //must be initialized first
+    int counter = 0;
+    std::cout << "OPTIMIZING FOR SIGMA 0%" << std::flush;
+
+    #pragma omp parallel for
+    for (int i = 0; i < N_sigmas; i++) {
+        NeuralQuantumState nqs(nParticles, nDims, nHidden, sigmas[i], seed, sigma_init, samplingRule); //must be initialized first
         Hamiltonian hamiltonian(omega, interaction, nqs);
         Optimizer optimizer(eta, whichOptimizer);
         Sampler sampler(nMCcycles,
@@ -115,15 +126,22 @@ double runSigmaGridSearch(int nCyclesPow2, int samplingRule, int whichOptimizer)
         sampler.m_printOptimInfo = false;
         sampler.runOptimization();
         sampler.runDataCollection(nMCcycles*8, false);
-        double meanEnergy = sampler.getMeanEnergy();
-        // #pragma omp critical
-        meanEnergies[i] = meanEnergy;
+        // HARDCODED ABSOLUTE DIFFERENCE BETWEEN EXPECTED ENERGY AND MEAN
+        meanEnergies[i] = sampler.getMeanEnergy();
+        counter++;
+        std::cout << "\rOPTIMIZING FOR SIGMA " << round(100*counter/N_sigmas) << "%" << std::flush;
     }
-    for (int i = 0; i < 20; i++) {
-        std::cout << meanEnergies[i] << ", ";
+    double minimum = meanEnergies[0];
+    int min_idx = 0;
+    for (int i = 1; i < N_sigmas; i++) {
+        if (abs(meanEnergies[i]-3) < minimum) {
+            minimum = abs(meanEnergies[i]-expected);
+            min_idx = i;
+        }
     }
-    std::cout << std::endl;
-    return 0.0;
+    std::cout << " – BEST SIGMA= " << sigmas[min_idx];
+    std::cout << ", dE= " << minimum << std::endl;
+    return sigmas[min_idx];
 }
 
 void runSingle(){

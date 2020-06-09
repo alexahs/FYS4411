@@ -332,6 +332,7 @@ void Sampler::writeEnergySamples(){
     outfile.close();
     if(m_printOptimInfo){cout << " * Results written to " << filename << endl;}
 
+    //sampler.m_nqs.net.inputLayer -> (x1, y1, x2, y2)
 }
 
 
