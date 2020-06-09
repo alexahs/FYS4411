@@ -21,22 +21,31 @@ void runGridSearch3();
 void runGridSearch4();
 
 int main(){
+
+    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
+    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
+    // std::vector<int> hiddenVals {1,2,3,4,5};
+    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int nCyclesPow2 = 2;
+    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
+    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
+
     // runSingle();
     // Execution of main part of program
     auto t0 = std::chrono::high_resolution_clock::now();
-    runGridSearch1();
+    runGridSearch1(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
     auto t1 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt1 = (t1 - t0);
     std::cout << "dt1 = " << dt1.count() << " s\n";
-    runGridSearch2();
+    runGridSearch2(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt2 = (t2 - t1);
     std::cout << "dt2 = " << dt2.count() << " s\n";
-    runGridSearch3();
+    runGridSearch3(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
     auto t3 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt3 = (t3 - t2);
     std::cout << "dt3 = " << dt3.count() << " s\n";
-    runGridSearch4();
+    runGridSearch4(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals);
     auto t4 = std::chrono::high_resolution_clock::now();
   	std::chrono::duration<double> dt4 = (t4 - t3);
     std::cout << "dt4 = " << dt4.count() << " s\n";
@@ -84,7 +93,7 @@ void runSingle(){
     sampler.runDataCollection(nMCcycles*8);
 }
 
-void runGridSearch1(){
+void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
 
     int nParticles = 1;
     int nDims = 1;
@@ -94,21 +103,13 @@ void runGridSearch1(){
     bool interaction = false;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 16;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 200; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337; //seed does nothing apparently
 
-
-    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
-    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
-    // std::vector<int> hiddenVals {1,2,3,4,5};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     double eta;
     int nHidden;
     double counter = 0.0;
@@ -144,7 +145,7 @@ void runGridSearch1(){
     std::cout << std::endl;
 }
 
-void runGridSearch2(){
+void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
 
     int nParticles = 2;
     int nDims = 1;
@@ -154,21 +155,13 @@ void runGridSearch2(){
     bool interaction = true;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 15;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 200; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337; //seed does nothing apparently
 
-
-    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
-    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
-    // std::vector<int> hiddenVals {1,2,3,4,5};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     double eta;
     int nHidden;
     double counter = 0.0;
@@ -205,7 +198,7 @@ void runGridSearch2(){
     std::cout << std::endl;
 }
 
-void runGridSearch3(){
+void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
 
     int nParticles = 2;
     int nDims = 2;
@@ -215,21 +208,14 @@ void runGridSearch3(){
     bool interaction = true;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 18;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 200; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337; //seed does nothing apparently
 
 
-    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
-    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
-    // std::vector<int> hiddenVals {1,2,3,4,5};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     double eta;
     int nHidden;
     double counter = 0.0;
@@ -267,7 +253,7 @@ void runGridSearch3(){
 
 }
 
-void runGridSearch4(){
+void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
 
     int nParticles = 2;
     int nDims = 3;
@@ -277,21 +263,13 @@ void runGridSearch4(){
     bool interaction = true;
     if(interaction) {assert(nParticles > 1);}
 
-    int nCyclesPow2 = 15;
     int nMCcycles = (int)pow(2, nCyclesPow2); //number of montecarlo cycles
     int nOptimizeIters = 200; //max iters in optimization
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
     double tolerance = 1e-6; //tolerance for convergence
     long seed = 1337; //seed does nothing apparently
 
-
-    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
-    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
-    // std::vector<int> hiddenVals {1,2,3,4,5};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     double eta;
     int nHidden;
     double counter = 0.0;
