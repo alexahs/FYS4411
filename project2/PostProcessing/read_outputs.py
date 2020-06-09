@@ -78,7 +78,7 @@ def read_energy_samples():
               'learning_rate']
 
     files = []
-    defaults = np.zeros(10)
+    defaults = -1E-3*np.ones(10)
     empty_arr = np.array([])
 
     for f in all_files:
