@@ -8,7 +8,6 @@
 using std::cout;
 using std::endl;
 
-
 NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init, int samplingRule){
     //
     m_nVisible = (int) nParticles*nDims;
@@ -24,8 +23,6 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
     if(samplingRule == 3){m_isGibbsSampling = true;}
     initialize();
 }
-
-
 
 void NeuralQuantumState::initialize(){
     //randomly initialize weights or something
@@ -47,11 +44,9 @@ void NeuralQuantumState::initialize(){
 
 }
 
-
 void NeuralQuantumState::adjustPosition(int node, double change){
     net.inputLayer(node) += change;
 }
-
 
 double NeuralQuantumState::evaluate(){
     //evaluate the wavefunction
@@ -62,16 +57,12 @@ double NeuralQuantumState::evaluate(){
         psi1 +=  (net.inputLayer(i)-net.inputBias(i))*(net.inputLayer(i)-net.inputBias(i));
     }
     psi1 = exp(-psi1/(2*m_sigma2));
-
-
-
     //////
     Eigen::VectorXd Q = computeQfactor();
     for(int j = 0; j<m_nHidden; j++){
         psi2 *= (1 + exp(Q(j)));
     }
     //////
-
     /*
     for(int j = 0; j < m_nHidden; j++){
         double term1 = 0;
@@ -108,7 +99,6 @@ Eigen::VectorXd NeuralQuantumState::computeQfactor(){
     return Qfactor;
 }
 
-
 Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
     // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
     // equations (115) and (116) in lecture notes
@@ -135,14 +125,12 @@ Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNum
         ddx *= 0.5;
     }
 
-
     Eigen::VectorXd derivatives(2);
     derivatives(0) = dx;
     derivatives(1) = ddx;
 
     return derivatives;
 }
-
 
 double NeuralQuantumState::computeDistance(int p, int q){
     //compute the distance between two particles p and q
@@ -154,24 +142,19 @@ double NeuralQuantumState::computeDistance(int p, int q){
         distance += net.inputLayer(pIdx + d) - net.inputLayer(qIdx + d);
         distance2 += distance*distance;
     }
-
     return sqrt(distance2);
-
 }
-
 
 Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
     //gradients wrt variational parameters (weights / biases)
     //equations 101, 102 and 103 in lecture notes
     Eigen::VectorXd grads(m_nInput + m_nHidden + m_nInput*m_nHidden);
 
-
     Eigen::VectorXd Q = computeQfactor();
     Eigen::VectorXd exp_neg_Q(m_nHidden);
     for(int i = 0; i < m_nHidden; i++){
         exp_neg_Q(i) = exp(-Q(i));
     }
-
 
     //derivative wrt. input bias
     for(int i = 0; i < m_nInput; i++){
@@ -184,7 +167,6 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
         grads(i) = 1/(exp_neg_Q(k) + 1);
         k++;
     }
-
 
     //derivative wrt weights
     k = m_nInput+m_nHidden;
@@ -199,9 +181,5 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
     if(m_isGibbsSampling){grads *= 0.5;}
 
     return grads;
-
 }
-
-
-
 //

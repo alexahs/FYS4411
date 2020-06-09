@@ -23,13 +23,37 @@ void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::
 
 int main(){
 
-    // std::vector<double> etaVals {0.09, 0.095, 0.10, 0.105, 0.11};
-    std::vector<double> etaVals {0.045, 0.056, 0.067, 0.078, 0.089, 0.100, 0.111, 0.123, 0.134, 0.145, 0.156, 0.167, 0.178, 0.189, 0.200};
-    // std::vector<int> hiddenVals {1,2,3,4,5};
-    std::vector<int> hiddenVals {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-    int nCyclesPow2 = 10;
-    int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
+    ////////////////////////////////////////////////////////////////////////////
+
+    double eta_min = 0.045;
+    double eta_max = 0.2;
+    int N_etas = 15;
+
+    double hidden_min = 1;
+    double hidden_max = 15;
+
+    int nCyclesPow2 = 8;
+    int samplingRule = 2;   //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
+
+    double expected = 3;    // Expected value in sigma search
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    std::vector<double> etaVals;
+    std::vector<int> hiddenVals;
+
+    etaVals.assign(N_etas, 0);
+    hiddenVals.assign(hidden_max - hidden_min + 1, 0);
+
+    double d_eta = (eta_max - eta_min)/(N_etas-1);
+    for (int i = 0; i < N_etas; i++) {
+      etaVals[i] = eta_min + i*d_eta;
+    }
+
+    for (int i = 0; i < hidden_max - hidden_min + 1; i++) {
+      hiddenVals[i] = hidden_min + i;
+    }
 
     while (true) {
         std::cout << "Delete Previous Data? (y/n/q)" << std::endl;
@@ -47,7 +71,6 @@ int main(){
         }
     }
 
-    double expected = 3;  // Expected value in sigma search
     double sigma = runSigmaGridSearch(nCyclesPow2, samplingRule, whichOptimizer, expected);
     // Execution of main part of program
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -381,7 +404,7 @@ void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::
             sampler.m_printOptimInfo = false;
             sampler.runOptimization();
             sampler.runDataCollection(nMCcycles*8);
-            sampler.printGridSearchInfo(i, j);
+            // sampler.printGridSearchInfo(i, j);
             counter++;
             std::cout << "\rLOADING " << round(100*counter/tot_iter) << "%" << std::flush;
 

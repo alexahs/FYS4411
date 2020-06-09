@@ -98,9 +98,51 @@ def read_energy_samples():
 
     return files
 
+def read_pos_samples():
+    '''
+        Reads files with names of formats:
+            'pos_samples_Pp_Dd_Hh_Ccycles_Eeta.bin'
+
+        Where:
+            'P' is the number of particles
+            'D' is the number of dimensions
+            'H' is the number of hidden units
+            'C' is the number of cycles
+            'E' is the learning rate
+    '''
+    all_files = list(data_path.glob(r'**/*'))
+    base = r'.*pos_samples_'
+    ext = r'\.bin'
+
+    pattern_1 = \
+    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
+
+    pattern_2 = \
+    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
+
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+              'learning_rate']
+
+    files = []
+    defaults = -1E-3*np.ones(10)
+    empty_arr = np.array([])
+
+    for f in all_files:
+        match = re.findall(pattern_1, str(f))
+        if match:
+            files.append({'path':f})
+            vals = re.findall(pattern_2, str(f))[0]
+            for k,v in zip(labels, vals):
+                files[-1][k] = float(v)
+
+            data = np.fromfile(f, dtype = np.float64)
+            shape = data.shape[0]
+            new_shape = (shape/files[-1]['dimensions'], files[-1]['dimensions'])
+            new_shape = (int(new_shape[0]), int(new_shape[1]))
+            files[-1]['pos'] = data.reshape(new_shape)
+    return files
+
 if __name__ == '__main__':
     optimizations = read_optimization()
     energies = read_energy_samples()
-
-    print(optimizations)
-    print(energies)
+    pos = read_pos_samples()

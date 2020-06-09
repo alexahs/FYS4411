@@ -10,7 +10,6 @@ using std::endl;
 using std::setw;
 using std::setprecision;
 
-
 Sampler::Sampler(int nMCcycles,
                  int samplingRule,
                  double tolerance,
@@ -52,8 +51,6 @@ Sampler::Sampler(int nMCcycles,
     //     }
     // }
 
-
-
 }
 
 bool Sampler::sample(int particleNumber){
@@ -74,7 +71,6 @@ bool Sampler::sample(int particleNumber){
     }
 
 }
-
 
 bool Sampler::metropolisStep(int particleNumber){
     int idxStart = particleNumber*m_nDims;
@@ -104,7 +100,6 @@ bool Sampler::metropolisStep(int particleNumber){
     }
 }
 
-
 bool Sampler::importanceStep(int particleNumber){
     int idxStart = particleNumber*m_nDims;
     int idxStop = idxStart + m_nDims;
@@ -115,7 +110,6 @@ bool Sampler::importanceStep(int particleNumber){
     Eigen::VectorXd posNew(m_nDims);
     Eigen::VectorXd proposedStep(m_nDims);
     double sigma2 = m_nqs.getSigma2();
-
 
     //old quantities
     Eigen::VectorXd Q = m_nqs.computeQfactor();
@@ -133,7 +127,6 @@ bool Sampler::importanceStep(int particleNumber){
         m_nqs.adjustPosition(i, step);
 
         qForceNew(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
-
 
         k++;
     }
@@ -178,7 +171,6 @@ bool Sampler::importanceStep(int particleNumber){
     }
 }
 
-
 bool Sampler::gibbsStep(){
 
     for(int j = 0; j < m_nHidden; j++){
@@ -195,11 +187,9 @@ bool Sampler::gibbsStep(){
     return true;
 }
 
-
 double Sampler::sigmoid(double z){
     return 1.0/(1 + exp(-z));
 }
-
 
 void Sampler::runSampling(){
     /*
@@ -256,7 +246,6 @@ void Sampler::runSampling(){
             m_energySamples(cycle) = localEnergy;
         }
 
-
     }// end MC cycles
 
     m_energy /= m_nMCcycles;
@@ -266,10 +255,6 @@ void Sampler::runSampling(){
 
     m_variance = m_energy2 - m_energy*m_energy;
     m_costGradient = 2*(m_dPsiTimesE - m_energy*m_dPsi);
-
-
-
-
 
 }
 
@@ -293,7 +278,6 @@ void Sampler::runOptimization(){
         m_varianceVals(step) = m_variance;
         m_acceptRatioVals(step) = m_acceptRatio;
         if(m_printOptimInfo){printInfo(step);}
-
 
     }
     writeCumulativeResults();
@@ -326,17 +310,27 @@ void Sampler::writeEnergySamples(){
     filename.append(std::to_string(m_nMCcycles) + "cycles_");
     filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
 
+    std::string filename_2 = "./Data/pos_samples_";
+    filename_2.append(std::to_string(m_nParticles) + "p_");
+    filename_2.append(std::to_string(m_nDims) + "d_");
+    filename_2.append(std::to_string(m_nHidden) + "h_");
+    filename_2.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename_2.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
+
     std::ofstream outfile;
     outfile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
     outfile.write(reinterpret_cast<const char*> (m_energySamples.data()),m_energySamples.size()*sizeof(double));
     outfile.close();
     if(m_printOptimInfo){cout << " * Results written to " << filename << endl;}
 
+    std::ofstream outfile_2;
+    outfile_2.open(filename_2, std::ios::out | std::ios::binary | std::ios::trunc);
+    outfile_2.write(reinterpret_cast<const char*> (m_nqs.net.inputLayer.data()), m_nqs.net.inputLayer.size()*sizeof(double));
+    outfile_2.close();
+    if(m_printOptimInfo){cout << " * Results written to " << filename_2 << endl;}
+
     //sampler.m_nqs.net.inputLayer -> (x1, y1, x2, y2)
 }
-
-
-
 
 void Sampler::printFinalInfo(){
     cout << endl;
@@ -349,7 +343,6 @@ void Sampler::printFinalInfo(){
     cout << setw(15) << setprecision(6) << m_acceptRatio << endl;
 }
 
-
 void Sampler::printInfo(int step){
     cout << setw(10) << step;
     cout << setw(15) << setprecision(6) << m_energy;
@@ -358,7 +351,6 @@ void Sampler::printInfo(int step){
     cout << setw(15) << setprecision(6) << m_costGradient.sum();
     cout << setw(15) << setprecision(6) << m_acceptRatio << endl;
 }
-
 
 void Sampler::printInitalSystemInfo(){
     cout << endl;
@@ -373,7 +365,6 @@ void Sampler::printInitalSystemInfo(){
     cout << "===== Step ====== Energy ====== Energy2 ====== Variance ====== Cost ====== ";
     cout << "Accept ratio =====" << endl << endl;
 }
-
 
 void Sampler::writeCumulativeResults(){
     /*
