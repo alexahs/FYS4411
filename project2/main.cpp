@@ -15,10 +15,10 @@ using std::cout;
 using std::endl;
 
 void runSingle();
-void runGridSearch1();
-void runGridSearch2();
-void runGridSearch3();
-void runGridSearch4();
+void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
+void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals);
 
 int main(){
 
@@ -29,6 +29,22 @@ int main(){
     int nCyclesPow2 = 2;
     int samplingRule = 2; //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
+
+    while (true) {
+        std::cout << "Delete Previous Data? (y/n/q)" << std::endl;
+        char input;
+        std::cin >> input;
+        if (input == 'y' || input == 'Y') {
+          int output = system("rm -rf Data/*");
+          break;
+        } else if (input == 'q' || input == 'Q') {
+          exit(0);
+        } else if (input != 'n' && input != 'N') {
+          std::cout << "Invalid Input: " << input << std::endl;
+        } else {
+          break;
+        }
+    }
 
     // runSingle();
     // Execution of main part of program
@@ -93,7 +109,7 @@ void runSingle(){
     sampler.runDataCollection(nMCcycles*8);
 }
 
-void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
+void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
     int nParticles = 1;
     int nDims = 1;
@@ -145,7 +161,7 @@ void runGridSearch1(int nCyclesPow2, int samplingRule, int whichOptimizer, std::
     std::cout << std::endl;
 }
 
-void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
+void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
     int nParticles = 2;
     int nDims = 1;
@@ -198,7 +214,7 @@ void runGridSearch2(int nCyclesPow2, int samplingRule, int whichOptimizer, std::
     std::cout << std::endl;
 }
 
-void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
+void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
     int nParticles = 2;
     int nDims = 2;
@@ -253,7 +269,7 @@ void runGridSearch3(int nCyclesPow2, int samplingRule, int whichOptimizer, std::
 
 }
 
-void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<double> hiddenVals){
+void runGridSearch4(int nCyclesPow2, int samplingRule, int whichOptimizer, std::vector<double> etaVals, std::vector<int> hiddenVals){
 
     int nParticles = 2;
     int nDims = 3;
