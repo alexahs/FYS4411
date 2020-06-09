@@ -89,7 +89,7 @@ class dataAnalysisClass:
 
     # Blocking
     @staticmethod
-    @njit(cache = True)
+    # @njit(cache = True)
     def blocking(data, blockSizeMax = 500):
         blockSizeMin = 1
 
