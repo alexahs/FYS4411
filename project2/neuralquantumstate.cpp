@@ -39,8 +39,6 @@ void NeuralQuantumState::initialize(){
 
         }
     }
-    cout << net.weights << endl;
-    exit(1);
 
     for(int i = 0; i < m_nHidden; i++){
         net.hiddenBias(i) = Random::nextGaussian(0, m_sigma_init);
