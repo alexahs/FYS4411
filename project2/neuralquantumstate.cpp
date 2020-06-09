@@ -71,7 +71,7 @@ double NeuralQuantumState::evaluate(){
         psi2 *= (1 + exp(Q(j)));
     }
     //////
-    
+
     /*
     for(int j = 0; j < m_nHidden; j++){
         double term1 = 0;
