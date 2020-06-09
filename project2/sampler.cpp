@@ -67,11 +67,14 @@ bool Sampler::sample(int particleNumber){
         return gibbsStep();
     }
     else{
-        cout << "Invalild sampling rule. " << endl;
+        cout << "Invalild sampling rule." << endl;
+        cout << "Usage:" << endl;
+        cout << "(1) - Standard metropolis sampling" << endl << "(2) - Importance sampling" << endl << "(3) - Gibbs sampling" << endl;
         exit(1);
     }
 
 }
+
 
 bool Sampler::metropolisStep(int particleNumber){
     int idxStart = particleNumber*m_nDims;
@@ -216,7 +219,7 @@ void Sampler::runSampling(){
     */
 
     Eigen::VectorXd netGrads1d = m_nqs.computeCostGradient();
-    m_wfOld = m_nqs.evaluate();
+    if(m_samplingRule != 3){m_wfOld = m_nqs.evaluate();}
     double localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
 
     m_energy = 0;

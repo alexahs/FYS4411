@@ -81,6 +81,7 @@ public:
     void runOptimization();
     void runDataCollection(int nMCcycles);
     void printGridSearchInfo(int i, int j);
+    bool isGibbsSampling();
     Hamiltonian m_hamiltonian;
     NeuralQuantumState m_nqs;
     Optimizer m_optimizer;

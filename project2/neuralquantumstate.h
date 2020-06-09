@@ -17,9 +17,10 @@ private:
     double m_sigma;
     double m_sigma2;
     double m_sigma4;
+    bool m_isGibbsSampling = false;
 
 public:
-    NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init);
+    NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init, int samplingRule);
 
     double evaluate(); //evaluate the wavefunction
     double computeDistance(int p, int q); //distance between two particles p and q
