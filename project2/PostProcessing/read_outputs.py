@@ -8,13 +8,14 @@ data_path = project_path.parents[0] / 'Data'
 def read_optimization():
     '''
         Reads files with names of formats:
-            'rbm_cumulative_results_Pp_Dd_Hh_Ccycles_Eeta.csv'
+            'rbm_cumulative_results_Pp_Dd_Hh_Ccycles_Ss_Eeta.csv'
 
         Where:
             'P' is the number of particles
             'D' is the number of dimensions
             'H' is the number of hidden units
             'C' is the number of optimization cycles
+            'S' is the selected sampling method
             'E' is the learning rate
     '''
     all_files = list(data_path.glob(r'**/*'))
@@ -22,12 +23,12 @@ def read_optimization():
     ext = r'\.csv'
 
     pattern_1 = \
-    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
+    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+s_\d+(?:\.\d+)?eta' + ext
 
     pattern_2 = \
-    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
+    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+)s_(\d+(?:\.\d+)?)eta' + ext
 
-    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles', 'sampling',
               'learning_rate']
     files = []
 
@@ -62,6 +63,7 @@ def read_energy_samples():
             'D' is the number of dimensions
             'H' is the number of hidden units
             'C' is the number of cycles
+            'S' is the selected sampling method
             'E' is the learning rate
     '''
     all_files = list(data_path.glob(r'**/*'))
@@ -69,12 +71,12 @@ def read_energy_samples():
     ext = r'\.bin'
 
     pattern_1 = \
-    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
+    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+s_\d+(?:\.\d+)?eta' + ext
 
     pattern_2 = \
-    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
+    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+)s_(\d+(?:\.\d+)?)eta' + ext
 
-    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles', 'sampling',
               'learning_rate']
 
     files = []
@@ -108,6 +110,7 @@ def read_pos_samples():
             'D' is the number of dimensions
             'H' is the number of hidden units
             'C' is the number of cycles
+            'S' is the selected sampling method
             'E' is the learning rate
     '''
     all_files = list(data_path.glob(r'**/*'))
@@ -115,18 +118,17 @@ def read_pos_samples():
     ext = r'\.bin'
 
     pattern_1 = \
-    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+(?:\.\d+)?eta' + ext
+    base + r'\d+p_\d+d_\d+h_\d+cycles_\d+s_\d+(?:\.\d+)?eta' + ext
 
     pattern_2 = \
-    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+(?:\.\d+)?)eta' + ext
+    base + r'(\d+)p_(\d+)d_(\d+)h_(\d+)cycles_(\d+)s_(\d+(?:\.\d+)?)eta' + ext
 
-    labels = ['particle', 'dimensions', 'hidden_units', 'cycles',
+    labels = ['particle', 'dimensions', 'hidden_units', 'cycles', 'sampling',
               'learning_rate']
 
     files = []
     defaults = -1E-3*np.ones(10)
     empty_arr = np.array([])
-
     for f in all_files:
         match = re.findall(pattern_1, str(f))
         if match:
@@ -140,6 +142,7 @@ def read_pos_samples():
             new_shape = (shape/files[-1]['dimensions'], files[-1]['dimensions'])
             new_shape = (int(new_shape[0]), int(new_shape[1]))
             files[-1]['pos'] = data.reshape(new_shape)
+    print(files)
     return files
 
 if __name__ == '__main__':

@@ -181,7 +181,8 @@ def plot_pos(grid):
 if __name__ == '__main__':
 
     optimizations = read_outputs.read_optimization()
-    plot_optimizations(optimizations[10])
+    print(optimizations)
+    plot_optimizations(optimizations)
 
     # energies = read_outputs.read_energy_samples()
     # grids = processing.load_energy_grids('run_2')
