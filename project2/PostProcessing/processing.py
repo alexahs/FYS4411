@@ -284,7 +284,7 @@ if __name__ == '__main__':
     # energies = read_outputs.read_energy_samples()
     positions = read_outputs.read_pos_samples()
     sorted_positions = get_position_grids(positions)
-    print(sorted_positions)
+    print(sorted_positions['P2D3C2048']['pos'][3][5])
     # sorted_energies = get_energy_grids(energies, test = False)
     #
     # if not os.path.exists('../DataProcessed/'):

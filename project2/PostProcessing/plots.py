@@ -1,5 +1,6 @@
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 import numpy as np
 
 import read_outputs
@@ -143,11 +144,52 @@ def plot_pos(grid):
     '''
         Plots the position density at a given point
     '''
-    
+    grid = np.linalg.norm(grid, axis = 1)
+    maxwell = stats.maxwell
+
+    x = np.linspace(np.min(grid), np.max(grid), 1000)
+
+    dist_label = 'Boltzmann Distribution Best Fit'
+    dist_params = {
+                   'label'      : dist_label,
+                   'color'      : 'r'
+                  }
+
+    y = maxwell.pdf(x, *maxwell.fit(grid))
+    plt.plot(x, y, **dist_params)
+
+    print(maxwell.fit(grid))
+
+    hist_params = {
+                    'density'   : True,
+                    'stacked'   : True,
+                    'bins'      : grid.shape[0]//50,
+                    'label'     : 'Experimental Results',
+                    'color'     : 'C0'
+                  }
+    units = r'$\left[ \sqrt{\frac{\hbar}{m \omega_{ho}}} \ \right]$'
+    plt.hist(grid, **hist_params)
+    plt.subplots_adjust(bottom=0.15)
+    plt.ylabel('Probability Density')
+    plt.xlabel('Distance from Origin ' + units)
+    plt.xlim([np.min(grid), np.max(grid)])
+    plt.grid()
+    plt.legend()
+    plt.show()
+
 
 if __name__ == '__main__':
-    # optimizations = read_outputs.read_optimization()
+
+    optimizations = read_outputs.read_optimization()
+    plot_optimizations(optimizations[10])
+
     # energies = read_outputs.read_energy_samples()
-    grids = processing.load_energy_grids('run_2')
-    plot_energies(grids, 2)#, 0.5)
-    plot_err(grids, 2)
+    # grids = processing.load_energy_grids('run_2')
+    # plot_energies(grids, 2)#, 0.5)
+    # plot_err(grids, 2)
+
+
+    # positions = read_outputs.read_pos_samples()
+    # sorted_positions = processing.get_position_grids(positions)
+    # pos_1 = sorted_positions['P2D3C2048']['pos'][3][5]
+    # plot_pos(pos_1)
