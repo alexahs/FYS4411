@@ -244,7 +244,8 @@ void Sampler::runSampling(){
 
         if(m_finalRun){
             m_energySamples(cycle) = localEnergy;
-            m_positions.segment(m_nDims*cycle, m_nDims) = m_nqs.net.inputLayer;
+            // TODO
+            // m_positions.segment(m_nDims*cycle, m_nDims) = m_nqs.net.inputLayer;
         }
 
     }// end MC cycles
