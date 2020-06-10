@@ -137,6 +137,8 @@ def read_pos_samples():
 
             data = np.fromfile(f, dtype = np.float64)
             shape = data.shape[0]
+            print(shape)
+            exit()
             new_shape = (shape/files[-1]['dimensions'], files[-1]['dimensions'])
             new_shape = (int(new_shape[0]), int(new_shape[1]))
             files[-1]['pos'] = data.reshape(new_shape)

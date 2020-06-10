@@ -183,19 +183,131 @@ def load_energy_grids(savename):
         sorted_results[key1][key2] = np.load(savename + '/' + f)
     return sorted_results
 
+def split_position_lists(data):
+    '''
+        Splits the list of results into compatible sublists, where each list
+        only contains results with equal numbers of particles, dimensions,
+        and cycles.
+    '''
+
+    conditions = {}
+    ID = '{:.0f}{:.0f}{:.0f}'
+    for d in data:
+        key = ID.format(d['particle'], d['dimensions'], d['cycles'])
+        if key not in conditions.keys():
+            conditions[key] = [d]
+        else:
+            conditions[key].append(d)
+    conditions = list(conditions.values())
+    return conditions
+
+def sort_position_grids(results):
+    '''
+        Organizes a set of unordered compatible position datapoints into a grid.
+    '''
+    unique_HU = []
+    unique_LR = []
+    for i in results:
+        if i['hidden_units'] not in unique_HU:
+            unique_HU.append(i['hidden_units'])
+        if i['learning_rate'] not in unique_LR:
+            unique_LR.append(i['learning_rate'])
+
+    unique_HU = np.sort(np.array(unique_HU, np.float64))
+    unique_LR = np.sort(np.array(unique_LR, np.float64))
+
+    LR, HU = np.meshgrid(unique_LR, unique_HU)
+    pos_grid = [[0 for i in unique_HU] for j in unique_LR]
+    for i,(a,b) in enumerate(zip(LR, HU)):
+        for j,(c,d) in enumerate(zip(a, b)):
+            for result in results:
+                if result['learning_rate'] == c and result['hidden_units'] == d:
+                    pos_grid[i][j] = result['pos']
+                    break
+    return pos_grid, LR, HU
+
+def get_position_grids(data):
+    '''
+        Calculates the mean positions after optimization is complete for all
+        points given in a list of data dicts.
+    '''
+    results = split_position_lists(data)
+    sorted_results = {}
+    for result in results:
+        key = f'P{result[0]["particle"]:.0f}D{result[0]["dimensions"]:.0f}C{result[0]["cycles"]:.0f}'
+        sorted_results[key] = {}
+        pos_grid, LR, HU = sort_position_grids(result)
+        sorted_results[key]['pos'] = pos_grid
+        sorted_results[key]['LR'] = LR
+        sorted_results[key]['HU'] = HU
+    return sorted_results
+
+def save_position_grids(sorted_results, savename):
+    '''
+        Saves the position grids to file
+    '''
+    savename = f'../DataProcessed/{savename}'
+    if os.path.isdir(savename):
+        while True:
+            delete = input('Delete Previously Saved Data? (y/n)')
+            if delete == 'y':
+                shutil.rmtree(savename)
+                break
+            elif delete == 'n':
+                exit()
+            else:
+                print('Invalid input: {delete}, try again.')
+
+    os.mkdir(savename)
+    for key, value in sorted_results.items():
+        name = f'{savename}/pos_arr_{key}_{{}}'
+        np.save(name.format('pos'), value['pos'])
+        np.save(name.format('LR'), value['LR'])
+        np.save(name.format('HU'), value['HU'])
+
+def load_position_grids(savename):
+    '''
+        Loads the position grids from file
+    '''
+    savename = f'../DataProcessed/{savename}'
+    files = os.listdir(savename)
+    sorted_results = {}
+    for f in files:
+        pattern = r'pos_arr__(P\d+D\d+C\d+)_(.*)\.npy'
+        key1,key2  = re.findall(pattern, f)[0]
+        if key1 not in sorted_results.keys():
+            sorted_results[key1] = {}
+        sorted_results[key1][key2] = np.load(savename + '/' + f)
+    return sorted_results
+
 if __name__ == '__main__':
-    energies = read_outputs.read_energy_samples()
-    sorted_results = get_energy_grids(energies, test = False)
-    if not os.path.exists('../DataProcessed/'):
-        os.mkdir('../DataProcessed/')
-    save_energy_grids(sorted_results, 'run_2')
-    loaded_results = load_energy_grids('run_2')
-    for i,j in zip(sorted_results.items(), loaded_results.items()):
-        assert np.array_equal(i[1]['sample'], j[1]['sample'])
-        assert np.array_equal(i[1]['blocking'], j[1]['blocking'])
-        assert np.array_equal(i[1]['bootstrap'], j[1]['bootstrap'])
-        assert np.array_equal(i[1]['sample_err'], j[1]['sample_err'])
-        assert np.array_equal(i[1]['blocking_err'], j[1]['blocking_err'])
-        assert np.array_equal(i[1]['bootstrap_err'], j[1]['bootstrap_err'])
-        assert np.array_equal(i[1]['LR'], j[1]['LR'])
-        assert np.array_equal(i[1]['HU'], j[1]['HU'])
+    # energies = read_outputs.read_energy_samples()
+    positions = read_outputs.read_pos_samples()
+    sorted_positions = get_position_grids(positions)
+    print(sorted_positions)
+    # sorted_energies = get_energy_grids(energies, test = False)
+    #
+    # if not os.path.exists('../DataProcessed/'):
+    #     os.mkdir('../DataProcessed/')
+    # save_energy_grids(sorted_energies, 'run_2')
+    # loaded_energies = load_energy_grids('run_2')
+    #
+    # for i,j in zip(sorted_energies.items(), loaded_results.items()):
+    #     assert np.array_equal(i[1]['sample'], j[1]['sample'])
+    #     assert np.array_equal(i[1]['blocking'], j[1]['blocking'])
+    #     assert np.array_equal(i[1]['bootstrap'], j[1]['bootstrap'])
+    #     assert np.array_equal(i[1]['sample_err'], j[1]['sample_err'])
+    #     assert np.array_equal(i[1]['blocking_err'], j[1]['blocking_err'])
+    #     assert np.array_equal(i[1]['bootstrap_err'], j[1]['bootstrap_err'])
+    #     assert np.array_equal(i[1]['LR'], j[1]['LR'])
+    #     assert np.array_equal(i[1]['HU'], j[1]['HU'])
+    #
+    # for i,j in zip(sorted_energies.items(), loaded_energies.items()):
+    #     assert np.array_equal(i[1]['sample'], j[1]['sample'])
+    #     assert np.array_equal(i[1]['blocking'], j[1]['blocking'])
+    #     assert np.array_equal(i[1]['bootstrap'], j[1]['bootstrap'])
+    #     assert np.array_equal(i[1]['sample_err'], j[1]['sample_err'])
+    #     assert np.array_equal(i[1]['blocking_err'], j[1]['blocking_err'])
+    #     assert np.array_equal(i[1]['bootstrap_err'], j[1]['bootstrap_err'])
+    #     assert np.array_equal(i[1]['LR'], j[1]['LR'])
+    #     assert np.array_equal(i[1]['HU'], j[1]['HU'])

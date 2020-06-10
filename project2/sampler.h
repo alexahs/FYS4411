@@ -46,6 +46,7 @@ private:
     bool m_finalRun = false;
 
     Eigen::VectorXd m_energySamples;
+    Eigen::VectorXd m_positions;
 
     Eigen::VectorXd m_uniform_real_distribution_H;
 

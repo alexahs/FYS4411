@@ -32,7 +32,8 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 18;
+    int nCyclesPow2 = 3;
+    int nCyclesSigma = 2;
     int samplingRule = 2;   //1 - standard, 2 - metropolis, 3- gibbs
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
 
@@ -71,7 +72,7 @@ int main(){
         }
     }
 
-    double sigma = runSigmaGridSearch(nCyclesPow2, samplingRule, whichOptimizer, expected);
+    double sigma = runSigmaGridSearch(nCyclesSigma, samplingRule, whichOptimizer, expected);
     // Execution of main part of program
     auto t0 = std::chrono::high_resolution_clock::now();
     runGridSearch1(nCyclesPow2, samplingRule, whichOptimizer, etaVals, hiddenVals, sigma);

@@ -244,6 +244,7 @@ void Sampler::runSampling(){
 
         if(m_finalRun){
             m_energySamples(cycle) = localEnergy;
+            m_positions.segment(m_nDims*cycle, m_nDims) = m_nqs.net.inputLayer;
         }
 
     }// end MC cycles
@@ -293,6 +294,7 @@ void Sampler::runDataCollection(int nMCcycles, bool saveToFile){
     m_nMCcycles = nMCcycles;
     m_finalRun = true;
     m_energySamples.resize(m_nMCcycles);
+    m_positions.resize(m_nDims*m_nMCcycles);
     runSampling();
     m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles/(double)m_nParticles;
 
@@ -321,13 +323,13 @@ void Sampler::writeEnergySamples(){
     outfile.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
     outfile.write(reinterpret_cast<const char*> (m_energySamples.data()),m_energySamples.size()*sizeof(double));
     outfile.close();
-    if(m_printOptimInfo){cout << " * Results written to " << filename << endl;}
+    if(m_printOptimInfo){cout << " * Energies written to " << filename << endl;}
 
     std::ofstream outfile_2;
     outfile_2.open(filename_2, std::ios::out | std::ios::binary | std::ios::trunc);
-    outfile_2.write(reinterpret_cast<const char*> (m_nqs.net.inputLayer.data()), m_nqs.net.inputLayer.size()*sizeof(double));
+    outfile_2.write(reinterpret_cast<const char*> (m_positions.data()), m_positions.size()*sizeof(double));
     outfile_2.close();
-    if(m_printOptimInfo){cout << " * Results written to " << filename_2 << endl;}
+    if(m_printOptimInfo){cout << " * Positions written to " << filename_2 << endl;}
 
     //sampler.m_nqs.net.inputLayer -> (x1, y1, x2, y2)
 }

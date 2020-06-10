@@ -139,6 +139,12 @@ def plot_err(grids, dimensions = 2):
                 ax.set_zlabel(f'Std. Error of  {mean_type.capitalize()} Energy')
             plt.show()
 
+def plot_pos(grid):
+    '''
+        Plots the position density at a given point
+    '''
+    
+
 if __name__ == '__main__':
     # optimizations = read_outputs.read_optimization()
     # energies = read_outputs.read_energy_samples()
