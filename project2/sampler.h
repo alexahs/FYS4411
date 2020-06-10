@@ -5,7 +5,6 @@
 #include "netparams.h"
 #include <fstream>
 
-
 class Sampler{
 /*
 * To maintain a simple and readabla main function, we can let this class be the main class
@@ -50,9 +49,6 @@ private:
 
     Eigen::VectorXd m_uniform_real_distribution_H;
 
-
-
-
     //loop over mc cycles and sample energies etc
     void runSampling();
     bool sample(int particleNumber);
@@ -88,8 +84,6 @@ public:
     Optimizer m_optimizer;
 
     double getMeanEnergy(){return m_energy;}
-
-
 
     bool m_printOptimInfo = true;
 };

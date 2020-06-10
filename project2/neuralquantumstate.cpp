@@ -34,14 +34,12 @@ void NeuralQuantumState::initialize(){
         // std::cout << net.inputBias(i) << std::endl;
         for(int j = 0; j < m_nHidden; j++){
             net.weights(i, j) = Random::nextGaussian(0, m_sigma_init);
-
         }
     }
 
     for(int i = 0; i < m_nHidden; i++){
         net.hiddenBias(i) = Random::nextGaussian(0, m_sigma_init);
     }
-
 }
 
 void NeuralQuantumState::adjustPosition(int node, double change){
@@ -74,7 +72,6 @@ double NeuralQuantumState::evaluate(){
         psi2 *= 1 + exp(term1);
     }
     */
-
     return psi1*psi2;
 }
 
@@ -93,9 +90,7 @@ Eigen::VectorXd NeuralQuantumState::computeQfactor(){
         Qfactor(n) = exp(net.hiddenBias(n) + term1/m_sigma2);
     }
     */
-
     Eigen::VectorXd Qfactor = net.hiddenBias + (((1.0/m_sigma2)*net.inputLayer).transpose()*net.weights).transpose();
-
     return Qfactor;
 }
 
@@ -128,7 +123,6 @@ Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNum
     Eigen::VectorXd derivatives(2);
     derivatives(0) = dx;
     derivatives(1) = ddx;
-
     return derivatives;
 }
 
@@ -177,9 +171,6 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
             k++;
         }
     }
-
     if(m_isGibbsSampling){grads *= 0.5;}
-
     return grads;
 }
-//

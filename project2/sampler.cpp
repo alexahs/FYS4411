@@ -244,10 +244,10 @@ void Sampler::runSampling(){
 
         if(m_finalRun){
             m_energySamples(cycle) = localEnergy;
-            // TODO
-            // m_positions.segment(m_nDims*cycle, m_nDims) = m_nqs.net.inputLayer;
+            for(int i = 0; i < m_nDims; i++) {
+                m_positions(m_nDims*cycle+i) = m_nqs.net.inputLayer.data()[i];
+            }
         }
-
     }// end MC cycles
 
     m_energy /= m_nMCcycles;
@@ -257,7 +257,6 @@ void Sampler::runSampling(){
 
     m_variance = m_energy2 - m_energy*m_energy;
     m_costGradient = 2*(m_dPsiTimesE - m_energy*m_dPsi);
-
 }
 
 void Sampler::runOptimization(){
@@ -302,7 +301,6 @@ void Sampler::runDataCollection(int nMCcycles, bool saveToFile){
     if (saveToFile) {
       writeEnergySamples();
     }
-
 }
 
 void Sampler::writeEnergySamples(){
@@ -311,6 +309,7 @@ void Sampler::writeEnergySamples(){
     filename.append(std::to_string(m_nDims) + "d_");
     filename.append(std::to_string(m_nHidden) + "h_");
     filename.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename.append(std::to_string(m_samplingRule) + "s_");
     filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
 
     std::string filename_2 = "./Data/pos_samples_";
@@ -318,6 +317,7 @@ void Sampler::writeEnergySamples(){
     filename_2.append(std::to_string(m_nDims) + "d_");
     filename_2.append(std::to_string(m_nHidden) + "h_");
     filename_2.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename_2.append(std::to_string(m_samplingRule) + "s_");
     filename_2.append(std::to_string(m_optimizer.getLearningRate()) + "eta.bin");
 
     std::ofstream outfile;
@@ -331,8 +331,6 @@ void Sampler::writeEnergySamples(){
     outfile_2.write(reinterpret_cast<const char*> (m_positions.data()), m_positions.size()*sizeof(double));
     outfile_2.close();
     if(m_printOptimInfo){cout << " * Positions written to " << filename_2 << endl;}
-
-    //sampler.m_nqs.net.inputLayer -> (x1, y1, x2, y2)
 }
 
 void Sampler::printFinalInfo(){

@@ -37,11 +37,7 @@ struct NetParams {
 
         // dInputBias.resize(nInput);
         // dHiddenBias.resize(nHidden);
-
         weights.resize(nInput, nHidden);
         // dWeights.resize(nInput, nHidden);
     }
-
-
-
 };

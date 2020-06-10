@@ -3,14 +3,10 @@
 #include <vector>
 #include <Eigen/Dense>
 
-
-
 Optimizer::Optimizer(double eta, int whichOptimizer){
     m_eta = eta;
     m_whichOptimizer = whichOptimizer;
 }
-
-
 
 void Optimizer::optimize(NeuralQuantumState &nqs, Eigen::VectorXd grads, int nInput, int nHidden){
     //gradient denscent
@@ -33,8 +29,6 @@ void Optimizer::optimize(NeuralQuantumState &nqs, Eigen::VectorXd grads, int nIn
                 k++;
             }
         }
-
-
     }
     if (m_whichOptimizer == 2){
         //some other optim method
