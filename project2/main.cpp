@@ -68,7 +68,9 @@ int main(){
 
     int nCyclesPow2 = 17;
     int nCyclesSigma = 10;
-    int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
+    // int nCyclesPow2 = 8;     // For testing
+    // int nCyclesSigma = 8;    // For testing
+    int whichOptimizer = 1;     //1 - gradient descent, 2 - some other optim scheme
 
     double expected_1P = 0.5;    // Expected value in sigma search
     double expected_2P = 3.0;    // Expected value in sigma search
@@ -234,6 +236,20 @@ double runSigmaSearch(double sigma_min, double sigma_max, int nCyclesPow2, int s
     outfile.close();
     cout << " * Sigmas written to " << filename << endl;
 
+    std::string filename2 = "./Data/sigmas_E_";
+    filename2.append(std::to_string(nParticles) + "p_");
+    filename2.append(std::to_string(nDims) + "d_");
+    filename2.append(std::to_string(nHidden) + "h_");
+    filename2.append(std::to_string(nMCcycles) + "cycles_");
+    filename2.append(std::to_string(samplingRule) + "s_");
+    filename2.append(std::to_string(eta) + "eta.bin");
+
+    std::ofstream outfile2;
+    outfile2.open(filename2, std::ios::out | std::ios::binary | std::ios::trunc);
+    outfile2.write(reinterpret_cast<const char*> (meanEnergies), N_sigmas*sizeof(double));
+    outfile2.close();
+    cout << " * Sigma Energies written to " << filename << endl;
+
     return sigmas[min_idx];
 }
 
@@ -311,6 +327,20 @@ double runSigmaInitSearch(double sigma_min, double sigma_max, int nCyclesPow2, i
     outfile.write(reinterpret_cast<const char*> (sigmas), N_sigmas*sizeof(double));
     outfile.close();
     cout << " * Sigma_Inits written to " << filename << endl;
+
+    std::string filename2 = "./Data/sigma_inits_E_";
+    filename2.append(std::to_string(nParticles) + "p_");
+    filename2.append(std::to_string(nDims) + "d_");
+    filename2.append(std::to_string(nHidden) + "h_");
+    filename2.append(std::to_string(nMCcycles) + "cycles_");
+    filename2.append(std::to_string(samplingRule) + "s_");
+    filename2.append(std::to_string(eta) + "eta.bin");
+
+    std::ofstream outfile2;
+    outfile2.open(filename2, std::ios::out | std::ios::binary | std::ios::trunc);
+    outfile2.write(reinterpret_cast<const char*> (meanEnergies), N_sigmas*sizeof(double));
+    outfile2.close();
+    cout << " * Sigma_Init Energies written to " << filename << endl;
 
     return sigmas[min_idx];
 }
