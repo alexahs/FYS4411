@@ -177,7 +177,6 @@ def plot_pos(grid):
     plt.legend()
     plt.show()
 
-
 if __name__ == '__main__':
 
     optimizations = read_outputs.read_optimization()
