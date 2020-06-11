@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.font_manager import FontProperties
 from multiprocessing import Pool
-from numba import njit, prange
+from numba import njit
 
 # Timing Decorator
 def timeFunction(f):
@@ -67,10 +67,10 @@ class dataAnalysisClass:
 
     # Bootstrap
     @staticmethod
-    @njit(cache = True, parallel = True)
+    @njit(cache = True)
     def bootstrap(data, nBoots = 1000):
         bootVec = np.zeros(nBoots)
-        for k in prange(0, nBoots):
+        for k in range(0, nBoots):
             bootVec[k] = np.mean(np.random.choice(data, len(data)))
         return np.mean(bootVec), np.var(bootVec), np.std(bootVec)
 

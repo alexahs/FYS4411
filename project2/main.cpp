@@ -64,12 +64,12 @@ int main(){
     int N_etas = 15;
 
     double hidden_min = 1;
-    double hidden_max = 16;
+    double hidden_max = 15;
 
-    int nCyclesPow2 = 17;
-    int nCyclesSigma = 10;
-    // int nCyclesPow2 = 8;        // For testing
-    // int nCyclesSigma = 6;       // For testing
+    // int nCyclesPow2 = 17;
+    // int nCyclesSigma = 10;
+    int nCyclesPow2 = 6;        // For testing
+    int nCyclesSigma = 4;       // For testing
     int whichOptimizer = 1;     //1 - gradient descent, 2 - some other optim scheme
 
     double expected_1P = 0.5;    // Expected value in sigma search
@@ -188,7 +188,7 @@ double runSigmaSearch(double sigma_min, double sigma_max, int nCyclesPow2, int s
     int counter = 0;
     std::cout << "OPTIMIZING FOR SIGMA 0%" << std::flush;
 
-    #pragma omp parallel for num_threads(15)
+    #pragma omp parallel for
     for (int i = 0; i < N_sigmas; i++) {
         NeuralQuantumState nqs(nParticles, nDims, nHidden, sigmas[i], seed, sigma_init, samplingRule); //must be initialized first
         Hamiltonian hamiltonian(omega, interaction, nqs);
@@ -280,7 +280,7 @@ double runSigmaInitSearch(double sigma_min, double sigma_max, int nCyclesPow2, i
     int counter = 0;
     std::cout << "OPTIMIZING FOR SIGMA INIT 0%" << std::flush;
 
-    #pragma omp parallel for num_threads(15)
+    #pragma omp parallel for
     for (int i = 0; i < N_sigmas; i++) {
         NeuralQuantumState nqs(nParticles, nDims, nHidden, sigma, seed, sigmas[i], samplingRule); //must be initialized first
         Hamiltonian hamiltonian(omega, interaction, nqs);

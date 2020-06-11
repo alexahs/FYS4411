@@ -230,7 +230,7 @@ def sort_position_grids(results):
         for j,(c,d) in enumerate(zip(a, b)):
             for result in results:
                 if result['learning_rate'] == c and result['hidden_units'] == d:
-                    pos_grid[i][j] = result['pos']
+                    pos_grid[j][i] = result['pos']
                     break
     return pos_grid, LR, HU
 
