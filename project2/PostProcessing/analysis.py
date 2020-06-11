@@ -11,7 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.font_manager import FontProperties
 from multiprocessing import Pool
 from numba import njit
-max_processes = 8
+max_processes = 16
 
 # Timing Decorator
 def timeFunction(f):

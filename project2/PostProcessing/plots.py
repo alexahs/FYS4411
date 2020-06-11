@@ -203,7 +203,7 @@ def plot_pos(grids, key, i, j, ext = '.pdf'):
     hist_params = {
                     'density'   : True,
                     'stacked'   : True,
-                    'bins'      : grid.shape[0]//50,
+                    'bins'      : 200,  #grid.shape[0]//50,
                     'label'     : 'Experimental Results',
                     'color'     : 'C0'
                   }
@@ -244,6 +244,7 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
     label1 = 'Energies'
     label2 = f'Best $\sigma = {best_sigma:g}$'
     plt.figure()
+    plt.grid()
     plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
     plt.semilogy(sigmas, diffs, label = label1)
     plt.xlabel('$\sigma$')
@@ -254,6 +255,7 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
 
 
     plt.figure()
+    plt.grid()
     idx = np.isfinite(data['sigma_inits_E'])
 
     sigmas = data['sigma_inits'][idx]
@@ -286,9 +288,10 @@ if __name__ == '__main__':
         else:
             print('Invalid input: {delete}, try again.')
 
-    test_key = 'P2D3C2048S2'
-    test_key_optim = 'P2D3C256S2'
-    test_key_sigmas = 'P2D2C256S2'
+
+    test_key = 'P2D3C1048576S2'
+    test_key_optim = 'P2D3C131072S2'
+    test_key_sigmas = 'P2D2C1024S2'
     ext = '.png'
 
     optimizations = read_outputs.read_optimization()

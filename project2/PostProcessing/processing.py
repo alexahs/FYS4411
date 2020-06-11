@@ -6,7 +6,7 @@ import os
 import re
 
 import read_outputs
-max_processes = 8
+max_processes = 16
 
 
 def get_analyser_data(data, test):
