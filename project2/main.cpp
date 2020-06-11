@@ -66,10 +66,10 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 17;
-    int nCyclesSigma = 10;
-    // int nCyclesPow2 = 8;     // For testing
-    // int nCyclesSigma = 8;    // For testing
+    // int nCyclesPow2 = 17;
+    // int nCyclesSigma = 10;
+    int nCyclesPow2 = 8;        // For testing
+    int nCyclesSigma = 8;       // For testing
     int whichOptimizer = 1;     //1 - gradient descent, 2 - some other optim scheme
 
     double expected_1P = 0.5;    // Expected value in sigma search
