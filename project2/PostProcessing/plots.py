@@ -244,8 +244,8 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
     label1 = 'Energies'
     label2 = f'Best $\sigma = {best_sigma:g}$'
     plt.figure()
-    plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label1)
-    plt.semilogy(sigmas, diffs, label = label2)
+    plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
+    plt.semilogy(sigmas, diffs, label = label1)
     plt.xlabel('$\sigma$')
     plt.ylabel('Energy Deviance from Expected Value')
     plt.legend()
@@ -265,8 +265,8 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
 
     label1 = 'Energies'
     label2 = f'Best $\sigma_{{init}} = {best_sigma:g}$'
-    plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label1)
-    plt.semilogy(sigmas, diffs, label = label2)
+    plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
+    plt.semilogy(sigmas, diffs, label = label1)
     plt.xlabel('$\sigma_{{init}}$')
     plt.ylabel('Energy Deviance from Expected Value')
     plt.legend()
@@ -289,7 +289,7 @@ if __name__ == '__main__':
     test_key = 'P2D3C2048S2'
     test_key_optim = 'P2D3C256S2'
     test_key_sigmas = 'P2D2C256S2'
-    ext = '.pdf'
+    ext = '.png'
 
     optimizations = read_outputs.read_optimization()
     plot_optimizations(optimizations, test_key_optim, ext = ext)
