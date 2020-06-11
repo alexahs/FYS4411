@@ -11,6 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.font_manager import FontProperties
 from multiprocessing import Pool
 from numba import njit
+max_processes = 8
 
 # Timing Decorator
 def timeFunction(f):
@@ -34,7 +35,7 @@ class dataAnalysisClass:
     def loadData(self, size=0):
         if size != 0:
             # MODIFIED BY GABRIEL
-            pool = Pool()
+            pool = Pool(processes = max_processes)
             with open(self.inputFileName, 'r') as inputFile:
                 self.data = inputFile.read().split()
                 self.data = np.array(pool.map(float, self.data))
