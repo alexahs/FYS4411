@@ -181,16 +181,13 @@ def plot_pos(grid):
 if __name__ == '__main__':
 
     optimizations = read_outputs.read_optimization()
-    print(optimizations)
-    plot_optimizations(optimizations)
+    plot_optimizations(optimizations[0])
 
-    # energies = read_outputs.read_energy_samples()
-    # grids = processing.load_energy_grids('run_2')
-    # plot_energies(grids, 2)#, 0.5)
+    # grids = processing.load_energy_grids('run')
+    # plot_energies(grids, 2)
     # plot_err(grids, 2)
 
-
-    # positions = read_outputs.read_pos_samples()
-    # sorted_positions = processing.get_position_grids(positions)
-    # pos_1 = sorted_positions['P2D3C2048']['pos'][3][5]
-    # plot_pos(pos_1)
+    positions = read_outputs.read_pos_samples()
+    sorted_positions = processing.get_position_grids(positions)
+    pos_1 = sorted_positions['P2D3C2048S2']['pos'][3][5]
+    plot_pos(pos_1)

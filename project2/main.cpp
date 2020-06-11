@@ -66,8 +66,8 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 18;
-    int nCyclesSigma = 12;
+    int nCyclesPow2 = 8;
+    int nCyclesSigma = 8;
     int whichOptimizer = 1; //1 - gradient descent, 2 - some other optim scheme
 
     double expected_1P = 0.5;    // Expected value in sigma search
@@ -79,10 +79,10 @@ int main(){
 
   // Optimize for Sigmas for 2 Nodes 1D1P (E= 0.5)
     double sigma_1P = runSigmaSearch(5, 15, nCyclesSigma, 2, whichOptimizer, expected_1P, 1, 1, false);
-    double sigma_init_1P = runSigmaInitSearch(5, 15, nCyclesSigma, 2, whichOptimizer, expected_1P, 1, 1, sigma_1P, false);
+    double sigma_init_1P = runSigmaInitSearch(5, 20, nCyclesSigma, 2, whichOptimizer, expected_1P, 1, 1, sigma_1P, false);
 
   // Optimize for Sigmas for 2 Nodes 2P2D (E= 3)
-    double sigma_2P = runSigmaSearch(0.1, 1.0, nCyclesSigma, 2, whichOptimizer, expected_2P, 2, 2, true);
+    double sigma_2P = runSigmaSearch(0.1, 2.0, nCyclesSigma, 2, whichOptimizer, expected_2P, 2, 2, true);
     double sigma_init_2P = runSigmaInitSearch(1E-4, 3E-3, nCyclesSigma, 2, whichOptimizer, expected_2P, 2, 2, sigma_2P, true);
 
   ////////////////////////////////////

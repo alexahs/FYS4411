@@ -142,7 +142,6 @@ def read_pos_samples():
             new_shape = (shape/files[-1]['dimensions'], files[-1]['dimensions'])
             new_shape = (int(new_shape[0]), int(new_shape[1]))
             files[-1]['pos'] = data.reshape(new_shape)
-    print(files)
     return files
 
 if __name__ == '__main__':

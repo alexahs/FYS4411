@@ -378,6 +378,7 @@ void Sampler::writeCumulativeResults(){
     filename.append(std::to_string(m_nDims) + "d_");
     filename.append(std::to_string(m_nHidden) + "h_");
     filename.append(std::to_string(m_nMCcycles) + "cycles_");
+    filename.append(std::to_string(m_samplingRule) + "s_");
     filename.append(std::to_string(m_optimizer.getLearningRate()) + "eta.csv");
 
     std::ofstream outfile;
