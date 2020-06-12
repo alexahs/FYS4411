@@ -6,6 +6,8 @@ import os
 import re
 
 import read_outputs
+max_processes = 16
+
 
 def get_analyser_data(data, test):
     '''
@@ -112,7 +114,7 @@ def get_energy_grids(data, test = False):
         Calculates the mean energies after optimization is complete for all
         points given in a list of data dicts.
     '''
-    pool = Pool()
+    pool = Pool(processes = max_processes)
     for i in range(len(data)):
         data[i]['test'] = test
     results = np.zeros((len(data), 12), dtype = np.float64)
@@ -230,7 +232,7 @@ def sort_position_grids(results):
         for j,(c,d) in enumerate(zip(a, b)):
             for result in results:
                 if result['learning_rate'] == c and result['hidden_units'] == d:
-                    pos_grid[i][j] = result['pos']
+                    pos_grid[j][i] = result['pos']
                     break
     return pos_grid, LR, HU
 
