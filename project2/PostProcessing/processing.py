@@ -252,41 +252,36 @@ def get_position_grids(data):
         sorted_results[key]['HU'] = HU
     return sorted_results
 
-def get_best_energy_idx(grid, expected):
+def get_best_energy_data(grid, expected):
     '''
         Returns the best HU and LR, as well as their indices, for an energy
         grid, given an expected value.
     '''
-    for i in grid['blocking']:
-        for j in i:
-            print(f'{j:5.2f} ', end = '')
-        print()
-    exit()
     diffs = np.abs(grid['sample']-expected)
-    print(grid['blocking'])
     idx = np.unravel_index(diffs.argmin(), diffs.shape)
     HU = grid['HU'][idx]
     LR = grid['LR'][idx]
     E = grid['blocking'][idx]
     dE = diffs[idx]
-    print(f'{HU:g} {LR:g} {E:g} {dE:g}')
+    data = {'HU':HU, 'LR':LR, 'E':E, 'dE':dE, 'idx':idx}
+    return data
 
 if __name__ == '__main__':
 
-    if not os.path.exists('../DataProcessed/'):
-        os.mkdir('../DataProcessed/')
-    elif os.listdir('../DataProcessed/'):
-        while True:
-            delete = input('Delete Previously Processed Data? (y/n)')
-            if delete == 'y':
-                shutil.rmtree('../DataProcessed/')
-                os.mkdir('../DataProcessed/')
-                break
-            elif delete == 'n':
-                break
-            else:
-                print('Invalid input: {delete}, try again.')
-
+    # if not os.path.exists('../DataProcessed/'):
+    #     os.mkdir('../DataProcessed/')
+    # elif os.listdir('../DataProcessed/'):
+    #     while True:
+    #         delete = input('Delete Previously Processed Data? (y/n)')
+    #         if delete == 'y':
+    #             shutil.rmtree('../DataProcessed/')
+    #             os.mkdir('../DataProcessed/')
+    #             break
+    #         elif delete == 'n':
+    #             break
+    #         else:
+    #             print('Invalid input: {delete}, try again.')
+    #
     # energies = read_outputs.read_energy_samples()
     # positions = read_outputs.read_pos_samples()
     # sorted_positions = get_position_grids(positions)
@@ -306,7 +301,7 @@ if __name__ == '__main__':
     #     assert np.array_equal(v['HU'], loaded_energies[k]['HU'])
 
     loaded_energies = load_energy_grids('run')
-    N_cycles = 131072
-    known_cases_1P = [f'P2D2C{N_cycles:d}S3', f'P1D1C{N_cycles:d}S2', f'P1D1C{N_cycles:d}S1']
+    N_cycles = 65536
+    known_cases_1P = [f'P2D2C{N_cycles:d}S2', f'P2D2C{N_cycles:d}S2', f'P2D2C{N_cycles:d}S1']
     for key in known_cases_1P:
-        print(get_best_energy_idx(loaded_energies[key], 0.5))
+        print(get_best_energy_data(loaded_energies[key], 0.5))

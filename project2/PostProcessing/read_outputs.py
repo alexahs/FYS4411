@@ -189,18 +189,18 @@ def read_optimized_sigmas():
             name = '{}p_{}d_{}h_{}cycles_{}s_{}eta'.format(*vals) + ext[1:]
 
             files[key]['paths']['sigmas_E'] = data_path / ('sigmas_E_' + name)
-            files[key]['paths']['sigma_inits'] = data_path / ('sigma_inits_' + name)
-            files[key]['paths']['sigma_inits_E'] = data_path / ('sigma_inits_E_' + name)
+            # files[key]['paths']['sigma_inits'] = data_path / ('sigma_inits_' + name)
+            # files[key]['paths']['sigma_inits_E'] = data_path / ('sigma_inits_E_' + name)
 
             data1 = np.fromfile(files[key]['paths']['sigmas'], dtype = np.float64)
             data2 = np.fromfile(files[key]['paths']['sigmas_E'], dtype = np.float64)
-            data3 = np.fromfile(files[key]['paths']['sigma_inits'], dtype = np.float64)
-            data4 = np.fromfile(files[key]['paths']['sigma_inits_E'], dtype = np.float64)
+            # data3 = np.fromfile(files[key]['paths']['sigma_inits'], dtype = np.float64)
+            # data4 = np.fromfile(files[key]['paths']['sigma_inits_E'], dtype = np.float64)
 
             files[key]['sigmas'] = data1
             files[key]['sigmas_E'] = data2
-            files[key]['sigma_inits'] = data3
-            files[key]['sigma_inits_E'] = data4
+            # files[key]['sigma_inits'] = data3
+            # files[key]['sigma_inits_E'] = data4
 
     return files
 

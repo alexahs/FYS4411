@@ -41,6 +41,7 @@ def plot_optimizations(data, key, ext = '.pdf'):
     plt.ylabel('Energy $[eV]$ and Variance $[eV]$')
     plt.legend()
     plt.savefig(save_dir + key + ext)
+    plt.close()
 
 def plot_energies(grids, key, dimensions = 2, expected = None, ext = '.pdf'):
     '''
@@ -91,6 +92,7 @@ def plot_energies(grids, key, dimensions = 2, expected = None, ext = '.pdf'):
             else:
                 cbar.set_label(f'Mean {mean_type.capitalize()} Energy')
             plt.savefig(save_dir + key + f'_{mean_type}{ext}')
+            plt.close()
     elif dimensions == 3:
         for mean_type in means:
             fig = plt.figure()
@@ -119,6 +121,7 @@ def plot_energies(grids, key, dimensions = 2, expected = None, ext = '.pdf'):
             else:
                 ax.set_zlabel(f'Mean {mean_type.capitalize()} Energy')
             plt.savefig(save_dir + key + f'_{mean_type}{ext}')
+            plt.close()
 
 def plot_err(grids, key, dimensions = 2, ext = '.pdf'):
     '''
@@ -153,8 +156,10 @@ def plot_err(grids, key, dimensions = 2, ext = '.pdf'):
             plt.ylabel('Number of Nodes $H$')
             cbar = plt.colorbar()
             plt.axis(aspect='image')
-            cbar.set_label(f'Std. Error of {mean_type.capitalize()} Energy')
+            label = (mean_type.split('_'))[0].capitalize()
+            cbar.set_label(f'Std. Error of {label} Energy')
             plt.savefig(save_dir + key + f'_{mean_type}{ext}')
+            plt.close()
     elif dimensions == 3:
         for mean_type in means:
             fig = plt.figure()
@@ -163,11 +168,13 @@ def plot_err(grids, key, dimensions = 2, ext = '.pdf'):
             cutoffs = [0, 2]
             Z[Z < cutoffs[0]] = cutoffs[0]
             Z[Z > cutoffs[1]] = cutoffs[1]
+            label = (mean_type.split('_'))[0].capitalize()
             ax.plot_surface(grid['LR'], grid['HU'], Z, cmap = 'magma')
             ax.set_xlabel('Learning Rate $\eta$')
             ax.set_ylabel('Number of Nodes')
-            ax.set_zlabel(f'Std. Error of  {mean_type.capitalize()} Energy')
+            ax.set_zlabel(f'Std. Error of  {label} Energy')
             plt.savefig(save_dir + key + f'_{mean_type}{ext}')
+            plt.close()
 
 def plot_pos(grids, key, i, j, ext = '.pdf'):
     '''
@@ -217,6 +224,7 @@ def plot_pos(grids, key, i, j, ext = '.pdf'):
     plt.legend()
 
     plt.savefig(save_dir + key + f'HU{HU}LR{LR}' + ext)
+    plt.close()
 
 def plot_sigmas(data, key, expected, ext = '.pdf'):
     '''
@@ -252,31 +260,53 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
     plt.legend()
     plt.xlim(np.min(sigmas), np.max(sigmas))
     plt.savefig(save_dir + key + f'_sigma{ext}')
+    plt.close()
 
 
-    plt.figure()
-    plt.grid()
-    idx = np.isfinite(data['sigma_inits_E'])
+    # plt.figure()
+    # plt.grid()
+    # idx = np.isfinite(data['sigma_inits_E'])
+    #
+    # sigmas = data['sigma_inits'][idx]
+    # energies = data['sigma_inits_E'][idx]
+    #
+    # diffs = np.abs(energies-expected)
+    # best_E = np.min(diffs)
+    # best_sigma = sigmas[np.argmin(diffs)]
+    #
+    # label1 = 'Energies'
+    # label2 = f'Best $\sigma_{{init}} = {best_sigma:g}$'
+    # plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
+    # plt.semilogy(sigmas, diffs, label = label1)
+    # plt.xlabel('$\sigma_{{init}}$')
+    # plt.ylabel('Energy Deviance from Expected Value')
+    # plt.legend()
+    # plt.xlim(np.min(sigmas), np.max(sigmas))
+    #
+    # plt.savefig(save_dir + key + f'_sigma_init{ext}')
+    # plt.close()
 
-    sigmas = data['sigma_inits'][idx]
-    energies = data['sigma_inits_E'][idx]
-
-    diffs = np.abs(energies-expected)
-    best_E = np.min(diffs)
-    best_sigma = sigmas[np.argmin(diffs)]
-
-    label1 = 'Energies'
-    label2 = f'Best $\sigma_{{init}} = {best_sigma:g}$'
-    plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
-    plt.semilogy(sigmas, diffs, label = label1)
-    plt.xlabel('$\sigma_{{init}}$')
-    plt.ylabel('Energy Deviance from Expected Value')
-    plt.legend()
-    plt.xlim(np.min(sigmas), np.max(sigmas))
-
-    plt.savefig(save_dir + key + f'_sigma_init{ext}')
+def get_energy_table(data):
+    '''
+        Creates a LaTEX formatted table including the errors, and specific
+        hyperparameters for the best-fitting energies
+    '''
+    # for key, value in data.items():
+        # pattern =
 
 if __name__ == '__main__':
+
+    # iters = {
+    #          'optim': 131072,
+    #          'main' : 1048576,
+    #          'sigma': 1024
+    #         }
+
+    iters = {
+             'optim': 8192,
+             'main' : 65536,
+             'sigma': 256
+            }
 
     if not os.path.exists('../Plots/'):
         os.mkdir('../Plots/')
@@ -292,22 +322,37 @@ if __name__ == '__main__':
             else:
                 print('Invalid input: {delete}, try again.')
 
-    test_key = 'P2D3C131072S2'
-    test_key_optim = 'P2D3C16384S2'
-    test_key_sigmas = 'P2D2C256S2'
-
-    ext = '.png'
-
     optimizations = read_outputs.read_optimization()
-    plot_optimizations(optimizations, test_key_optim, ext = ext)
-
     grids = processing.load_energy_grids('run')
-    plot_energies(grids, test_key, 2, ext = ext)
-    plot_err(grids, test_key, 2, ext = ext)
-
     positions = read_outputs.read_pos_samples()
     sorted_positions = processing.get_position_grids(positions)
-    plot_pos(sorted_positions, test_key, 3, 5, ext = ext)
-
     sigmas = read_outputs.read_optimized_sigmas()
-    plot_sigmas(sigmas, test_key_sigmas, 3, ext = ext)
+    ext = '.png'
+
+    optim_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
+    for n,i in enumerate(optim_keys):
+        optim_keys[n] = i.format(iters['optim'])
+    for i in optim_keys:
+        plot_optimizations(optimizations, i, ext = ext)
+
+    energy_err_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
+    for n,i in enumerate(energy_err_keys):
+        energy_err_keys[n] = i.format(iters['main'])
+    for i in energy_err_keys:
+        plot_energies(grids, i, 2, ext = ext)
+        plot_err(grids, i, 2, ext = ext)
+
+    position_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
+    for n,i in enumerate(position_keys):
+        position_keys[n] = i.format(iters['main'])
+    expected = [0.5, 0.5, 0.5, 3]
+    for i,j in zip(position_keys, expected):
+        data = processing.get_best_energy_data(grids[i], j)
+        plot_pos(sorted_positions, i, *data['idx'], ext = ext)
+
+    sigma_keys = ['P1D1C{:d}S3', 'P2D2C{:d}S3']
+    expected = [0.5, 3]
+    for n,i in enumerate(sigma_keys):
+        sigma_keys[n] = i.format(iters['sigma'])
+    for i,j in zip(sigma_keys, expected):
+        plot_sigmas(sigmas, i, 3, ext = ext)

@@ -81,11 +81,11 @@ int main(){
   //////////////////////////////////////////////
 
   // Optimize for Sigmas for 2 Nodes 1D1P (E= 0.5)
-    double sigma_1P = runSigmaSearch(0.001, 1, nCyclesSigma, 2, 3, expected_1P, 1, 1, false);
+    double sigma_1P = runSigmaSearch(0.001, 1, nCyclesSigma, 3, 1, expected_1P, 1, 1, false);
     double sigma_init_1P = 0.001;
 
   // Optimize for Sigmas for 2 Nodes 2P2D (E= 3)
-    double sigma_2P = runSigmaSearch(0.1, 2.0, nCyclesSigma, 2, 3, expected_2P, 2, 2, true);
+    double sigma_2P = runSigmaSearch(0.1, 2.0, nCyclesSigma, 3, 1, expected_2P, 2, 2, true);
     double sigma_init_2P = 0.001;
 
   ////////////////////////////////////
