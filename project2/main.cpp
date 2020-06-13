@@ -68,8 +68,8 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 13;
-    int nCyclesSigma = 8;
+    int nCyclesPow2 = 17;
+    int nCyclesSigma = 9;
     // int nCyclesPow2 = 6;          // For testing
     // int nCyclesSigma = 4;         // For testing
 
