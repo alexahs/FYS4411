@@ -278,20 +278,24 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
 
 if __name__ == '__main__':
 
-    while True:
-        delete = input('Delete Previously Saved Data? (y/n)')
-        if delete == 'y':
-            shutil.rmtree('../Plots/')
-            break
-        elif delete == 'n':
-            exit()
-        else:
-            print('Invalid input: {delete}, try again.')
+    if not os.path.exists('../Plots/'):
+        os.mkdir('../Plots/')
+    elif os.listdir('../Plots/'):
+        while True:
+            delete = input('Delete Previously Saved Data? (y/n)')
+            if delete == 'y':
+                shutil.rmtree('../Plots/')
+                os.mkdir('../Plots/')
+                break
+            elif delete == 'n':
+                break
+            else:
+                print('Invalid input: {delete}, try again.')
 
+    test_key = 'P2D3C131072S2'
+    test_key_optim = 'P2D3C16384S2'
+    test_key_sigmas = 'P2D2C256S2'
 
-    test_key = 'P2D3C1048576S2'
-    test_key_optim = 'P2D3C131072S2'
-    test_key_sigmas = 'P2D2C1024S2'
     ext = '.png'
 
     optimizations = read_outputs.read_optimization()

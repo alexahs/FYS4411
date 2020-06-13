@@ -29,12 +29,13 @@ int main(){
   // CONFIRM DATA RESET //
   ////////////////////////
 
+    system("mkdir -p Data");
     while (true) {
         std::cout << "Delete Previous Data? (y/n/q)" << std::endl;
         char input;
         std::cin >> input;
         if (input == 'y' || input == 'Y') {
-          int output = system("rm -rf Data/*");
+          system("rm -rf Data/*");
           break;
         } else if (input == 'q' || input == 'Q') {
           exit(0);
@@ -54,6 +55,7 @@ int main(){
     double stepLength = 0.1; //for standard metropolis stampling
     double timeStep = 0.45; //for importance sampling
     double tolerance = 1e-6; //tolerance for convergence
+    int whichOptimizer = 1;       //1 - gradient descent, 2 - some other optim scheme
 
   ///////////////////////
   // GRIDSEARCH PARAMS //
@@ -66,26 +68,25 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    // int nCyclesPow2 = 17;
-    // int nCyclesSigma = 10;
-    int nCyclesPow2 = 6;        // For testing
-    int nCyclesSigma = 4;       // For testing
-    int whichOptimizer = 1;     //1 - gradient descent, 2 - some other optim scheme
+    int nCyclesPow2 = 13;
+    int nCyclesSigma = 8;
+    // int nCyclesPow2 = 6;          // For testing
+    // int nCyclesSigma = 4;         // For testing
 
-    double expected_1P = 0.5;    // Expected value in sigma search
-    double expected_2P = 3.0;    // Expected value in sigma search
+    double expected_1P = 0.5;     // Expected value in sigma search
+    double expected_2P = 3.0;     // Expected value in sigma search
 
   //////////////////////////////////////////////
   // DETERMINING IDEAL SIGMAS AND SIGMA INITS //
   //////////////////////////////////////////////
 
   // Optimize for Sigmas for 2 Nodes 1D1P (E= 0.5)
-    double sigma_1P = runSigmaSearch(5, 15, nCyclesSigma, 2, whichOptimizer, expected_1P, 1, 1, false);
-    double sigma_init_1P = runSigmaInitSearch(5, 20, nCyclesSigma, 2, whichOptimizer, expected_1P, 1, 1, sigma_1P, false);
+    double sigma_1P = runSigmaSearch(0.7, 1.3, nCyclesSigma, 2, 3, expected_1P, 1, 1, false);
+    double sigma_init_1P = runSigmaInitSearch(1, 20, nCyclesSigma, 2, 3, expected_1P, 1, 1, sigma_1P, false);
 
   // Optimize for Sigmas for 2 Nodes 2P2D (E= 3)
-    double sigma_2P = runSigmaSearch(0.1, 2.0, nCyclesSigma, 2, whichOptimizer, expected_2P, 2, 2, true);
-    double sigma_init_2P = runSigmaInitSearch(1E-4, 3E-3, nCyclesSigma, 2, whichOptimizer, expected_2P, 2, 2, sigma_2P, true);
+    double sigma_2P = runSigmaSearch(0.1, 2.0, nCyclesSigma, 2, 3, expected_2P, 2, 2, true);
+    double sigma_init_2P = runSigmaInitSearch(1E-4, 3E-3, nCyclesSigma, 2, 3, expected_2P, 2, 2, sigma_2P, true);
 
   ////////////////////////////////////
   // INITIALIZING GRIDSEARCH VALUES //
@@ -117,12 +118,12 @@ int main(){
 
     // 1P1D Gridsearch w/ Brute Force
     runGridSearch(1, 1, false, 1, nCyclesPow2,
-                  whichOptimizer, etaVals, hiddenVals, sigma_1P, sigma_init_1P,
+                  whichOptimizer, etaVals, hiddenVals, 1, 0.001,
                   nOptimizeIters, stepLength, timeStep, tolerance, omega);
 
     // 1P1D Gridsearch w/ Metropolis
     runGridSearch(1, 1, false, 2, nCyclesPow2,
-                  whichOptimizer, etaVals, hiddenVals, sigma_1P, sigma_init_1P,
+                  whichOptimizer, etaVals, hiddenVals, 1, 0.001,
                   nOptimizeIters, stepLength, timeStep, tolerance, omega);
 
     // 1P1D Gridsearch w/ Gibbs
@@ -132,12 +133,12 @@ int main(){
 
     // 2P1D Gridsearch w/ Metropolis
     runGridSearch(2, 1, true, 2, nCyclesPow2,
-                  whichOptimizer, etaVals, hiddenVals, sigma_2P, sigma_init_2P,
+                  whichOptimizer, etaVals, hiddenVals, 1, 0.001,
                   nOptimizeIters, stepLength, timeStep, tolerance, omega);
 
     // 2P2D Gridsearch w/ Metropolis
     runGridSearch(2, 2, true, 2, nCyclesPow2,
-                  whichOptimizer, etaVals, hiddenVals, sigma_2P, sigma_init_2P,
+                  whichOptimizer, etaVals, hiddenVals, 1, 0.001,
                   nOptimizeIters, stepLength, timeStep, tolerance, omega);
 
     // 2P2D Gridsearch w/ Gibbs
@@ -147,7 +148,7 @@ int main(){
 
     // 2P3D Gridsearch w/ Metropolis
     runGridSearch(2, 3, true, 2, nCyclesPow2,
-                  whichOptimizer, etaVals, hiddenVals, sigma_2P, sigma_init_2P,
+                  whichOptimizer, etaVals, hiddenVals, 1, 0.001,
                   nOptimizeIters, stepLength, timeStep, tolerance, omega);
 
   ////////////
