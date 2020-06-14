@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import numpy as np
 import shutil
+import sys
 import os
+import re
 
 import read_outputs
 import processing
@@ -63,7 +65,7 @@ def plot_energies(grids, key, dimensions = 2, expected = None, ext = '.pdf'):
         os.mkdir(save_dir)
 
     msg = '$\Delta E={:g}$ at $\eta={:g}$, $H={:g}$'
-    means = ['sample', 'bootstrap', 'blocking']
+    means = ['sample', 'blocking']
     if dimensions == 2:
         for mean_type in means:
             Z = grid[mean_type]
@@ -143,7 +145,7 @@ def plot_err(grids, key, dimensions = 2, ext = '.pdf'):
         os.mkdir(save_dir)
 
     msg = '$\Delta E={:g}$ at $\eta={:g}$, $H={:g}$'
-    means = ['sample_err', 'bootstrap_err', 'blocking_err']
+    means = ['blocking_err']
     if dimensions == 2:
         for mean_type in means:
             Z = grid[mean_type]
@@ -176,7 +178,7 @@ def plot_err(grids, key, dimensions = 2, ext = '.pdf'):
             plt.savefig(save_dir + key + f'_{mean_type}{ext}')
             plt.close()
 
-def plot_pos(grids, key, i, j, ext = '.pdf'):
+def plot_pos(grids, key, i, j, ext = '.pdf', dist = stats.maxwell):
     '''
         Plots the position density at a given point
     '''
@@ -193,7 +195,6 @@ def plot_pos(grids, key, i, j, ext = '.pdf'):
         os.mkdir(save_dir)
 
     grid = np.linalg.norm(grid, axis = 1)
-    maxwell = stats.maxwell
 
     x = np.linspace(np.min(grid), np.max(grid), 1000)
 
@@ -203,14 +204,14 @@ def plot_pos(grids, key, i, j, ext = '.pdf'):
                    'color'      : 'r'
                   }
 
-    y = maxwell.pdf(x, *maxwell.fit(grid))
+    y = dist.pdf(x, *dist.fit(grid))
     plt.figure()
     plt.plot(x, y, **dist_params)
 
     hist_params = {
                     'density'   : True,
                     'stacked'   : True,
-                    'bins'      : 200,  #grid.shape[0]//50,
+                    'bins'      : 200,
                     'label'     : 'Experimental Results',
                     'color'     : 'C0'
                   }
@@ -286,29 +287,91 @@ def plot_sigmas(data, key, expected, ext = '.pdf'):
     # plt.savefig(save_dir + key + f'_sigma_init{ext}')
     # plt.close()
 
-def get_energy_table(data):
+def get_energy_table(data, idx_1P, idx_2P):
     '''
         Creates a LaTEX formatted table including the errors, and specific
         hyperparameters for the best-fitting energies
     '''
-    # for key, value in data.items():
-        # pattern =
+
+    cycles = int(re.findall(f'P\d+D\d+C(\d+)S\d+', list(data.keys())[0])[0])
+
+    label = 'tab:experiment_results'
+    caption = (f'Comparison of results for {len(data.keys()):d} experiments,'
+               f' each with {cycles:d} cycles (i.e. iterations).')
+
+    sampling = ['Metropolis', 'Metrop-Hastings', 'Gibbs']
+    labels = ['Particles', 'Dims', 'Sampling', 'Hid Units',
+              'Learn Rate', 'Avg', 'Blocking Avg', 'Std Err']
+    rows = []
+
+
+    for key, value in data.items():
+        pattern = f'P(\d+)D(\d+)C(\d+)S(\d+)'
+        vals = list(map(int, re.findall(pattern, key)[0]))
+
+        rows.append({'Particles':f"{vals[0]:.0f}", 'Dims':f"{vals[1]:.0f}",
+                     'Sampling':sampling[vals[3]-1]})
+
+        assert int(vals[2]) == cycles, 'Inconsistent number of MC-cycles'
+        if vals[0] == 1:
+            rows[-1]['Hid Units'] = f"{value['HU'][idx_1P]:.0f}"
+            rows[-1]['Learn Rate'] = f"{value['LR'][idx_1P]:.3f}"
+            rows[-1]['Avg'] = f"{value['sample'][idx_1P]:.3f}"
+            rows[-1]['Blocking Avg'] = f"{value['blocking'][idx_1P]:.3f}"
+            rows[-1]['Std Err'] = f"{value['blocking'][idx_1P]:.3f}"
+        elif vals[0] == 2:
+            rows[-1]['Hid Units'] = f"{value['HU'][idx_2P]:.0f}"
+            rows[-1]['Learn Rate'] = f"{value['LR'][idx_2P]:.3f}"
+            rows[-1]['Avg'] = f"{value['sample'][idx_2P]:.3f}"
+            rows[-1]['Blocking Avg'] = f"{value['blocking'][idx_2P]:.3f}"
+            rows[-1]['Std Err'] = f"{value['blocking'][idx_2P]:.3f}"
+        else:
+            raise ValueError('Unrecognized Number of Particles')
+
+    string = (f'\\begin{{table}}[H]\n\t'
+          	  f'\\centering\n\t'
+        	  f'\\caption{{{caption}')
+
+    string += (f'\\label{{{label}}}}}\n\t'
+               f'\\begin{{tabular}}{{' + ('c '*len(labels))[:-1] +f'}}\n\t\t')
+
+    for label in labels:
+        string += f'{label} & '
+
+    string = string[:-2] + '\\\\'
+
+    for row in rows:
+        string += '\n\t\t'
+        for col in labels:
+            string += f'{row[col]:s} & '
+        string = string[:-3]
+        string += r' \\'
+    string = string[:-2]
+
+    string += (f'\n\t\end{{tabular}}\n'
+               f'\end{{table}}')
+
+    print(string)
 
 if __name__ == '__main__':
 
-    # iters = {
-    #          'optim': 131072,
-    #          'main' : 1048576,
-    #          'sigma': 1024
-    #         }
-
     iters = {
-             'optim': 8192,
-             'main' : 65536,
-             'sigma': 256
+             'optim': 131072,
+             'main' : 1048576,
+             'sigma': 512
             }
 
-    if not os.path.exists('../Plots/'):
+    # iters = {
+    #          'optim': 8192,
+    #          'main' : 65536,
+    #          'sigma': 256
+    #         }
+
+    if len(sys.argv) > 1 and sys.argv[1] == '-o':
+        if os.path.exists('../Plots/'):
+            shutil.rmtree('../Plots/')
+        os.mkdir('../Plots/')
+    elif not os.path.exists('../Plots/'):
         os.mkdir('../Plots/')
     elif os.listdir('../Plots/'):
         while True:
@@ -329,6 +392,14 @@ if __name__ == '__main__':
     sigmas = read_outputs.read_optimized_sigmas()
     ext = '.png'
 
+    best_keys = ['P1D1C{:d}S2', 'P2D2C{:d}S2']
+    expected = [0.5, 3]
+    for n,i in enumerate(best_keys):
+        best_keys[n] = i.format(iters['main'])
+    data_1P = processing.get_best_energy_data(grids[best_keys[0]], expected[0])
+    data_2P = processing.get_best_energy_data(grids[best_keys[1]], expected[1])
+    get_energy_table(grids, data_1P['idx'], data_2P['idx'])
+
     optim_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
     for n,i in enumerate(optim_keys):
         optim_keys[n] = i.format(iters['optim'])
@@ -343,16 +414,17 @@ if __name__ == '__main__':
         plot_err(grids, i, 2, ext = ext)
 
     position_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
+    dists = [stats.gompertz, stats.gompertz, stats.gompertz, stats.maxwell]
     for n,i in enumerate(position_keys):
         position_keys[n] = i.format(iters['main'])
     expected = [0.5, 0.5, 0.5, 3]
-    for i,j in zip(position_keys, expected):
+    for i,j,k in zip(position_keys, expected, dists):
         data = processing.get_best_energy_data(grids[i], j)
-        plot_pos(sorted_positions, i, *data['idx'], ext = ext)
+        plot_pos(sorted_positions, i, *data['idx'], ext = ext, dist = k)
 
     sigma_keys = ['P1D1C{:d}S3', 'P2D2C{:d}S3']
     expected = [0.5, 3]
     for n,i in enumerate(sigma_keys):
         sigma_keys[n] = i.format(iters['sigma'])
     for i,j in zip(sigma_keys, expected):
-        plot_sigmas(sigmas, i, 3, ext = ext)
+        plot_sigmas(sigmas, i, j, ext = ext)

@@ -52,7 +52,8 @@ class dataAnalysisClass:
     # Statistical Analysis with Multiple Methods
     def runAllAnalyses(self, skip = False):
         if not skip:
-            self.bootAvg, self.bootVar, self.bootStd = self.bootstrap(self.data)
+            # self.bootAvg, self.bootVar, self.bootStd = self.bootstrap(self.data)
+            self.bootAvg, self.bootVar, self.bootStd = 0,0,0
             self.blockingAvg, self.blockingVar, self.blockingStd = self.blocking(self.data)
         else:
             self.bootAvg, self.bootVar, self.bootStd = 0,0,0

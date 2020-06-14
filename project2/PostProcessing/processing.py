@@ -2,12 +2,12 @@ from analysis import dataAnalysisClass
 from multiprocessing import Pool
 import numpy as np
 import shutil
+import sys
 import os
 import re
 
 import read_outputs
-max_processes = 16
-
+max_processes = 8
 
 def get_analyser_data(data, test):
     '''
@@ -29,19 +29,18 @@ def get_energy_data(data):
                     particles, dimensions, hidden units, cycles, learning rate]
     '''
     means = get_analyser_data(data['Energy'], data['test'])
-    vals = np.zeros(12, dtype = np.float64)
+    vals = np.zeros(10, dtype = np.float64)
     vals[0]  = means['sample']['avg']
     vals[1]  = means['sample']['std']
     vals[2]  = means['blocking']['avg']
     vals[3]  = means['blocking']['std']
-    vals[4]  = means['bootstrap']['avg']
-    vals[5]  = means['bootstrap']['std']
-    vals[6]  = data['particle']
-    vals[7]  = data['dimensions']
-    vals[8]  = data['hidden_units']
-    vals[9]  = data['cycles']
-    vals[10] = data['learning_rate']
-    vals[11] = data['sampling']
+
+    vals[4]  = data['particle']
+    vals[5]  = data['dimensions']
+    vals[6]  = data['hidden_units']
+    vals[7]  = data['cycles']
+    vals[8] = data['learning_rate']
+    vals[9] = data['sampling']
     return vals
 
 def split_energy_lists(results):
@@ -54,7 +53,7 @@ def split_energy_lists(results):
     conditions = {}
     ID = 'P{:.0f}D{:.0f}C{:.0f}S{:.0f}'
     for result in results:
-        key = ID.format(result[6],result[7],result[9],result[11])
+        key = ID.format(result[4],result[5],result[7],result[9])
         if key not in conditions.keys():
             conditions[key] = [result]
         else:
@@ -69,18 +68,18 @@ def sort_energy_grids(results):
     '''
     zeros_compare = np.zeros(results.shape[0], dtype = np.float64)
     msg = 'Incompatible parameters in selected gridsearch'
-    for i in [6,7,9,11]:
+    for i in [4,5,7,9]:
         assert np.array_equal(results[:,i]-results[0,i], zeros_compare), msg
-    hidden_units = results[:,8]
-    learning_rate = results[:,10]
+    hidden_units = results[:,6]
+    learning_rate = results[:,8]
 
     unique_HU = []
     unique_LR = []
     for i in results:
-        if i[8] not in unique_HU:
-            unique_HU.append(i[8])
-        if i[10] not in unique_LR:
-            unique_LR.append(i[10])
+        if i[6] not in unique_HU:
+            unique_HU.append(i[6])
+        if i[8] not in unique_LR:
+            unique_LR.append(i[8])
 
     unique_HU = np.sort(np.array(unique_HU, np.float64))
     unique_LR = np.sort(np.array(unique_LR, np.float64))
@@ -88,15 +87,13 @@ def sort_energy_grids(results):
     LR, HU = np.meshgrid(unique_LR, unique_HU)
     energy_grid_sample = np.zeros((len(unique_HU), len(unique_LR)))
     energy_grid_blocking = np.zeros((len(unique_HU), len(unique_LR)))
-    energy_grid_bootstrap = np.zeros((len(unique_HU), len(unique_LR)))
     err_grid_sample = np.zeros((len(unique_HU), len(unique_LR)))
     err_grid_blocking = np.zeros((len(unique_HU), len(unique_LR)))
-    err_grid_bootstrap = np.zeros((len(unique_HU), len(unique_LR)))
     msg2 = 'Multiple energies found for same conditions.'
     for i,(a,b) in enumerate(zip(LR, HU)):
         for j,(c,d) in enumerate(zip(a, b)):
-            cond_1 = results[:,10] == c
-            cond_2 = results[:,8] == d
+            cond_1 = results[:,8] == c
+            cond_2 = results[:,6] == d
             idx = np.where(np.logical_and(cond_1, cond_2))
             assert len(idx) == 1, msg2
             idx = idx[0]
@@ -104,20 +101,39 @@ def sort_energy_grids(results):
             err_grid_sample[i,j] = results[idx].squeeze()[1]
             energy_grid_blocking[i,j] = results[idx].squeeze()[2]
             err_grid_blocking[i,j] = results[idx].squeeze()[3]
-            energy_grid_bootstrap[i,j] = results[idx].squeeze()[4]
-            err_grid_bootstrap[i,j] = results[idx].squeeze()[5]
 
-    return energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, energy_grid_bootstrap, err_grid_bootstrap, LR, HU
+    return energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, LR, HU
 
-def get_energy_grids(data, test = False):
+def save_energy_grids(data, savename, test = False):
     '''
         Calculates the mean energies after optimization is complete for all
         points given in a list of data dicts.
     '''
+
+    savename = f'../DataProcessed/{savename}'
+
+    if len(sys.argv) > 1 and sys.argv[1] == '-o':
+        if os.path.isdir(savename):
+            shutil.rmtree(savename)
+        os.mkdir(savename)
+    elif os.path.isdir(savename):
+        while True:
+            delete = input('Delete Previously Saved Data? (y/n)')
+            if delete == 'y':
+                shutil.rmtree(savename)
+                os.mkdir(savename)
+                break
+            elif delete == 'n':
+                exit()
+            else:
+                print('Invalid input: {delete}, try again.')
+    else:
+        os.mkdir(savename)
+
     pool = Pool(processes = max_processes)
     for i in range(len(data)):
         data[i]['test'] = test
-    results = np.zeros((len(data), 12), dtype = np.float64)
+    results = np.zeros((len(data), 10), dtype = np.float64)
     count = 0
     print(f'Loading {0:.2%}', end ='')
     for n,i in enumerate(pool.imap_unordered(get_energy_data, data)):
@@ -126,57 +142,18 @@ def get_energy_grids(data, test = False):
         results[n] = i
     print()
     results = split_energy_lists(results)
-    sorted_results = {}
     for result in results:
-        key = f'P{result[0][6]:.0f}D{result[0][7]:.0f}C{result[0][9]:.0f}S{result[0][11]:.0f}'
-        sorted_results[key] = {}
-        energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, energy_grid_bootstrap, err_grid_bootstrap, LR, HU = \
+        key = f'P{result[0][4]:.0f}D{result[0][5]:.0f}C{result[0][7]:.0f}S{result[0][9]:.0f}'
+
+        energy_grid_sample, err_grid_sample, energy_grid_blocking, err_grid_blocking, LR, HU = \
         sort_energy_grids(np.array(result))
-        sorted_results[key]['sample'] = energy_grid_sample
-        sorted_results[key]['sample_err'] = err_grid_sample
-        sorted_results[key]['blocking'] = energy_grid_blocking
-        sorted_results[key]['blocking_err'] = err_grid_blocking
-        sorted_results[key]['bootstrap'] = energy_grid_bootstrap
-        sorted_results[key]['bootstrap_err'] = err_grid_bootstrap
-        sorted_results[key]['LR'] = LR
-        sorted_results[key]['HU'] = HU
-    return sorted_results
 
-def save_energy_grids(sorted_results, savename, autodelete = False):
-    '''
-        Saves the energy grids to file
-    '''
-    savename = f'../DataProcessed/{savename}'
-
-    if not os.path.exists('../DataProcessed/'):
-        os.mkdir('../DataProcessed/')
-
-    if os.path.isdir(savename):
-        if autodelete:
-            shutil.rmtree(savename)
-        else:
-            while True:
-                delete = input('Delete Previously Saved Data? (y/n)')
-                if delete == 'y':
-                    shutil.rmtree(savename)
-                    break
-                elif delete == 'n':
-                    exit()
-                else:
-                    print('Invalid input: {delete}, try again.')
-
-    os.mkdir(savename)
-    for key, value in sorted_results.items():
         name = f'{savename}/arr_{key}_{{}}'
-        np.save(name.format('sample'), value['sample'])
-        np.save(name.format('blocking'), value['blocking'])
-        np.save(name.format('bootstrap'), value['bootstrap'])
-        np.save(name.format('LR'), value['LR'])
-        np.save(name.format('HU'), value['HU'])
-
-        np.save(name.format('sample_err'), value['sample_err'])
-        np.save(name.format('blocking_err'), value['blocking_err'])
-        np.save(name.format('bootstrap_err'), value['bootstrap_err'])
+        np.save(name.format('sample'), energy_grid_sample)
+        np.save(name.format('blocking'), energy_grid_blocking)
+        np.save(name.format('LR'), LR)
+        np.save(name.format('HU'), HU)
+        np.save(name.format('blocking_err'), err_grid_blocking)
 
 def load_energy_grids(savename):
     '''
@@ -268,40 +245,23 @@ def get_best_energy_data(grid, expected):
 
 if __name__ == '__main__':
 
-    # if not os.path.exists('../DataProcessed/'):
-    #     os.mkdir('../DataProcessed/')
-    # elif os.listdir('../DataProcessed/'):
-    #     while True:
-    #         delete = input('Delete Previously Processed Data? (y/n)')
-    #         if delete == 'y':
-    #             shutil.rmtree('../DataProcessed/')
-    #             os.mkdir('../DataProcessed/')
-    #             break
-    #         elif delete == 'n':
-    #             break
-    #         else:
-    #             print('Invalid input: {delete}, try again.')
-    #
-    # energies = read_outputs.read_energy_samples()
-    # positions = read_outputs.read_pos_samples()
-    # sorted_positions = get_position_grids(positions)
-    # sorted_energies = get_energy_grids(energies, test = False)
-    #
-    # save_energy_grids(sorted_energies, 'run', autodelete = True)
-    # loaded_energies = load_energy_grids('run')
-    #
-    # for k,v in sorted_energies.items():
-    #     assert np.array_equal(v['sample'], loaded_energies[k]['sample'])
-    #     assert np.array_equal(v['blocking'], loaded_energies[k]['blocking'])
-    #     assert np.array_equal(v['bootstrap'], loaded_energies[k]['bootstrap'])
-    #     assert np.array_equal(v['sample_err'], loaded_energies[k]['sample_err'])
-    #     assert np.array_equal(v['blocking_err'], loaded_energies[k]['blocking_err'])
-    #     assert np.array_equal(v['bootstrap_err'], loaded_energies[k]['bootstrap_err'])
-    #     assert np.array_equal(v['LR'], loaded_energies[k]['LR'])
-    #     assert np.array_equal(v['HU'], loaded_energies[k]['HU'])
+    if len(sys.argv) > 1 and sys.argv[1] == '-o':
+        if os.path.exists('../DataProcessed/'):
+            shutil.rmtree('../DataProcessed/')
+        os.mkdir('../DataProcessed/')
+    elif not os.path.exists('../DataProcessed/'):
+        os.mkdir('../DataProcessed/')
+    elif os.listdir('../DataProcessed/'):
+        while True:
+            delete = input('Delete Previously Processed Data? (y/n)')
+            if delete == 'y':
+                shutil.rmtree('../DataProcessed/')
+                os.mkdir('../DataProcessed/')
+                break
+            elif delete == 'n':
+                break
+            else:
+                print('Invalid input: {delete}, try again.')
 
-    loaded_energies = load_energy_grids('run')
-    N_cycles = 65536
-    known_cases_1P = [f'P2D2C{N_cycles:d}S2', f'P2D2C{N_cycles:d}S2', f'P2D2C{N_cycles:d}S1']
-    for key in known_cases_1P:
-        print(get_best_energy_data(loaded_energies[key], 0.5))
+    energies = read_outputs.read_energy_samples()
+    save_energy_grids(energies, 'run')
