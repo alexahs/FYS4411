@@ -9,6 +9,10 @@ Optimizer::Optimizer(double eta, int whichOptimizer){
 }
 
 void Optimizer::optimize(NeuralQuantumState &nqs, Eigen::VectorXd grads, int nInput, int nHidden){
+    /*
+    Method for updating the parameters of the wave function by simple gradient descent.
+    */
+
     //gradient denscent
     if (m_whichOptimizer == 1) {
 
@@ -30,8 +34,7 @@ void Optimizer::optimize(NeuralQuantumState &nqs, Eigen::VectorXd grads, int nIn
             }
         }
     }
-    if (m_whichOptimizer == 2){
-        //some other optim method
-        int a = 1;
-    }
+
+    //Plans for a more sophisticated minimizing scheme...
+    if (m_whichOptimizer == 2){}
 }

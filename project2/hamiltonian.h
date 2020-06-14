@@ -15,5 +15,4 @@ private:
 public:
     Hamiltonian(double omega, bool interaction, NeuralQuantumState &nqs);
     double computeLocalEnergy(NeuralQuantumState &nqs);
-    double evaluateCost();
 };

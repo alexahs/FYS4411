@@ -8,8 +8,13 @@
 using std::cout;
 using std::endl;
 
-NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, double sigma, long seed, double sigma_init, int samplingRule){
-    //
+NeuralQuantumState::NeuralQuantumState(int nParticles,
+                                       int nDims,
+                                       int nHidden,
+                                       double sigma,
+                                       long seed,
+                                       double sigma_init,
+                                       int samplingRule){
     m_nVisible = (int) nParticles*nDims;
     m_nInput = (int) nParticles*nDims;
     m_nHidden = nHidden;
@@ -25,13 +30,20 @@ NeuralQuantumState::NeuralQuantumState(int nParticles, int nDims, int nHidden, d
 }
 
 void NeuralQuantumState::initialize(){
-    //randomly initialize weights or something
-    // Random::setSeed(100);
-    // double sigma_init = 0.001;
+    /*
+    Initializes weights and biases of the network and
+    initial positions of the particles
+
+    Weights are normally distributed around zero with low
+    variance (typically use sigma_init = 0.001)
+
+    Initial positions are uniformly distributed in the
+    range [-0.5, 0.5]. For systems of many particles,
+    this method of initializing should be altered.
+    */
     for(int i = 0; i < m_nVisible; i++){
         net.inputBias(i) = Random::nextGaussian(0, m_sigma_init);
         net.inputLayer(i) = Random::nextDouble() - 0.5;
-        // std::cout << net.inputBias(i) << std::endl;
         for(int j = 0; j < m_nHidden; j++){
             net.weights(i, j) = Random::nextGaussian(0, m_sigma_init);
         }
@@ -43,60 +55,50 @@ void NeuralQuantumState::initialize(){
 }
 
 void NeuralQuantumState::adjustPosition(int node, double change){
+    /*
+    Adjusts the position of a particle along
+    a single dimension
+    */
+
     net.inputLayer(node) += change;
 }
 
 double NeuralQuantumState::evaluate(){
-    //evaluate the wavefunction
-    //could probably use some matrix magic to speed up computations here..
+    /*
+    Method for evaluating the wave function
+    */
+
     double psi1 = 0;
     double psi2 = 1;
     for(int i = 0; i < m_nVisible; i++){
         psi1 +=  (net.inputLayer(i)-net.inputBias(i))*(net.inputLayer(i)-net.inputBias(i));
     }
     psi1 = exp(-psi1/(2*m_sigma2));
-    //////
+
     Eigen::VectorXd Q = computeQfactor();
     for(int j = 0; j<m_nHidden; j++){
         psi2 *= (1 + exp(Q(j)));
     }
-    //////
-    /*
-    for(int j = 0; j < m_nHidden; j++){
-        double term1 = 0;
-        for(int i = 0; i < m_nVisible; i++){
-            term1 += net.inputLayer(i)*net.weights(i,j);
-        }
-        term1 /= m_sigma2;
-        term1 += net.hiddenBias(j);
-        psi2 *= 1 + exp(term1);
-    }
-    */
+
     return psi1*psi2;
 }
 
 Eigen::VectorXd NeuralQuantumState::computeQfactor(){
-    //computes the exponential factor used many times throughout the program
-    // b_j - sum(x_i*w_ij), as seen in equation (102) in notes
-
     /*
-    Eigen::VectorXd Qfactor(m_nHidden);
-    for(int n = 0; n < m_nHidden; n++){
-        double term1 = 0;
-        for(int i = 0; i < m_nVisible; i++){
-            term1 += net.inputLayer(i)*net.weights(i,n);
-        }
-
-        Qfactor(n) = exp(net.hiddenBias(n) + term1/m_sigma2);
-    }
+    Method for computing the argument of the exponential function
+    in the wave function, which is used many times throughout the program.
     */
+
     Eigen::VectorXd Qfactor = net.hiddenBias + (((1.0/m_sigma2)*net.inputLayer).transpose()*net.weights).transpose();
     return Qfactor;
 }
 
 Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNumber){
-    // returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)]. m = nodeNumber
-    // equations (115) and (116) in lecture notes
+    /*
+    Computes the laplacian and first derivative of the wave function
+    for one particle along one dimension.
+    returns vector of d/dx_m [ln(psi)] and d^2/dx_m^2 [ln(psi)].
+    */
 
     int m = nodeNumber;
 
@@ -127,7 +129,9 @@ Eigen::VectorXd NeuralQuantumState::computeFirstAndSecondDerivatives(int nodeNum
 }
 
 double NeuralQuantumState::computeDistance(int p, int q){
-    //compute the distance between two particles p and q
+    /*
+    Computes the distance between two particles p and q
+    */
     double distance2 = 0;
     int pIdx = p*m_nDims;
     int qIdx = q*m_nDims;
@@ -140,8 +144,20 @@ double NeuralQuantumState::computeDistance(int p, int q){
 }
 
 Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
-    //gradients wrt variational parameters (weights / biases)
-    //equations 101, 102 and 103 in lecture notes
+    /*
+    Method for computing the gradients of the local energy
+    wrt. the weights and biases.
+
+    Returns them in a vector of size [M + N + M*N],
+    where M and N are the number of visible and hidden nodes respectively.
+
+
+    Index 0 to N-1
+
+    The M first entries are the gradients wrt. input biases.
+    The next N entries are wrt. hidden biases.
+    The last M*N are wrt. the weights
+    */
     Eigen::VectorXd grads(m_nInput + m_nHidden + m_nInput*m_nHidden);
 
     Eigen::VectorXd Q = computeQfactor();
@@ -166,11 +182,12 @@ Eigen::VectorXd NeuralQuantumState::computeCostGradient(){
     k = m_nInput+m_nHidden;
     for(int i = 0; i < m_nVisible; i++){
         for(int j = 0; j < m_nHidden; j++){
-            // grads(k) = net.inputLayer(i)/(sig2Inv*(Q(j) + 1));
             grads(k) = net.inputLayer(i)/(m_sigma2*(exp_neg_Q(j) + 1));
             k++;
         }
     }
+
+    // divide by a factor 2 if using Gibbs sampling
     if(m_isGibbsSampling){grads *= 0.5;}
     return grads;
 }

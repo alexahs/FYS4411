@@ -45,15 +45,13 @@ Sampler::Sampler(int nMCcycles,
     m_varianceVals.resize(m_nOptimizeIters);
     m_acceptRatioVals.resize(m_nOptimizeIters);
 
-    // if(m_samplingRule == 3){
-    //     for(int i = 0; i < m_nInput; i++){
-    //         m_uniform_real_distribution_H(i) = Random::nextDouble();
-    //     }
-    // }
 
 }
 
 bool Sampler::sample(int particleNumber){
+    /*
+    Calls the appropriate function for performing the sampling step
+    */
     if(m_samplingRule == 1){
         return metropolisStep(particleNumber);
     }
@@ -73,16 +71,30 @@ bool Sampler::sample(int particleNumber){
 }
 
 bool Sampler::metropolisStep(int particleNumber){
+    /*
+    Function for performing the actual Metropolis step:
+    Choose a particle at random and change it's position by a random amount,
+    check if the step is accepted by the Metropolis test (compare the wave function evaluated
+    at this new position with the one at the old position).
+
+    Returns
+    true, if step is accepted
+    false, if step is rejected
+    */
+
     int idxStart = particleNumber*m_nDims;
     int idxStop = idxStart + m_nDims;
 
     std::vector<double> proposedStep;
+
+    // Propose a move for the particle
     for(int node = idxStart; node < idxStop; node++){
         double step = m_stepLength*(Random::nextDouble() - 0.5);
         proposedStep.push_back(step);
         m_nqs.adjustPosition(node, step);
     }
 
+    // Evaluate new wave function
     double wfNew = m_nqs.evaluate();
     double ratio = wfNew*wfNew/(m_wfOld*m_wfOld);
 
@@ -90,6 +102,8 @@ bool Sampler::metropolisStep(int particleNumber){
         m_wfOld = wfNew;
         return true;
     }
+
+    // If move is rejected, then revert to the old position
     else{
         int i = 0;
         for(int node = idxStart; node < idxStop; node++){
@@ -101,6 +115,13 @@ bool Sampler::metropolisStep(int particleNumber){
 }
 
 bool Sampler::importanceStep(int particleNumber){
+    /*
+    Perform one step according to Metropolis-Hastings algorithm
+    Returns
+    true, if step is accepted
+    false, if step is rejected
+    */
+
     int idxStart = particleNumber*m_nDims;
     int idxStop = idxStart + m_nDims;
     int m = idxStart;
@@ -119,13 +140,18 @@ bool Sampler::importanceStep(int particleNumber){
         for(int n = 0; n < m_nHidden; n++){
             sum += m_nqs.net.weights(m, n)/(exp(-Q(n)) + 1);
         }
+        // Calculate old quantum force
         qForceOld(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
         posOld(k) = m_nqs.net.inputLayer(i);
-        //calculate new position
+
+        // Calculate new position based on the langevin equation
         double step = qForceOld(k)*m_timeStepDiffusion + Random::nextGaussian(0, 1.0)*m_sqrtTimeStep;
+
+        // Propose move
         proposedStep(k) = step;
         m_nqs.adjustPosition(i, step);
 
+        // Calculate new quantum force
         qForceNew(k) = 2/sigma2*(-(m_nqs.net.inputLayer(i) - m_nqs.net.inputBias(i)) + sum);
 
         k++;
@@ -145,7 +171,7 @@ bool Sampler::importanceStep(int particleNumber){
         k++;
     }
 
-    //compute greens function
+    // Compute greens function
     double greensRatio = 0;
     for(int i = 0; i < m_nDims; i++){
         double term1 = posOld(i) - posNew(i) - m_timeStepDiffusion*qForceNew(i);
@@ -157,6 +183,7 @@ bool Sampler::importanceStep(int particleNumber){
     greensRatio = exp(greensRatio);
     double probabilityRatio = greensRatio*wfNew*wfNew/(m_wfOld*m_wfOld);
 
+    // Perform Metropolis-Hastings test
     if(Random::nextDouble() <= probabilityRatio){
         m_wfOld = wfNew;
         return true;
@@ -172,12 +199,17 @@ bool Sampler::importanceStep(int particleNumber){
 }
 
 bool Sampler::gibbsStep(){
+    /*
+    Adjust positions of particles according to the Gibbs sampling rule
+    */
 
+    // Calculate conditional probabilities of the hidden nodes
     for(int j = 0; j < m_nHidden; j++){
          double z = m_nqs.net.hiddenBias(j) + m_nqs.net.inputLayer.dot(m_nqs.net.weights.col(j))/m_nqs.getSigma2();
          m_nqs.net.hiddenLayer(j) = Random::nextDouble() < sigmoid(z);
     }
 
+    // Update particle positions
     for(int i = 0; i < m_nInput; i++){
         double meanPos = m_nqs.net.inputBias(i) + m_nqs.net.weights.row(i)*m_nqs.net.hiddenLayer;
         double posDistribution = Random::nextGaussian(meanPos, m_nqs.getSigma());
@@ -193,32 +225,24 @@ double Sampler::sigmoid(double z){
 
 void Sampler::runSampling(){
     /*
-    * pretty much the same as in project 1, main flow:
-    * loop over nuber of cycles:
-    *     loop over particles:
-    *         calculate new position (accorting to some rule, probably qFroce)
-    *         calculate new values of wavefunction (m_nqs.evaluate())
-    *         calculate ratio of WFs (either by standard metropolis, importance or gibbs sampling)
-              if random() <= ratio:
-                  update positions and WF
+    Function for performing the Monte Carlo sampling.
 
-          calculate local energy and add to cumulative energy
-          calculate cost gradient and add to cumulative gradient
-
-     take averages of cumulative sums (save to member variables possibly)
     */
 
+
+    // Old values
     Eigen::VectorXd netGrads1d = m_nqs.computeCostGradient();
     if(m_samplingRule != 3){m_wfOld = m_nqs.evaluate();}
     double localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
 
+
     m_energy = 0;
     m_energy2 = 0;
     m_acceptedSteps = 0;
-
     m_dPsi.fill(0);
     m_dPsiTimesE.fill(0);
 
+    // Equilibriate the system before sampling
     for(int equil = 0; equil < (int) 0.1*m_nMCcycles; equil++){
         for(int particle = 0; particle < m_nParticles; particle++){
             int rndParticle = Random::nextInt(m_nParticles);
@@ -226,22 +250,24 @@ void Sampler::runSampling(){
         }
     }
 
+    // Monte Carlo loop
     for(int cycle = 0; cycle < m_nMCcycles; cycle++){
-        // for(int particle = 0; particle < m_nParticles; particle++){
         int rndParticle = Random::nextInt(m_nParticles);
         bool stepAccepted = sample(rndParticle);
         if(stepAccepted) {
             m_acceptedSteps++;
+
+            // Calculate energy and energy gradient of new configuration
             localEnergy = m_hamiltonian.computeLocalEnergy(m_nqs);
             netGrads1d = m_nqs.computeCostGradient();
         }
-        // }
 
         m_energy += localEnergy;
         m_energy2 += localEnergy*localEnergy;
         m_dPsi += netGrads1d;
         m_dPsiTimesE += netGrads1d*localEnergy;
 
+        // Save energy and positions to file
         if(m_finalRun){
             m_energySamples(cycle) = localEnergy;
             for(int i = 0; i < m_nDims; i++) {
@@ -250,12 +276,16 @@ void Sampler::runSampling(){
         }
     }// end MC cycles
 
+    // Compute averages
     m_energy /= m_nMCcycles;
     m_energy2 /= m_nMCcycles;
     m_dPsi /= m_nMCcycles;
     m_dPsiTimesE /= m_nMCcycles;
 
+    // Compute sample variance
     m_variance = m_energy2 - m_energy*m_energy;
+
+    // Compute energy gradient
     m_costGradient = 2*(m_dPsiTimesE - m_energy*m_dPsi);
 }
 
@@ -268,8 +298,6 @@ void Sampler::runOptimization(){
     m_finalRun = false;
     for(int step = 0; step < m_nOptimizeIters; step++){
         runSampling();
-        // cout << m_nqs.net.hiddenLayer << endl;
-        // exit(1);
         m_optimizer.optimize(m_nqs, m_costGradient, m_nInput, m_nHidden);
 
         m_acceptRatio = (double)m_acceptedSteps/(double)m_nMCcycles;
@@ -289,7 +317,7 @@ void Sampler::runOptimization(){
 
 void Sampler::runDataCollection(int nMCcycles, bool saveToFile){
     /*
-    final big run with optimized weights
+    Final big run with optimized weights
     */
     m_nMCcycles = nMCcycles;
     m_finalRun = true;
@@ -304,6 +332,9 @@ void Sampler::runDataCollection(int nMCcycles, bool saveToFile){
 }
 
 void Sampler::writeEnergySamples(){
+    /*
+    Writes energy to file
+    */
     std::string filename = "./Data/energy_samples_";
     filename.append(std::to_string(m_nParticles) + "p_");
     filename.append(std::to_string(m_nDims) + "d_");
@@ -334,6 +365,9 @@ void Sampler::writeEnergySamples(){
 }
 
 void Sampler::printFinalInfo(){
+    /*
+    Prints final results
+    */
     cout << endl;
     cout << "------- Final values with optimized parameters -------" << endl;
     cout << "===== Cycles ====== Energy ====== Energy2 ====== Variance ===== Accept ratio =====" << endl << endl;
@@ -354,6 +388,9 @@ void Sampler::printInfo(int step){
 }
 
 void Sampler::printInitalSystemInfo(){
+    /*
+    Prints initial system info
+    */
     cout << endl;
     cout << " -------- System info -------- " << endl;
     cout << " * Number of dimensions         : " << m_nDims << endl;
