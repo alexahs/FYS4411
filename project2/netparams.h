@@ -11,15 +11,14 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 struct NetParams {
+    /*
+    Data struct containing the parameters of the NQS
+    */
     VectorXd inputLayer;
     VectorXd hiddenLayer;
     VectorXd inputBias;
     VectorXd hiddenBias;
     MatrixXd weights;
-
-    // VectorXd dInputBias;
-    // VectorXd dHiddenBias;
-    // MatrixXd dWeights;
 
     int inputSize;
     int hiddenSize;
@@ -34,10 +33,6 @@ struct NetParams {
 
         hiddenLayer.resize(nHidden);
         hiddenBias.resize(nHidden);
-
-        // dInputBias.resize(nInput);
-        // dHiddenBias.resize(nHidden);
         weights.resize(nInput, nHidden);
-        // dWeights.resize(nInput, nHidden);
     }
 };

@@ -10,7 +10,9 @@ Hamiltonian::Hamiltonian(double omega, bool interaction, NeuralQuantumState &nqs
 }
 
 double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
-    // equation 114 in lecture notes
+    /*
+    Method for computing the local energy of the Neural Quantum State
+    */
     double localEnergy = 0;
     for(int m = 0; m < m_nInput; m++){
         Eigen::VectorXd derivatives = nqs.computeFirstAndSecondDerivatives(m);
@@ -21,6 +23,8 @@ double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
     }
 
     localEnergy *= 0.5;
+
+    //Compute the Jastrow factor if particles are interacting
     if (m_interaction) {
         double distances = 0;
         for(int p = 0; p < m_nParticles; p++){
@@ -32,9 +36,4 @@ double Hamiltonian::computeLocalEnergy(NeuralQuantumState &nqs){
     }
 
     return localEnergy;
-}
-
-double Hamiltonian::evaluateCost(){
-    //cost function wrt variational parameters to be used in gradient descent
-    //equation 99 in lecture notes
 }
