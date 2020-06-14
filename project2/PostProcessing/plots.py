@@ -58,11 +58,11 @@ def plot_optimizations(data, key, ext, label):
     plt.plot(steps, E-var/2, 'r--', alpha = alpha)
     plt.fill_between(steps, E-var/2, E+var/2, color = 'r', alpha = alpha,
                      label = 'Standard Error')
+    plt.subplots_adjust(left=0.2)
     plt.xlim(np.min(steps), np.max(steps))
-    plt.ylim(np.min([0, np.min(E-var/2)]), np.max(E+var/2))
     plt.grid()
     plt.xlabel('Optimization Step')
-    plt.ylabel('Energy $[eV]$ and Variance $[eV]$')
+    plt.ylabel('Energy $[a.u.]$ and Standard Error $[a.u.]$')
     plt.legend()
     plt.savefig(save_dir + key + ext)
     plt.close()
@@ -99,7 +99,7 @@ def plot_energies(grids, key, ext, label):
         os.mkdir(save_dir)
 
     msg = '$\Delta E={:g}$ at $\eta={:g}$, $H={:g}$'
-    means = ['sample', 'blocking']
+    means = ['sample']
     for mean_type in means:
 
         pattern = f'P(\d+)D(\d+)C(\d+)S(\d+)'
@@ -135,7 +135,7 @@ def plot_energies(grids, key, ext, label):
         #     plt.legend()
         #     msg2 = f'Log of |{mean_type.capitalize()} Energy - Expected Energy|'
         #     cbar.set_label(msg2)
-        cbar.set_label(f'Mean {mean_type.capitalize()} Energy')
+        cbar.set_label(f'Mean {mean_type.capitalize()} Energy $[a.u.]$')
         plt.savefig(save_dir + key + f'_{mean_type}{ext}')
         plt.close()
 
@@ -188,7 +188,7 @@ def plot_err(grids, key, ext, label):
         cbar = plt.colorbar()
         plt.axis(aspect='image')
         label2 = (mean_type.split('_'))[0].capitalize()
-        cbar.set_label(f'Standard Error of {label2} Energy')
+        cbar.set_label(f'Standard Error of {label2} Energy $[a.u.]$')
         plt.savefig(save_dir + key + f'_{mean_type}{ext}')
         plt.close()
 
@@ -241,14 +241,14 @@ def plot_pos(grids, key, i, j, ext, dist, label):
 
     hist_params = {
                     'density'   : True,
-                    'stacked'   : True,
-                    'bins'      : 200,
+                    'bins'      : 500,
                     'label'     : 'Experimental Results',
                     'color'     : 'C0'
                   }
+                  
     units = r'$\left[ \sqrt{\frac{\hbar}{m \omega_{ho}}} \ \right]$'
     plt.hist(grid, **hist_params)
-    plt.subplots_adjust(bottom=0.15)
+    plt.subplots_adjust(bottom = 0.15)
     plt.ylabel('Probability Density')
     plt.xlabel('Distance from Origin ' + units)
     plt.xlim([np.min(grid), np.max(grid)])
@@ -304,7 +304,7 @@ def plot_sigmas(data, key, expected, ext, label):
     plt.semilogy([best_sigma], [best_E], 'rx', ms = 15, label = label2)
     plt.semilogy(sigmas, diffs, label = label1)
     plt.xlabel('$\sigma$')
-    plt.ylabel('Energy Deviance from Expected Value')
+    plt.ylabel('Energy Deviance from Expected Value $[a.u.]$')
     plt.legend()
     plt.xlim(np.min(sigmas), np.max(sigmas))
     plt.savefig(save_dir + key + f'_sigma{ext}')
@@ -325,11 +325,11 @@ def get_energy_table(data, idx_1P, idx_2P):
 
     label = 'tab:experiment_results'
     caption = (f'Comparison of results for {len(data.keys()):d} experiments,'
-               f' each with {cycles:d} cycles (i.e. iterations).')
+               f' each with {cycles:d} cycles.')
 
     sampling = ['Metropolis', 'Metropolis-Hastings', 'Gibbs']
-    labels = ['Particles', 'Dimensions', 'Sampling', 'Hidden Units',
-              'Learning Rate $\\eta$', 'Mean', 'Blocking Mean', 'Std. Error']
+    labels = ['Particles', 'Dimensions', 'Sampling Method', 'Hidden Units',
+              'Learning Rate $\\eta$', 'Mean $[a.u.]$', 'Std. Error $[a.u.]$']
     rows = []
 
     for key, value in data.items():
@@ -337,21 +337,19 @@ def get_energy_table(data, idx_1P, idx_2P):
         vals = list(map(int, re.findall(pattern, key)[0]))
 
         rows.append({'Particles':f"{vals[0]:.0f}", 'Dimensions':f"{vals[1]:.0f}",
-                     'Sampling':sampling[vals[3]-1]})
+                     'Sampling Method':sampling[vals[3]-1]})
 
         assert int(vals[2]) == cycles, 'Inconsistent number of MC-cycles'
         if vals[0] == 1:
             rows[-1]['Hidden Units'] = f"{value['HU'][idx_1P]:.0f}"
             rows[-1]['Learning Rate $\\eta$'] = f"{value['LR'][idx_1P]:.3f}"
-            rows[-1]['Mean'] = f"{value['sample'][idx_1P]:.3f}"
-            rows[-1]['Blocking Mean'] = f"{value['blocking'][idx_1P]:.3f}"
-            rows[-1]['Std. Error'] = f"{value['blocking'][idx_1P]:.3f}"
+            rows[-1]['Mean $[a.u.]$'] = f"{value['sample'][idx_1P]:.3f}"
+            rows[-1]['Std. Error $[a.u.]$'] = f"{value['blocking_err'][idx_1P]:g}"
         elif vals[0] == 2:
             rows[-1]['Hidden Units'] = f"{value['HU'][idx_2P]:.0f}"
             rows[-1]['Learning Rate $\\eta$'] = f"{value['LR'][idx_2P]:.3f}"
-            rows[-1]['Mean'] = f"{value['sample'][idx_2P]:.3f}"
-            rows[-1]['Blocking Mean'] = f"{value['blocking'][idx_2P]:.3f}"
-            rows[-1]['Std. Error'] = f"{value['blocking'][idx_2P]:.3f}"
+            rows[-1]['Mean $[a.u.]$'] = f"{value['sample'][idx_2P]:.3f}"
+            rows[-1]['Std. Error $[a.u.]$'] = f"{value['blocking_err'][idx_2P]:g}"
         else:
             raise ValueError('Unrecognized Number of Particles')
 
@@ -382,7 +380,7 @@ def get_energy_table(data, idx_1P, idx_2P):
 
 if __name__ == '__main__':
 
-    ext = '.png'
+    ext = '.pdf'
     label = 1
 
     iters = {
@@ -409,6 +407,8 @@ if __name__ == '__main__':
             else:
                 print('Invalid input: {delete}, try again.')
 
+    print('\\onecolumngrid')
+
     optimizations = read_outputs.read_optimization()
     grids = processing.load_energy_grids('run')
     positions = read_outputs.read_pos_samples()
@@ -423,13 +423,15 @@ if __name__ == '__main__':
     data_2P = processing.get_best_energy_data(grids[best_keys[1]], expected[1])
     get_energy_table(grids, data_1P['idx'], data_2P['idx'])
 
+    print('\n\\twocolumngrid')
+
     optim_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
     for n,i in enumerate(optim_keys):
         optim_keys[n] = i.format(iters['optim'])
     for i in optim_keys:
         label = plot_optimizations(optimizations, i, ext = ext, label = label)
 
-    energy_err_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
+    energy_err_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2', 'P2D2C{:d}S3']
     for n,i in enumerate(energy_err_keys):
         energy_err_keys[n] = i.format(iters['main'])
     for i in energy_err_keys:
