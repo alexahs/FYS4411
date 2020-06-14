@@ -125,12 +125,6 @@ def plot_energies(grids, key, ext, label):
         Z[Z < cutoffs[0]] = cutoffs[0]
         Z[Z > cutoffs[1]] = cutoffs[1]
         plt.figure()
-        dLR = (grid['LR'][0][1] - grid['LR'][0][0])/2
-        dHU = (grid['HU'][0][1] - grid['HU'][0][0])/2
-        for a,b,c in zip(grid['LR'], grid['HU'], Z):
-            for i,j,k in zip(a,b,c):
-                plt.text(i+dLR,j+dHU,f'{k*10:2.1f}',
-                horizontalalignment = 'center', verticalalignment = 'center',)
         plt.pcolor(grid['LR'], grid['HU'], Z, cmap='magma')
         plt.xlabel('Learning Rate $\eta$')
         plt.ylabel('Number of Nodes $H$')
@@ -235,15 +229,15 @@ def plot_pos(grids, key, i, j, ext, dist, label):
 
     x = np.linspace(np.min(grid), np.max(grid), 1000)
 
-    dist_label = 'Boltzmann Distribution Best Fit'
-    dist_params = {
-                   'label'      : dist_label,
-                   'color'      : 'r'
-                  }
-
-    y = dist.pdf(x, *dist.fit(grid))
+    # dist_label = 'Boltzmann Distribution Best Fit'
+    # dist_params = {
+    #                'label'      : dist_label,
+    #                'color'      : 'r'
+    #               }
+    #
+    # y = dist.pdf(x, *dist.fit(grid))
     plt.figure()
-    plt.plot(x, y, **dist_params)
+    # plt.plot(x, y, **dist_params)
 
     hist_params = {
                     'density'   : True,
@@ -415,45 +409,45 @@ if __name__ == '__main__':
             else:
                 print('Invalid input: {delete}, try again.')
 
-    # optimizations = read_outputs.read_optimization()
+    optimizations = read_outputs.read_optimization()
     grids = processing.load_energy_grids('run')
-    # positions = read_outputs.read_pos_samples()
-    # sorted_positions = processing.get_position_grids(positions)
-    # sigmas = read_outputs.read_optimized_sigmas()
+    positions = read_outputs.read_pos_samples()
+    sorted_positions = processing.get_position_grids(positions)
+    sigmas = read_outputs.read_optimized_sigmas()
 
-    # best_keys = ['P1D1C{:d}S2', 'P2D2C{:d}S2']
-    # expected = [0.5, 3]
-    # for n,i in enumerate(best_keys):
-    #     best_keys[n] = i.format(iters['main'])
-    # data_1P = processing.get_best_energy_data(grids[best_keys[0]], expected[0])
-    # data_2P = processing.get_best_energy_data(grids[best_keys[1]], expected[1])
-    # get_energy_table(grids, data_1P['idx'], data_2P['idx'])
-    #
-    # optim_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
-    # for n,i in enumerate(optim_keys):
-    #     optim_keys[n] = i.format(iters['optim'])
-    # for i in optim_keys:
-    #     label = plot_optimizations(optimizations, i, ext = ext, label = label)
-    #
-    energy_err_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
+    best_keys = ['P1D1C{:d}S2', 'P2D2C{:d}S2']
+    expected = [0.5, 3]
+    for n,i in enumerate(best_keys):
+        best_keys[n] = i.format(iters['main'])
+    data_1P = processing.get_best_energy_data(grids[best_keys[0]], expected[0])
+    data_2P = processing.get_best_energy_data(grids[best_keys[1]], expected[1])
+    get_energy_table(grids, data_1P['idx'], data_2P['idx'])
+
+    optim_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3']
+    for n,i in enumerate(optim_keys):
+        optim_keys[n] = i.format(iters['optim'])
+    for i in optim_keys:
+        label = plot_optimizations(optimizations, i, ext = ext, label = label)
+
+    energy_err_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
     for n,i in enumerate(energy_err_keys):
         energy_err_keys[n] = i.format(iters['main'])
     for i in energy_err_keys:
         label = plot_energies(grids, i, ext = ext, label = label)
         label = plot_err(grids, i, ext = ext, label = label)
-    #
-    # position_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
-    # dists = [stats.maxwell, stats.maxwell, stats.maxwell, stats.maxwell]
-    # for n,i in enumerate(position_keys):
-    #     position_keys[n] = i.format(iters['main'])
-    # expected = [0.5, 0.5, 0.5, 3]
-    # for i,j,k in zip(position_keys, expected, dists):
-    #     data = processing.get_best_energy_data(grids[i], j)
-    #     label = plot_pos(sorted_positions, i, *data['idx'], ext = ext, dist = k, label = label)
-    #
-    # sigma_keys = ['P1D1C{:d}S3', 'P2D2C{:d}S3']
-    # expected = [0.5, 3]
-    # for n,i in enumerate(sigma_keys):
-    #     sigma_keys[n] = i.format(iters['sigma'])
-    # for i,j in zip(sigma_keys, expected):
-    #     label = plot_sigmas(sigmas, i, j, ext = ext, label = label)
+
+    position_keys = ['P1D1C{:d}S1', 'P1D1C{:d}S2', 'P1D1C{:d}S3', 'P2D2C{:d}S2']
+    dists = [stats.maxwell, stats.maxwell, stats.maxwell, stats.maxwell]
+    for n,i in enumerate(position_keys):
+        position_keys[n] = i.format(iters['main'])
+    expected = [0.5, 0.5, 0.5, 3]
+    for i,j,k in zip(position_keys, expected, dists):
+        data = processing.get_best_energy_data(grids[i], j)
+        label = plot_pos(sorted_positions, i, *data['idx'], ext = ext, dist = k, label = label)
+
+    sigma_keys = ['P1D1C{:d}S3', 'P2D2C{:d}S3']
+    expected = [0.5, 3]
+    for n,i in enumerate(sigma_keys):
+        sigma_keys[n] = i.format(iters['sigma'])
+    for i,j in zip(sigma_keys, expected):
+        label = plot_sigmas(sigmas, i, j, ext = ext, label = label)
