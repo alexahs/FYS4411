@@ -68,10 +68,10 @@ int main(){
     double hidden_min = 1;
     double hidden_max = 15;
 
-    int nCyclesPow2 = 17;
-    int nCyclesSigma = 9;
-    // int nCyclesPow2 = 6;          // For testing
-    // int nCyclesSigma = 4;         // For testing
+    // int nCyclesPow2 = 17;
+    // int nCyclesSigma = 9;
+    int nCyclesPow2 = 6;          // For testing
+    int nCyclesSigma = 4;         // For testing
 
     double expected_1P = 0.5;     // Expected value in sigma search
     double expected_2P = 3.0;     // Expected value in sigma search
